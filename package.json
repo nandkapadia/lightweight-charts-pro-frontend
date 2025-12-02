@@ -44,10 +44,20 @@
   ],
   "sideEffects": false,
   "license": "MIT",
+  "author": {
+    "name": "Nand Kapadia",
+    "email": "nand.kapadia@gmail.com"
+  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/nandkapadia/streamlit-lightweight-charts-pro.git",
-    "directory": "packages/core"
+    "url": "https://github.com/nandkapadia/lightweight-charts-pro-frontend.git"
+  },
+  "homepage": "https://github.com/nandkapadia/lightweight-charts-pro-frontend#readme",
+  "bugs": {
+    "url": "https://github.com/nandkapadia/lightweight-charts-pro-frontend/issues"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "keywords": [
     "lightweight-charts",
@@ -55,7 +65,8 @@
     "charts",
     "financial",
     "trading",
-    "typescript"
+    "typescript",
+    "framework-agnostic"
   ],
   "peerDependencies": {
     "lightweight-charts": "^5.0.0"

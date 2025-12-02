@@ -1,0 +1,33 @@
+# Source files (only include dist)
+src/
+tests/
+*.test.ts
+*.spec.ts
+
+# Config files
+.eslintrc*
+.prettierrc*
+tsconfig*.json
+vite.config.ts
+vitest.config.ts
+
+# Development
+node_modules/
+.vscode/
+.idea/
+*.log
+*.tsbuildinfo
+
+# Git
+.git/
+.gitignore
+.github/
+
+# Build artifacts (keep only dist/)
+coverage/
+.vite/
+
+# Misc
+.DS_Store
+*.swp
+*.swo
