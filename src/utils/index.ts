@@ -9,6 +9,9 @@
 export type { Disposable } from './Disposable';
 export { cleanupInstance } from './Disposable';
 
+// Event emitter
+export { EventEmitter } from './EventEmitter';
+
 // Singleton patterns
 export { KeyedSingletonManager } from './KeyedSingletonManager';
 export { SingletonBase, createSingleton, Singleton } from './SingletonBase';
