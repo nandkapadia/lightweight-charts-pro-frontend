@@ -1,10 +1,10 @@
-import { D as DIMENSIONS, l as logger } from "../SingletonBase-MBQ3miuj.js";
-import { C } from "../SingletonBase-MBQ3miuj.js";
-import { C as C2, P } from "../PrimitiveEventManager-D3Jlw88f.js";
+import { D as DIMENSIONS, l as logger } from "../SingletonBase-vKYdZ5tk.js";
+import { C } from "../SingletonBase-vKYdZ5tk.js";
+import { C as C2, P } from "../PrimitiveEventManager-DrK6RuJi.js";
 import { K as KeyedSingletonManager, c as cleanupInstance } from "../Disposable-BRvCF1V2.js";
-import { h as handleError, E as ErrorSeverity } from "../errorHandler-DvfD8_aT.js";
-import { T, a } from "../TradeTemplateProcessor-CI17RAXO.js";
-import { a as a2, b, c } from "../tradeVisualization-8Mmrhv2M.js";
+import { h as handleError, E as ErrorSeverity } from "../errorHandler-BuTzh9tq.js";
+import { T, a } from "../TradeTemplateProcessor-DwcE0VRc.js";
+import { a as a2, b, c } from "../tradeVisualization-DYwm4RS6.js";
 class PaneCollapseManager extends KeyedSingletonManager {
   constructor(chartApi, config = {}) {
     super();

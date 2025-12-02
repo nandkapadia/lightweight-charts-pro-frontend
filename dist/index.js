@@ -4,24 +4,24 @@ import { BandPrimitive } from "./BandPrimitive-BJsNeyNJ.js";
 import { RibbonPrimitive } from "./RibbonPrimitive-hcLJbxIK.js";
 import { GradientRibbonPrimitive } from "./GradientRibbonPrimitive-95ttgdAP.js";
 import { SignalPrimitive } from "./SignalPrimitive-D3Alyq5j.js";
-import { l as logger } from "./SingletonBase-MBQ3miuj.js";
-import { B as B2, r, C, D, F, L, M, a, S, T as T2, U, Z, i, b, h, c, k, n, o, m, j, d, p, s, g, v, q, f, e } from "./SingletonBase-MBQ3miuj.js";
-import { x as normalizeSeriesType, g as getSeriesDescriptor } from "./UnifiedPropertyMapper-DPcZdF4d.js";
-import { P, a as a2, S as S2, c as c2, f as f2, b as b2, d as d2, e as e2, i as i2, r as r2, u, h as h2, j as j2, k as k2 } from "./UnifiedPropertyMapper-DPcZdF4d.js";
-import { C as C2, P as P2 } from "./PrimitiveEventManager-D3Jlw88f.js";
+import { l as logger } from "./SingletonBase-vKYdZ5tk.js";
+import { m, B as B2, n, u, C, D, F, L, M, a, S, T as T2, U, Z, i, b, h, c, k, q, r, o, j, d, p, s, g, v, t, f, e } from "./SingletonBase-vKYdZ5tk.js";
+import { x as normalizeSeriesType, g as getSeriesDescriptor } from "./UnifiedPropertyMapper-C03EjEy4.js";
+import { P, a as a2, S as S2, c as c2, f as f2, b as b2, d as d2, e as e2, i as i2, r as r2, u as u2, h as h2, j as j2, k as k2 } from "./UnifiedPropertyMapper-C03EjEy4.js";
+import { C as C2, P as P2 } from "./PrimitiveEventManager-DrK6RuJi.js";
 import { PaneCollapseManager, createAnnotationVisualElements } from "./services/index.js";
-import { T as T3, a as a3 } from "./TradeTemplateProcessor-CI17RAXO.js";
-import { c as c3 } from "./tradeVisualization-8Mmrhv2M.js";
+import { T as T3, a as a3 } from "./TradeTemplateProcessor-DwcE0VRc.js";
+import { c as c3 } from "./tradeVisualization-DYwm4RS6.js";
 import { K } from "./Disposable-BRvCF1V2.js";
-import { ChartReadyDetector } from "./chartReadyDetection-DpyqN7co.js";
-import { Q, V, f as f3, e as e3, h as h3, b as b3, l, i as i3, d as d3, k as k3, g as g2, c as c4, m as m2, p as p2, s as s2, t, v as v2, j as j3 } from "./performance--JfsGWIh.js";
-import { S as S3, d as d4, l as l2, c as c5, n as n2, e as e4, k as k4, j as j4, m as m3, b as b4, h as h4, i as i4, f as f4, g as g3, a as a4, p as p3, r as r3, s as s3, t as t2 } from "./signalColorUtils-Coc3RHvl.js";
+import { ChartReadyDetector } from "./chartReadyDetection-j0ciLyDw.js";
+import { Q, V, f as f3, e as e3, h as h3, b as b3, l, i as i3, d as d3, k as k3, g as g2, c as c4, m as m2, p as p2, s as s2, t as t2, v as v2, j as j3 } from "./performance-D-9QML3X.js";
+import { S as S3, d as d4, l as l2, c as c5, n as n2, e as e4, k as k4, j as j4, m as m3, b as b4, h as h4, i as i4, f as f4, g as g3, a as a4, p as p3, r as r3, s as s3, t as t3 } from "./signalColorUtils-Coc3RHvl.js";
 import { c as c6, v as v3 } from "./lineStyle-Ds69R7UM.js";
-import { E, d as d5, c as c7, h as h5, a as a5, s as s4, b as b5, t as t3 } from "./errorHandler-DvfD8_aT.js";
-import { R } from "./resizeObserverManager-CDko58AG.js";
-import { S as S4, d as d6, c as c8, b as b6, a as a6, e as e5, f as f5, h as h6, g as g4 } from "./trendFillSeriesPlugin-KufklRJL.js";
-import { T as T4 } from "./TooltipManager-CDwk_ImJ.js";
-import { R as R2, T as T5 } from "./rectanglePlugin-BJ1xCgeR.js";
+import { E, d as d5, c as c7, h as h5, a as a5, s as s4, b as b5, t as t4 } from "./errorHandler-BuTzh9tq.js";
+import { R } from "./resizeObserverManager-CTQVlijh.js";
+import { S as S4, d as d6, c as c8, b as b6, a as a6, e as e5, f as f5, h as h6, g as g4 } from "./trendFillSeriesPlugin-BNYaVgFd.js";
+import { T as T4 } from "./TooltipManager-tt1WqIi2.js";
+import { R as R2, T as T5 } from "./rectanglePlugin-97q9vCvJ.js";
 function propertyTypeToSettingType(propertyType) {
   return propertyType;
 }
@@ -56,8 +56,10 @@ export {
   BandPrimitive,
   BasePanePrimitive,
   B as BaseSeriesPrimitive,
+  m as ButtonColors,
   B2 as ButtonDimensions,
-  r as CSS_CLASSES,
+  n as ButtonEffects,
+  u as CSS_CLASSES,
   C as ChartCoordinateService,
   ChartReadyDetector,
   C2 as CornerLayoutManager,
@@ -140,9 +142,9 @@ export {
   j4 as getContrastColor,
   k as getCoordinateDebugInfo,
   d2 as getDefaultOptions,
-  n as getDimensions,
-  o as getFallback,
-  m as getMargins,
+  q as getDimensions,
+  r as getFallback,
+  o as getMargins,
   getSeriesDescriptor,
   e2 as getSeriesDescriptorsByCategory,
   getSeriesSettings,
@@ -170,16 +172,16 @@ export {
   s2 as safeSeriesOptions,
   s as sanitizeCoordinates,
   s3 as sanitizeHexColor,
-  t as throttle,
-  t3 as throwValidationError,
-  t2 as toCss,
-  u as unregisterSeriesDescriptor,
+  t2 as throttle,
+  t4 as throwValidationError,
+  t3 as toCss,
+  u2 as unregisterSeriesDescriptor,
   h2 as updateSeriesData,
   j2 as updateSeriesMarkers,
   k2 as updateSeriesOptions,
   g as validateBoundingBox,
   v as validateChartCoordinates,
-  q as validateConfiguration,
+  t as validateConfiguration,
   v2 as validateData,
   j3 as validateDataArray,
   v3 as validateLineStyle,

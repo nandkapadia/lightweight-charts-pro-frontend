@@ -10,8 +10,8 @@ export { createBandSeries, createRibbonSeries, createGradientRibbonSeries, Signa
 export type { BandData, BandSeriesOptions, RibbonData, RibbonSeriesOptions, GradientRibbonData, GradientRibbonSeriesOptions, SignalData, SignalSeriesOptions, TrendFillData, TrendFillSeriesOptions, } from './plugins/series';
 export { TooltipManager, TooltipPlugin } from './plugins/chart';
 export { RectangleOverlayPlugin } from './plugins/overlay';
-export { BasePanePrimitive, BaseSeriesPrimitive, LegendPrimitive, createLegendPrimitive, DefaultLegendConfigs, RangeSwitcherPrimitive, createRangeSwitcherPrimitive, DefaultRangeConfigs, TimeRange, TradeRectanglePrimitive, BandPrimitive, RibbonPrimitive, GradientRibbonPrimitive, SignalPrimitive, TrendFillPrimitive, PrimitiveStylingUtils, UniversalSpacing, ButtonDimensions, PrimitivePriority, } from './primitives';
-export type { BasePrimitiveConfig } from './primitives';
+export { BasePanePrimitive, BaseSeriesPrimitive, LegendPrimitive, createLegendPrimitive, DefaultLegendConfigs, RangeSwitcherPrimitive, createRangeSwitcherPrimitive, DefaultRangeConfigs, TimeRange, TradeRectanglePrimitive, BandPrimitive, RibbonPrimitive, GradientRibbonPrimitive, SignalPrimitive, TrendFillPrimitive, PrimitiveStylingUtils, UniversalSpacing, ButtonDimensions, ButtonColors, ButtonEffects, PrimitivePriority, } from './primitives';
+export type { BasePrimitiveConfig, RangeConfig } from './primitives';
 export { SeriesFactory, SeriesCreationError, getSeriesDescriptor, getAvailableSeriesTypes, isCustomSeries, createSeries, getDefaultOptions, registerSeriesDescriptor, unregisterSeriesDescriptor, getSeriesDescriptorsByCategory, createSeriesWithConfig, updateSeriesData, updateSeriesMarkers, updateSeriesOptions, PropertyMapper, } from './series';
 export type { ExtendedSeriesConfig, ExtendedSeriesApi } from './series';
 export { ChartCoordinateService, CornerLayoutManager, PaneCollapseManager, PrimitiveEventManager, TemplateEngine, TradeTemplateProcessor, createAnnotationVisualElements, createTradeVisualElements, } from './services';

@@ -5,15 +5,15 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
-    include: ['__tests__/**/*.test.ts'],
+    include: ['src/__tests__/**/*.test.ts'],
     exclude: ['node_modules', 'dist'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
       include: ['src/**/*.ts'],
-      exclude: ['src/**/*.d.ts', 'src/**/index.ts'],
+      exclude: ['src/**/*.d.ts', 'src/**/index.ts', 'src/__tests__/**'],
     },
-    setupFiles: ['__tests__/setup/testSetup.ts'],
+    setupFiles: [], // No setup files for now
   },
   resolve: {
     alias: {

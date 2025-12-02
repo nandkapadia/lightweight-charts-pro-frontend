@@ -11,6 +11,8 @@ export default [
       'vite.config.ts',
       'vitest.config.ts',
       'eslint.config.js',
+      'src/__tests__/**',  // Test files are not in tsconfig
+      'src/test-utils/**',  // Test utilities are not in tsconfig
     ]
   },
 

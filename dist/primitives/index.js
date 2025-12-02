@@ -1,10 +1,10 @@
-import { C as CornerLayoutManager, P as PrimitiveEventManager } from "../PrimitiveEventManager-D3Jlw88f.js";
-import { c as createSingleton, C as ChartCoordinateService, u as LegendDimensions, w as LegendColors, x as FormatDefaults, y as ContainerDefaults, z as CommonValues, A as TimeRangeSeconds, B as ButtonDimensions, E as ButtonSpacing, G as ButtonEffects, H as ButtonColors, I as DefaultRangeSwitcherConfig, l as logger } from "../SingletonBase-MBQ3miuj.js";
-import { J, K, O, N, t, R, U } from "../SingletonBase-MBQ3miuj.js";
-import { T as TemplateEngine, a as TradeTemplateProcessor } from "../TradeTemplateProcessor-CI17RAXO.js";
+import { C as CornerLayoutManager, P as PrimitiveEventManager } from "../PrimitiveEventManager-DrK6RuJi.js";
+import { c as createSingleton, C as ChartCoordinateService, x as LegendDimensions, y as LegendColors, z as FormatDefaults, A as ContainerDefaults, E as CommonValues, G as TimeRangeSeconds, B as ButtonDimensions, H as ButtonSpacing, n as ButtonEffects, m as ButtonColors, I as DefaultRangeSwitcherConfig, l as logger } from "../SingletonBase-vKYdZ5tk.js";
+import { J, K, O, N, w, R, U } from "../SingletonBase-vKYdZ5tk.js";
+import { T as TemplateEngine, a as TradeTemplateProcessor } from "../TradeTemplateProcessor-DwcE0VRc.js";
 import { B, T } from "../TrendFillPrimitive-DHivyY9P.js";
 import { s as sanitizeHtml } from "../sanitization-HfsXpoG7.js";
-import { T as TooltipManager } from "../TooltipManager-CDwk_ImJ.js";
+import { T as TooltipManager } from "../TooltipManager-tt1WqIi2.js";
 import { BandPrimitive } from "../BandPrimitive-BJsNeyNJ.js";
 import { RibbonPrimitive } from "../RibbonPrimitive-hcLJbxIK.js";
 import { GradientRibbonPrimitive } from "../GradientRibbonPrimitive-95ttgdAP.js";
@@ -2313,7 +2313,7 @@ export {
   DefaultRangeSwitcherConfig,
   FormatDefaults,
   GradientRibbonPrimitive,
-  t as LayoutSpacing,
+  w as LayoutSpacing,
   LegendColors,
   LegendDimensions,
   LegendPrimitive,

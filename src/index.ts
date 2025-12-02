@@ -65,9 +65,11 @@ export {
   PrimitiveStylingUtils,
   UniversalSpacing,
   ButtonDimensions,
+  ButtonColors,
+  ButtonEffects,
   PrimitivePriority,
 } from './primitives';
-export type { BasePrimitiveConfig } from './primitives';
+export type { BasePrimitiveConfig, RangeConfig } from './primitives';
 
 // =============================================================================
 // SERIES - Unified series factory and descriptors
