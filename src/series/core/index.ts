@@ -2,4 +2,4 @@
  * @fileoverview Core series types and descriptors
  */
 
-export * from './UnifiedSeriesDescriptor';
+export * from "./UnifiedSeriesDescriptor";

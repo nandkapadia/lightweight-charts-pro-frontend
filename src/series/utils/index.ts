@@ -2,4 +2,4 @@
  * @fileoverview Series utility functions
  */
 
-export * from './seriesTypeNormalizer';
+export * from "./seriesTypeNormalizer";

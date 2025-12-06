@@ -21,11 +21,14 @@ export {
   updateSeriesData,
   updateSeriesMarkers,
   updateSeriesOptions,
-} from './UnifiedSeriesFactory';
-export type { ExtendedSeriesConfig, ExtendedSeriesApi } from './UnifiedSeriesFactory';
-export { PropertyMapper } from './UnifiedPropertyMapper';
+} from "./UnifiedSeriesFactory";
+export type {
+  ExtendedSeriesConfig,
+  ExtendedSeriesApi,
+} from "./UnifiedSeriesFactory";
+export { PropertyMapper } from "./UnifiedPropertyMapper";
 
 // Core types and descriptors
-export * from './core';
-export * from './descriptors';
-export * from './utils';
+export * from "./core";
+export * from "./descriptors";
+export * from "./utils";

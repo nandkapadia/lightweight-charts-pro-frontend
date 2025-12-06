@@ -7,18 +7,23 @@
  * - Eliminates code duplication across the codebase
  */
 
-import { ISeriesApi, LineStyle, LineWidth, SeriesOptionsMap } from 'lightweight-charts';
+import {
+  ISeriesApi,
+  LineStyle,
+  LineWidth,
+  SeriesOptionsMap,
+} from "lightweight-charts";
 
 /**
  * Property types for dialog rendering
  */
 export type PropertyType =
-  | 'boolean'
-  | 'number'
-  | 'color'
-  | 'line' // Nested line editor (color, lineWidth, lineStyle)
-  | 'lineStyle' // LineStyle dropdown
-  | 'lineWidth'; // LineWidth input
+  | "boolean"
+  | "number"
+  | "color"
+  | "line" // Nested line editor (color, lineWidth, lineStyle)
+  | "lineStyle" // LineStyle dropdown
+  | "lineWidth"; // LineWidth input
 
 /**
  * Line configuration for nested line editor
@@ -72,7 +77,7 @@ export type SeriesCreator<T = unknown> = (
   chart: unknown,
   data: unknown[],
   options: Partial<T>,
-  paneId?: number
+  paneId?: number,
 ) => ISeriesApi<keyof SeriesOptionsMap>;
 
 /**
@@ -122,10 +127,10 @@ export const PropertyDescriptors = {
     defaultColor: string,
     defaultWidth: LineWidth,
     defaultStyle: LineStyle,
-    apiMapping: { colorKey: string; widthKey: string; styleKey: string }
+    apiMapping: { colorKey: string; widthKey: string; styleKey: string },
   ): PropertyDescriptor {
     return {
-      type: 'line',
+      type: "line",
       label,
       default: {
         color: defaultColor,
@@ -139,9 +144,13 @@ export const PropertyDescriptors = {
   /**
    * Create a color property descriptor
    */
-  color(label: string, defaultValue: string, group?: string): PropertyDescriptor {
+  color(
+    label: string,
+    defaultValue: string,
+    group?: string,
+  ): PropertyDescriptor {
     return {
-      type: 'color',
+      type: "color",
       label,
       default: defaultValue,
       group,
@@ -151,9 +160,13 @@ export const PropertyDescriptors = {
   /**
    * Create a boolean property descriptor
    */
-  boolean(label: string, defaultValue: boolean, group?: string): PropertyDescriptor {
+  boolean(
+    label: string,
+    defaultValue: boolean,
+    group?: string,
+  ): PropertyDescriptor {
     return {
-      type: 'boolean',
+      type: "boolean",
       label,
       default: defaultValue,
       group,
@@ -167,10 +180,10 @@ export const PropertyDescriptors = {
     label: string,
     defaultValue: number,
     group?: string,
-    hidden?: boolean
+    hidden?: boolean,
   ): PropertyDescriptor {
     return {
-      type: 'number',
+      type: "number",
       label,
       default: defaultValue,
       group,
@@ -181,9 +194,13 @@ export const PropertyDescriptors = {
   /**
    * Create a lineStyle property descriptor
    */
-  lineStyle(label: string, defaultValue: LineStyle, group?: string): PropertyDescriptor {
+  lineStyle(
+    label: string,
+    defaultValue: LineStyle,
+    group?: string,
+  ): PropertyDescriptor {
     return {
-      type: 'lineStyle',
+      type: "lineStyle",
       label,
       default: defaultValue,
       group,
@@ -193,9 +210,13 @@ export const PropertyDescriptors = {
   /**
    * Create a lineWidth property descriptor
    */
-  lineWidth(label: string, defaultValue: LineWidth, group?: string): PropertyDescriptor {
+  lineWidth(
+    label: string,
+    defaultValue: LineWidth,
+    group?: string,
+  ): PropertyDescriptor {
     return {
-      type: 'lineWidth',
+      type: "lineWidth",
       label,
       default: defaultValue,
       group,
@@ -220,81 +241,81 @@ export const STANDARD_SERIES_PROPERTIES: Record<string, PropertyDescriptor> = {
   // Common properties (hardcoded in SeriesSettingsDialog, hidden from SeriesSettingsRenderer)
   // These are rendered in the "Common Settings" section of the dialog
   visible: {
-    ...PropertyDescriptors.boolean('Visible', true, 'General'),
+    ...PropertyDescriptors.boolean("Visible", true, "General"),
     hidden: true, // Rendered in "Common Settings" section
   },
   lastValueVisible: {
-    ...PropertyDescriptors.boolean('Show Last Value', true, 'General'),
+    ...PropertyDescriptors.boolean("Show Last Value", true, "General"),
     hidden: true, // Rendered in "Common Settings" section
   },
   priceLineVisible: {
-    ...PropertyDescriptors.boolean('Show Price Line', true, 'General'),
+    ...PropertyDescriptors.boolean("Show Price Line", true, "General"),
     hidden: true, // Rendered in "Common Settings" section
   },
   title: {
-    type: 'color', // Using color type as string input (will be improved in future)
-    label: 'Title',
+    type: "color", // Using color type as string input (will be improved in future)
+    label: "Title",
     default: undefined,
-    group: 'General',
-    description: 'Technical name shown on chart axis/legend',
+    group: "General",
+    description: "Technical name shown on chart axis/legend",
     hidden: true, // Not shown in UI, only used internally
   },
 
   // Hidden properties (not shown in UI but passed through for consistency)
   // These ensure dialog updates don't lose properties set via JSON from Python
   zIndex: {
-    type: 'number',
-    label: 'Z-Index',
+    type: "number",
+    label: "Z-Index",
     default: 0,
-    group: 'General',
+    group: "General",
     hidden: true,
     description:
-      'Rendering order (higher values render on top). ' +
-      'Official Lightweight Charts API property.',
+      "Rendering order (higher values render on top). " +
+      "Official Lightweight Charts API property.",
   },
   priceLineSource: {
-    type: 'number',
-    label: 'Price Line Source',
+    type: "number",
+    label: "Price Line Source",
     default: 0,
-    group: 'General',
+    group: "General",
     hidden: true,
-    description: 'Source for price line data',
+    description: "Source for price line data",
   },
   priceLineWidth: {
-    type: 'number',
-    label: 'Price Line Width',
+    type: "number",
+    label: "Price Line Width",
     default: 1,
-    group: 'General',
+    group: "General",
     hidden: true,
-    description: 'Width of the price line in pixels',
+    description: "Width of the price line in pixels",
   },
   priceLineColor: {
-    type: 'color',
-    label: 'Price Line Color',
-    default: '',
-    group: 'General',
+    type: "color",
+    label: "Price Line Color",
+    default: "",
+    group: "General",
     hidden: true,
-    description: 'Color of the price line',
+    description: "Color of the price line",
   },
   priceScaleId: {
-    type: 'color', // Using color type as string input (will be improved in future)
-    label: 'Price Scale ID',
-    default: 'right',
-    group: 'General',
+    type: "color", // Using color type as string input (will be improved in future)
+    label: "Price Scale ID",
+    default: "right",
+    group: "General",
     hidden: true,
     description:
       'ID of the price scale for this series (e.g., "left", "right", or custom ID). ' +
-      'Official Lightweight Charts API property. ' +
-      'NOTE: To configure price scale properties (margins, mode, etc.), use the ' +
-      'priceScale object at the top level of series config.',
+      "Official Lightweight Charts API property. " +
+      "NOTE: To configure price scale properties (margins, mode, etc.), use the " +
+      "priceScale object at the top level of series config.",
   },
   priceLineStyle: {
-    type: 'lineStyle',
-    label: 'Price Line Style',
+    type: "lineStyle",
+    label: "Price Line Style",
     default: 2, // LineStyle.Dashed
-    group: 'General',
+    group: "General",
     hidden: true,
-    description: 'Style of the price line',
+    description: "Style of the price line",
   },
 };
 
@@ -302,12 +323,12 @@ export const STANDARD_SERIES_PROPERTIES: Record<string, PropertyDescriptor> = {
  * Helper to extract default options from property descriptors
  */
 export function extractDefaultOptions<T = unknown>(
-  descriptor: UnifiedSeriesDescriptor<T>
+  descriptor: UnifiedSeriesDescriptor<T>,
 ): Partial<T> {
   const options: Record<string, unknown> = { ...descriptor.defaultOptions };
 
   for (const [propName, propDesc] of Object.entries(descriptor.properties)) {
-    if (propDesc.type === 'line' && propDesc.apiMapping) {
+    if (propDesc.type === "line" && propDesc.apiMapping) {
       // Flatten line properties
       const lineDefault = propDesc.default as LineConfig;
       if (propDesc.apiMapping.colorKey) {
@@ -342,7 +363,7 @@ export function extractDefaultOptions<T = unknown>(
  */
 export function dialogConfigToApiOptions<T = unknown>(
   descriptor: UnifiedSeriesDescriptor<T>,
-  dialogConfig: Record<string, unknown>
+  dialogConfig: Record<string, unknown>,
 ): Partial<T> {
   const apiOptions: Record<string, unknown> = {};
 
@@ -354,17 +375,23 @@ export function dialogConfigToApiOptions<T = unknown>(
   for (const [propName, propDesc] of Object.entries(descriptor.properties)) {
     if (dialogConfig[propName] === undefined) continue;
 
-    if (propDesc.type === 'line' && propDesc.apiMapping) {
+    if (propDesc.type === "line" && propDesc.apiMapping) {
       // Flatten line config (nested → flat)
       const lineConfig = dialogConfig[propName] as Record<string, unknown>;
-      if (lineConfig && typeof lineConfig === 'object') {
+      if (lineConfig && typeof lineConfig === "object") {
         if (lineConfig.color !== undefined && propDesc.apiMapping.colorKey) {
           apiOptions[propDesc.apiMapping.colorKey] = lineConfig.color;
         }
-        if (lineConfig.lineWidth !== undefined && propDesc.apiMapping.widthKey) {
+        if (
+          lineConfig.lineWidth !== undefined &&
+          propDesc.apiMapping.widthKey
+        ) {
           apiOptions[propDesc.apiMapping.widthKey] = lineConfig.lineWidth;
         }
-        if (lineConfig.lineStyle !== undefined && propDesc.apiMapping.styleKey) {
+        if (
+          lineConfig.lineStyle !== undefined &&
+          propDesc.apiMapping.styleKey
+        ) {
           apiOptions[propDesc.apiMapping.styleKey] = lineConfig.lineStyle;
         }
       }
@@ -377,7 +404,8 @@ export function dialogConfigToApiOptions<T = unknown>(
   // DisplayName is special: NOT passed to TradingView API
   // It's only used for UI elements (dialog tabs, tooltips)
   // Title IS passed to the API and shown on chart axis/legend
-  if (dialogConfig.displayName !== undefined) apiOptions.displayName = dialogConfig.displayName;
+  if (dialogConfig.displayName !== undefined)
+    apiOptions.displayName = dialogConfig.displayName;
 
   return apiOptions as Partial<T>;
 }
@@ -387,12 +415,13 @@ export function dialogConfigToApiOptions<T = unknown>(
  */
 export function apiOptionsToDialogConfig<T = unknown>(
   descriptor: UnifiedSeriesDescriptor<T>,
-  apiOptions: Record<string, unknown>
+  apiOptions: Record<string, unknown>,
 ): Record<string, unknown> {
   const dialogConfig: Record<string, unknown> = {};
 
   // Common properties (always flat)
-  if (apiOptions.visible !== undefined) dialogConfig.visible = apiOptions.visible;
+  if (apiOptions.visible !== undefined)
+    dialogConfig.visible = apiOptions.visible;
   if (apiOptions.lastValueVisible !== undefined)
     dialogConfig.lastValueVisible = apiOptions.lastValueVisible;
   if (apiOptions.priceLineVisible !== undefined)
@@ -403,25 +432,35 @@ export function apiOptionsToDialogConfig<T = unknown>(
   // - displayName: User-friendly name shown in UI dialogs (e.g., "Moving Average", "Momentum")
   // Both are stored separately; getTabTitle() in SeriesSettingsDialog handles priority logic
   if (apiOptions.title !== undefined) dialogConfig.title = apiOptions.title;
-  if (apiOptions.displayName !== undefined) dialogConfig.displayName = apiOptions.displayName;
+  if (apiOptions.displayName !== undefined)
+    dialogConfig.displayName = apiOptions.displayName;
 
   // Property-descriptor-driven mapping
   for (const [propName, propDesc] of Object.entries(descriptor.properties)) {
-    if (propDesc.type === 'line' && propDesc.apiMapping) {
+    if (propDesc.type === "line" && propDesc.apiMapping) {
       // Python sends flattened line properties (e.g., uptrendLineColor, uptrendLineWidth, uptrendLineStyle)
       // Unflatten them into nested dialog config (e.g., uptrendLine: {color, lineWidth, lineStyle})
       const lineConfig: Record<string, unknown> = {};
       let hasValue = false;
 
-      if (propDesc.apiMapping.colorKey && apiOptions[propDesc.apiMapping.colorKey] !== undefined) {
+      if (
+        propDesc.apiMapping.colorKey &&
+        apiOptions[propDesc.apiMapping.colorKey] !== undefined
+      ) {
         lineConfig.color = apiOptions[propDesc.apiMapping.colorKey];
         hasValue = true;
       }
-      if (propDesc.apiMapping.widthKey && apiOptions[propDesc.apiMapping.widthKey] !== undefined) {
+      if (
+        propDesc.apiMapping.widthKey &&
+        apiOptions[propDesc.apiMapping.widthKey] !== undefined
+      ) {
         lineConfig.lineWidth = apiOptions[propDesc.apiMapping.widthKey];
         hasValue = true;
       }
-      if (propDesc.apiMapping.styleKey && apiOptions[propDesc.apiMapping.styleKey] !== undefined) {
+      if (
+        propDesc.apiMapping.styleKey &&
+        apiOptions[propDesc.apiMapping.styleKey] !== undefined
+      ) {
         lineConfig.lineStyle = apiOptions[propDesc.apiMapping.styleKey];
         hasValue = true;
       }
