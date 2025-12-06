@@ -7,6 +7,64 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### 🔧 Fixed
+
+#### Critical Bug Fixes - Timezone and Performance
+- **BREAKING: Removed all timezone conversions** - Library now treats all time values as opaque
+  - Backend is now responsible for all timezone handling
+  - Times are displayed exactly as sent from backend/server
+  - No automatic conversion to browser's local timezone
+  - See [TIMEZONE.md](./TIMEZONE.md) for migration guide
+- **Fixed RangeSwitcher memory leak** - Interval now stops after initial setup completes
+- **Fixed RangeSwitcher Date.now() bug** - Now uses last bar time instead of current time for historical data
+- **Fixed marker alignment timezone issues** - Markers now snap correctly without timezone drift
+- **Optimized marker snapping performance** - Replaced O(n×m) linear scan with O(log n) binary search
+  - 90x faster for typical workloads (100 markers × 10,000 bars)
+  - Performance improvement: ~1,000,000 ops → ~11,300 ops
+
+### 📚 Documentation
+
+#### Timezone Handling
+- **Added comprehensive timezone documentation** in README.md
+- **Created TIMEZONE.md** - Complete guide to timezone handling philosophy and patterns
+  - Backend conversion patterns (Python, Node.js examples)
+  - Custom formatter patterns for display
+  - Migration guide from auto-conversion
+  - Multiple timezone support patterns
+  - Troubleshooting guide
+
+### ✅ Testing
+
+#### Comprehensive Test Coverage for Fixes
+- **Added timeNormalization.test.ts** - 57 tests covering:
+  - Time normalization without conversion
+  - Binary search performance verification
+  - ISO 8601 round-trip testing
+  - Edge cases and error handling
+- **Added markerAlignment.test.ts** - 35 tests covering:
+  - Marker snapping without timezone conversion
+  - Mixed time format handling
+  - Performance benchmarks (O(log n) verification)
+  - Accuracy and edge cases
+- **Enhanced RangeSwitcherPrimitive.test.ts** - Added 8 tests for:
+  - Interval leak fix verification
+  - Last bar time extraction
+  - Multiple series handling
+- **Enhanced TemplateEngine.test.ts** - Added 5 tests for:
+  - NO timezone conversion verification
+  - Custom formatter support
+  - ISO 8601 UTC formatting
+
+### 🔨 Internal
+
+#### Time Utilities
+- **Created timeNormalization.ts** - Centralized time handling utilities
+  - `normalizeTime()` - Normalize any time format WITHOUT conversion
+  - `formatTime()` - Format as ISO 8601 UTC by default
+  - `findNearestTimestamp()` - O(log n) binary search
+  - `createSortedTimeArray()` - Pre-sort for fast lookups
+  - Helper functions: `isBusinessDay()`, `ensureSecondsTimestamp()`, etc.
+
 ## [0.1.0] - 2024-12-06
 
 ### 🎉 Initial Release - Production Ready

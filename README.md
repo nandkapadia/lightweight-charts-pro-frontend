@@ -75,6 +75,167 @@ const coordService = ChartCoordinateService.getInstance();
 const dimensions = await coordService.getValidatedChartDimensions(chart, container);
 ```
 
+## ⏰ Time and Timezone Handling
+
+**IMPORTANT: This library does NOT perform any timezone conversions. All time values are treated as opaque.**
+
+### Philosophy
+
+The library follows a strict "no timezone conversion" policy:
+
+- **Backend Responsibility**: Your backend/server is responsible for all timezone handling
+- **Opaque Values**: The library treats all time values as-is without modification
+- **User Control**: You have full control over how times are interpreted and displayed
+
+### Supported Time Formats
+
+The library accepts and normalizes various time formats WITHOUT conversion:
+
+```typescript
+// Unix timestamp (seconds) - recommended
+{ time: 1705312800, value: 100 }
+
+// ISO 8601 string - treated as-is
+{ time: '2024-01-15T10:00:00.000Z', value: 100 }
+
+// ISO with timezone offset - preserved
+{ time: '2024-01-15T10:00:00.000+05:00', value: 100 }
+
+// BusinessDay format - midnight UTC
+{ time: { year: 2024, month: 1, day: 15 }, value: 100 }
+
+// Numeric string
+{ time: '1705312800', value: 100 }
+```
+
+### Best Practices
+
+**1. Use Unix Timestamps (Recommended)**
+```typescript
+// Backend sends Unix timestamps in seconds
+const data = [
+  { time: 1705312800, value: 100 }, // 2024-01-15 10:00:00 UTC
+  { time: 1705316400, value: 105 }, // 2024-01-15 11:00:00 UTC
+];
+```
+
+**2. Backend Handles Timezone Conversion**
+```python
+# Python backend example
+from datetime import datetime
+import pytz
+
+# User's timezone
+user_tz = pytz.timezone('America/New_York')
+
+# Convert to user's timezone BEFORE sending to frontend
+dt = datetime(2024, 1, 15, 10, 0, 0, tzinfo=pytz.UTC)
+user_dt = dt.astimezone(user_tz)
+
+# Send as Unix timestamp
+timestamp = int(user_dt.timestamp())  # Already in user's timezone
+```
+
+**3. Display Formatting (Optional)**
+
+If you need to display times in a specific timezone, use custom formatters:
+
+```typescript
+import { TemplateEngine } from '@lightweight-charts-pro/core/services';
+
+const engine = TemplateEngine.getInstance();
+
+// Default: ISO 8601 UTC (no conversion)
+const result = engine.processTemplate(
+  'Time: $$time$$',
+  { seriesData: { time: 1705312800 } }
+);
+// Result: "Time: 2024-01-15T10:00:00.000Z"
+
+// Custom: Display in specific timezone
+const resultWithTz = engine.processTemplate(
+  'Time: $$time$$',
+  { seriesData: { time: 1705312800 } },
+  {
+    timeFormatter: (timestamp) => {
+      const date = new Date(timestamp * 1000);
+      return date.toLocaleString('en-US', {
+        timeZone: 'America/New_York',
+        dateStyle: 'short',
+        timeStyle: 'short'
+      });
+    }
+  }
+);
+// Result: "Time: 1/15/24, 5:00 AM" (EST)
+```
+
+### What This Library Does
+
+✅ **Normalizes** different time formats to Unix timestamps (seconds)
+✅ **Preserves** timezone information in ISO strings
+✅ **Formats** times as ISO 8601 UTC by default
+✅ **Provides** optional custom formatters for display
+✅ **Optimizes** time operations with binary search (O(log n))
+
+### What This Library Does NOT Do
+
+❌ **Does NOT convert** times between timezones
+❌ **Does NOT apply** local browser timezone
+❌ **Does NOT assume** any timezone
+❌ **Does NOT modify** your time data
+
+### Migration Guide
+
+If you were relying on automatic timezone conversion:
+
+**Before (❌ Don't do this):**
+```typescript
+// Frontend expecting automatic conversion
+const data = [
+  { time: '2024-01-15T10:00:00Z', value: 100 }
+];
+// OLD: Would convert to browser timezone
+```
+
+**After (✅ Do this):**
+```typescript
+// Backend converts to target timezone
+// Python example:
+// user_tz = pytz.timezone('America/New_York')
+// timestamp = int(dt.astimezone(user_tz).timestamp())
+
+const data = [
+  { time: 1705329600, value: 100 } // Already in user's timezone
+];
+```
+
+### Time Utilities
+
+The library provides utilities for working with times:
+
+```typescript
+import {
+  normalizeTime,
+  formatTime,
+  findNearestTimestamp,
+  createSortedTimeArray
+} from '@lightweight-charts-pro/core/utils';
+
+// Normalize any time format (no conversion)
+const timestamp = normalizeTime('2024-01-15T10:00:00.000Z');
+// Returns: 1705312800
+
+// Format timestamp (ISO 8601 UTC by default)
+const formatted = formatTime(1705312800);
+// Returns: "2024-01-15T10:00:00.000Z"
+
+// Find nearest timestamp (O(log n) binary search)
+const sorted = createSortedTimeArray([1000, 2000, 3000, 4000, 5000]);
+const nearest = findNearestTimestamp(2400, sorted);
+// Returns: 2000 (closest match)
+```
+
 ## 📚 Documentation
 
 ### Custom Series
