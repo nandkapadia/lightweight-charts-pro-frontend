@@ -1,16 +1,20 @@
 /**
  * @vitest-environment jsdom
  */
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { RectangleOverlayPlugin } from '../../plugins/overlay/rectanglePlugin';
-import { createSignalSeries } from '../../plugins/series/signalSeriesPlugin';
-import { createTradeVisualElements } from '../../services/tradeVisualization';
-import { createAnnotationVisualElements } from '../../services/annotationSystem';
-import { resetMocks, mockChart, mockSeries } from '../../test-utils/lightweightChartsMocks';
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { RectangleOverlayPlugin } from "../../plugins/overlay/rectanglePlugin";
+import { createSignalSeries } from "../../plugins/series/signalSeriesPlugin";
+import { createTradeVisualElements } from "../../services/tradeVisualization";
+import { createAnnotationVisualElements } from "../../services/annotationSystem";
+import {
+  resetMocks,
+  mockChart,
+  mockSeries,
+} from "../../test-utils/lightweightChartsMocks";
 
 // Use unified mock system
-vi.mock('lightweight-charts', async () => {
-  const mocks = await import('../../test-utils/lightweightChartsMocks');
+vi.mock("lightweight-charts", async () => {
+  const mocks = await import("../../test-utils/lightweightChartsMocks");
   return mocks.default;
 });
 
@@ -59,34 +63,34 @@ const mockCanvas = {
 
 // Mock document.createElement
 const originalCreateElement = document.createElement;
-document.createElement = vi.fn(tagName => {
-  if (tagName === 'canvas') {
+document.createElement = vi.fn((tagName) => {
+  if (tagName === "canvas") {
     return mockCanvas as unknown as HTMLCanvasElement;
   }
   return originalCreateElement.call(document, tagName);
 }) as any;
 
-describe('Chart Plugins', () => {
+describe("Chart Plugins", () => {
   let consoleErrorSpy: any;
 
   beforeEach(() => {
     resetMocks();
     // Suppress expected error logs from plugin initialization with mocks
     // These errors are expected and handled gracefully by the plugins
-    consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
   });
 
   afterEach(() => {
     consoleErrorSpy.mockRestore();
   });
 
-  describe('RectangleOverlayPlugin', () => {
-    it('should create rectangle overlay plugin', () => {
+  describe("RectangleOverlayPlugin", () => {
+    it("should create rectangle overlay plugin", () => {
       const plugin = new RectangleOverlayPlugin();
       expect(plugin).toBeDefined();
     });
 
-    it('should add rectangle overlay to chart', () => {
+    it("should add rectangle overlay to chart", () => {
       const plugin = new RectangleOverlayPlugin();
       const chart = mockChart;
 
@@ -95,7 +99,7 @@ describe('Chart Plugins', () => {
       expect(chart).toBeDefined();
     });
 
-    it('should handle rectangle data', () => {
+    it("should handle rectangle data", () => {
       const plugin = new RectangleOverlayPlugin();
       const chart = mockChart;
 
@@ -103,14 +107,14 @@ describe('Chart Plugins', () => {
 
       const rectangleData = [
         {
-          id: 'rect-1',
-          time: '2024-01-01',
+          id: "rect-1",
+          time: "2024-01-01",
           price: 100,
           x1: 0,
           y1: 0,
           x2: 50,
           y2: 20,
-          color: '#ff0000',
+          color: "#ff0000",
         },
       ];
 
@@ -119,7 +123,7 @@ describe('Chart Plugins', () => {
       expect(plugin).toBeDefined();
     });
 
-    it('should handle empty rectangle data', () => {
+    it("should handle empty rectangle data", () => {
       const plugin = new RectangleOverlayPlugin();
       const chart = mockChart;
 
@@ -129,7 +133,7 @@ describe('Chart Plugins', () => {
       expect(plugin).toBeDefined();
     });
 
-    it('should handle invalid rectangle data', () => {
+    it("should handle invalid rectangle data", () => {
       const plugin = new RectangleOverlayPlugin();
       const chart = mockChart;
 
@@ -140,14 +144,14 @@ describe('Chart Plugins', () => {
     });
   });
 
-  describe('SignalSeries', () => {
-    it('should create signal series', () => {
+  describe("SignalSeries", () => {
+    it("should create signal series", () => {
       const chart = mockChart;
       const signalSeries = createSignalSeries(chart);
       expect(signalSeries).toBeDefined();
     });
 
-    it('should add signal series to chart', () => {
+    it("should add signal series to chart", () => {
       const chart = mockChart;
       const signalSeries = createSignalSeries(chart);
 
@@ -155,13 +159,13 @@ describe('Chart Plugins', () => {
       expect(signalSeries).toBeDefined();
     });
 
-    it('should handle signal data', () => {
+    it("should handle signal data", () => {
       const chart = mockChart;
       const signalData = [
         {
-          time: '2024-01-01' as any,
+          time: "2024-01-01" as any,
           value: 1,
-          color: '#00ff00',
+          color: "#00ff00",
         },
       ];
 
@@ -171,7 +175,7 @@ describe('Chart Plugins', () => {
       expect(mockSeries.setData).toHaveBeenCalledWith(signalData);
     });
 
-    it('should handle empty signal data', () => {
+    it("should handle empty signal data", () => {
       const chart = mockChart;
       const signalSeries = createSignalSeries(chart, { data: [] });
 
@@ -179,12 +183,12 @@ describe('Chart Plugins', () => {
       expect(mockSeries.setData).not.toHaveBeenCalled();
     });
 
-    it('should handle different signal values', () => {
+    it("should handle different signal values", () => {
       const chart = mockChart;
       const signalData = [
-        { time: '2024-01-01' as any, value: 0 }, // neutral
-        { time: '2024-01-02' as any, value: 1 }, // signal
-        { time: '2024-01-03' as any, value: 2 }, // alert
+        { time: "2024-01-01" as any, value: 0 }, // neutral
+        { time: "2024-01-02" as any, value: 1 }, // signal
+        { time: "2024-01-03" as any, value: 2 }, // alert
       ];
 
       const signalSeries = createSignalSeries(chart, { data: signalData });
@@ -194,106 +198,106 @@ describe('Chart Plugins', () => {
     });
   });
 
-  describe('Trade Visualization', () => {
-    it('should create trade visual elements', () => {
+  describe("Trade Visualization", () => {
+    it("should create trade visual elements", () => {
       const trades = [
         {
-          entryTime: '2024-01-01',
+          entryTime: "2024-01-01",
           entryPrice: 100,
-          exitTime: '2024-01-02',
+          exitTime: "2024-01-02",
           exitPrice: 110,
           quantity: 10,
-          tradeType: 'long' as const,
+          tradeType: "long" as const,
           isProfitable: true,
-          id: 'trade-1',
+          id: "trade-1",
         },
       ];
 
-      const options = { showAnnotations: true, style: 'markers' as const };
+      const options = { showAnnotations: true, style: "markers" as const };
       const elements = createTradeVisualElements(trades, options);
       expect(elements).toBeDefined();
     });
 
-    it('should handle empty trades', () => {
-      const options = { showAnnotations: true, style: 'markers' as const };
+    it("should handle empty trades", () => {
+      const options = { showAnnotations: true, style: "markers" as const };
       const elements = createTradeVisualElements([], options);
       expect(elements).toBeDefined();
     });
 
-    it('should handle null trades', () => {
-      const options = { showAnnotations: true, style: 'markers' as const };
+    it("should handle null trades", () => {
+      const options = { showAnnotations: true, style: "markers" as const };
       const elements = createTradeVisualElements([], options);
       expect(elements).toBeDefined();
     });
 
-    it('should handle different trade types', () => {
+    it("should handle different trade types", () => {
       const trades = [
         {
-          entryTime: '2024-01-01',
+          entryTime: "2024-01-01",
           entryPrice: 100,
-          exitTime: '2024-01-02',
+          exitTime: "2024-01-02",
           exitPrice: 110,
           quantity: 10,
-          tradeType: 'long' as const,
+          tradeType: "long" as const,
           isProfitable: true,
-          id: 'trade-1',
+          id: "trade-1",
         },
         {
-          entryTime: '2024-01-03',
+          entryTime: "2024-01-03",
           entryPrice: 110,
-          exitTime: '2024-01-04',
+          exitTime: "2024-01-04",
           exitPrice: 100,
           quantity: 5,
-          tradeType: 'short' as const,
+          tradeType: "short" as const,
           isProfitable: true,
-          id: 'trade-2',
+          id: "trade-2",
         },
       ];
 
-      const options = { showAnnotations: true, style: 'markers' as const };
+      const options = { showAnnotations: true, style: "markers" as const };
       const elements = createTradeVisualElements(trades, options);
       expect(elements).toBeDefined();
     });
 
-    it('should handle trades with missing data', () => {
+    it("should handle trades with missing data", () => {
       const trades = [
         {
-          entryTime: '2024-01-01',
+          entryTime: "2024-01-01",
           entryPrice: 100,
-          exitTime: '2024-01-02',
+          exitTime: "2024-01-02",
           exitPrice: 110,
           quantity: 10,
-          tradeType: 'long' as const,
+          tradeType: "long" as const,
           isProfitable: true,
-          id: 'trade-1',
+          id: "trade-1",
         },
         {
-          entryTime: '2024-01-03',
+          entryTime: "2024-01-03",
           entryPrice: 110,
-          exitTime: '2024-01-04',
+          exitTime: "2024-01-04",
           exitPrice: 100,
           quantity: 5,
-          tradeType: 'short' as const,
+          tradeType: "short" as const,
           isProfitable: true,
-          id: 'trade-2',
+          id: "trade-2",
         },
       ];
 
-      const options = { showAnnotations: true, style: 'markers' as const };
+      const options = { showAnnotations: true, style: "markers" as const };
       const elements = createTradeVisualElements(trades, options);
       expect(elements).toBeDefined();
     });
   });
 
-  describe('Annotation System', () => {
-    it('should create annotation visual elements', () => {
+  describe("Annotation System", () => {
+    it("should create annotation visual elements", () => {
       const annotations = [
         {
-          time: '2024-01-01',
+          time: "2024-01-01",
           price: 100,
-          text: 'Test annotation',
-          type: 'text' as const,
-          position: 'above' as const,
+          text: "Test annotation",
+          type: "text" as const,
+          position: "above" as const,
         },
       ];
 
@@ -301,38 +305,38 @@ describe('Chart Plugins', () => {
       expect(elements).toBeDefined();
     });
 
-    it('should handle empty annotations', () => {
+    it("should handle empty annotations", () => {
       const elements = createAnnotationVisualElements([]);
       expect(elements).toBeDefined();
     });
 
-    it('should handle null annotations', () => {
+    it("should handle null annotations", () => {
       const elements = createAnnotationVisualElements([]);
       expect(elements).toBeDefined();
     });
 
-    it('should handle different annotation types', () => {
+    it("should handle different annotation types", () => {
       const annotations = [
         {
-          time: '2024-01-01',
+          time: "2024-01-01",
           price: 100,
-          text: 'Text annotation',
-          type: 'text' as const,
-          position: 'above' as const,
+          text: "Text annotation",
+          type: "text" as const,
+          position: "above" as const,
         },
         {
-          time: '2024-01-02',
+          time: "2024-01-02",
           price: 110,
-          text: 'Arrow annotation',
-          type: 'arrow' as const,
-          position: 'below' as const,
+          text: "Arrow annotation",
+          type: "arrow" as const,
+          position: "below" as const,
         },
         {
-          time: '2024-01-03',
+          time: "2024-01-03",
           price: 105,
-          text: 'Shape annotation',
-          type: 'shape' as const,
-          position: 'inline' as const,
+          text: "Shape annotation",
+          type: "shape" as const,
+          position: "inline" as const,
         },
       ];
 
@@ -340,18 +344,18 @@ describe('Chart Plugins', () => {
       expect(elements).toBeDefined();
     });
 
-    it('should handle annotations with custom styling', () => {
+    it("should handle annotations with custom styling", () => {
       const annotations = [
         {
-          time: '2024-01-01',
+          time: "2024-01-01",
           price: 100,
-          text: 'Styled annotation',
-          type: 'text' as const,
-          position: 'above' as const,
-          color: '#ff0000',
-          backgroundColor: '#ffff00',
+          text: "Styled annotation",
+          type: "text" as const,
+          position: "above" as const,
+          color: "#ff0000",
+          backgroundColor: "#ffff00",
           fontSize: 14,
-          fontWeight: 'bold',
+          fontWeight: "bold",
         },
       ];
 
@@ -359,14 +363,14 @@ describe('Chart Plugins', () => {
       expect(elements).toBeDefined();
     });
 
-    it('should handle annotations with missing properties', () => {
+    it("should handle annotations with missing properties", () => {
       const annotations = [
         {
-          time: '2024-01-01',
+          time: "2024-01-01",
           price: 100,
-          text: 'Minimal annotation',
-          type: 'text' as const,
-          position: 'above' as const,
+          text: "Minimal annotation",
+          type: "text" as const,
+          position: "above" as const,
         },
       ];
 
@@ -375,8 +379,8 @@ describe('Chart Plugins', () => {
     });
   });
 
-  describe('Plugin Integration', () => {
-    it('should integrate multiple plugins with chart', () => {
+  describe("Plugin Integration", () => {
+    it("should integrate multiple plugins with chart", () => {
       const chart = mockChart;
 
       const rectanglePlugin = new RectangleOverlayPlugin();
@@ -388,7 +392,7 @@ describe('Chart Plugins', () => {
       expect(signalSeries).toBeDefined();
     });
 
-    it('should handle plugin cleanup', () => {
+    it("should handle plugin cleanup", () => {
       const chart = mockChart;
 
       const rectanglePlugin = new RectangleOverlayPlugin();
@@ -400,7 +404,7 @@ describe('Chart Plugins', () => {
       expect(rectanglePlugin).toBeDefined();
     });
 
-    it('should handle plugin errors gracefully', () => {
+    it("should handle plugin errors gracefully", () => {
       const chart = {} as any; // Invalid chart
 
       const rectanglePlugin = new RectangleOverlayPlugin();
@@ -412,8 +416,8 @@ describe('Chart Plugins', () => {
     });
   });
 
-  describe('Performance', () => {
-    it('should handle large datasets efficiently', () => {
+  describe("Performance", () => {
+    it("should handle large datasets efficiently", () => {
       const chart = mockChart;
 
       const rectanglePlugin = new RectangleOverlayPlugin();
@@ -421,13 +425,13 @@ describe('Chart Plugins', () => {
 
       const largeRectangleData = Array.from({ length: 1000 }, (_, i) => ({
         id: `rect-${i}`,
-        time: `2024-01-${String(i + 1).padStart(2, '0')}`,
+        time: `2024-01-${String(i + 1).padStart(2, "0")}`,
         price: 100 + i,
         x1: 0,
         y1: 0,
         x2: 50,
         y2: 20,
-        color: '#ff0000',
+        color: "#ff0000",
       }));
 
       rectanglePlugin.setRectangles(largeRectangleData);
@@ -435,7 +439,7 @@ describe('Chart Plugins', () => {
       expect(rectanglePlugin).toBeDefined();
     });
 
-    it('should handle rapid updates', () => {
+    it("should handle rapid updates", () => {
       const chart = mockChart;
       const signalSeries = createSignalSeries(chart);
 
@@ -443,9 +447,9 @@ describe('Chart Plugins', () => {
       for (let i = 0; i < 100; i++) {
         const signalData = [
           {
-            time: `2024-01-${String(i + 1).padStart(2, '0')}` as any,
+            time: `2024-01-${String(i + 1).padStart(2, "0")}` as any,
             value: i % 3, // Cycle through 0, 1, 2
-            color: '#00ff00',
+            color: "#00ff00",
           },
         ];
 
@@ -457,8 +461,8 @@ describe('Chart Plugins', () => {
     });
   });
 
-  describe('Error Handling', () => {
-    it('should handle invalid plugin data', () => {
+  describe("Error Handling", () => {
+    it("should handle invalid plugin data", () => {
       const chart = mockChart;
 
       const rectanglePlugin = new RectangleOverlayPlugin();
@@ -466,14 +470,14 @@ describe('Chart Plugins', () => {
 
       const invalidData = [
         {
-          id: 'invalid-rect',
-          time: 'invalid-time',
-          price: 'invalid-price' as any,
+          id: "invalid-rect",
+          time: "invalid-time",
+          price: "invalid-price" as any,
           x1: -50,
           y1: -20,
           x2: 0,
           y2: 0,
-          color: 'invalid-color',
+          color: "invalid-color",
         },
       ];
 
@@ -482,7 +486,7 @@ describe('Chart Plugins', () => {
       expect(rectanglePlugin).toBeDefined();
     });
 
-    it('should handle plugin initialization errors', () => {
+    it("should handle plugin initialization errors", () => {
       const invalidChart = {
         // Missing required methods
       } as any;

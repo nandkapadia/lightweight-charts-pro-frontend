@@ -6,11 +6,11 @@
  * @vitest-environment jsdom
  */
 
-import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
 // MockedFunction not needed with proper type annotations
-import { ResizeObserverManager } from '../../utils/resizeObserverManager';
+import { ResizeObserverManager } from "../../utils/resizeObserverManager";
 
-describe('ResizeObserverManager', () => {
+describe("ResizeObserverManager", () => {
   let manager: ResizeObserverManager;
   let mockElement: HTMLElement;
   let mockObserver: any;
@@ -20,7 +20,7 @@ describe('ResizeObserverManager', () => {
 
   beforeEach(() => {
     manager = new ResizeObserverManager();
-    mockElement = document.createElement('div');
+    mockElement = document.createElement("div");
     mockCallback = vi.fn();
 
     // Mock ResizeObserver
@@ -31,10 +31,12 @@ describe('ResizeObserverManager', () => {
     };
 
     // Mock ResizeObserver constructor
-    global.ResizeObserver = vi.fn().mockImplementation(() => mockObserver) as any;
+    global.ResizeObserver = vi
+      .fn()
+      .mockImplementation(() => mockObserver) as any;
 
     // Mock Date.now for throttling tests - proper Vitest way
-    dateNowSpy = vi.spyOn(Date, 'now').mockReturnValue(1000);
+    dateNowSpy = vi.spyOn(Date, "now").mockReturnValue(1000);
   });
 
   afterEach(() => {
@@ -42,17 +44,17 @@ describe('ResizeObserverManager', () => {
     vi.clearAllTimers();
   });
 
-  describe('addObserver', () => {
-    it('should create and add a new resize observer', () => {
-      manager.addObserver('test-id', mockElement, mockCallback);
+  describe("addObserver", () => {
+    it("should create and add a new resize observer", () => {
+      manager.addObserver("test-id", mockElement, mockCallback);
 
       expect(global.ResizeObserver).toHaveBeenCalledWith(expect.any(Function));
       expect(mockObserver.observe).toHaveBeenCalledWith(mockElement);
     });
 
-    it('should remove existing observer before adding new one', () => {
+    it("should remove existing observer before adding new one", () => {
       // Add first observer
-      manager.addObserver('test-id', mockElement, mockCallback);
+      manager.addObserver("test-id", mockElement, mockCallback);
       const firstObserver = mockObserver;
 
       // Reset mocks
@@ -60,16 +62,19 @@ describe('ResizeObserverManager', () => {
       global.ResizeObserver = vi.fn().mockImplementation(() => mockObserver);
 
       // Add second observer with same ID
-      manager.addObserver('test-id', mockElement, mockCallback);
+      manager.addObserver("test-id", mockElement, mockCallback);
 
       expect(firstObserver.disconnect).toHaveBeenCalled();
       expect(global.ResizeObserver).toHaveBeenCalledWith(expect.any(Function));
     });
 
-    it('should apply throttling when specified', () => {
+    it("should apply throttling when specified", () => {
       const throttleMs = 100;
 
-      manager.addObserver('test-id', mockElement, mockCallback, { throttleMs, debounceMs: 0 });
+      manager.addObserver("test-id", mockElement, mockCallback, {
+        throttleMs,
+        debounceMs: 0,
+      });
 
       // Get the callback that was passed to ResizeObserver
       const observerCallback = (global.ResizeObserver as any).mock.calls[0][0];
@@ -110,11 +115,11 @@ describe('ResizeObserverManager', () => {
       expect(mockCallback).toHaveBeenCalledTimes(1);
     });
 
-    it('should apply debouncing when specified', () => {
+    it("should apply debouncing when specified", () => {
       vi.useFakeTimers();
       const debounceMs = 200;
 
-      manager.addObserver('test-id', mockElement, mockCallback, { debounceMs });
+      manager.addObserver("test-id", mockElement, mockCallback, { debounceMs });
 
       // Get the callback that was passed to ResizeObserver
       const observerCallback = (global.ResizeObserver as any).mock.calls[0][0];
@@ -154,12 +159,15 @@ describe('ResizeObserverManager', () => {
       vi.useRealTimers();
     });
 
-    it('should handle both throttling and debouncing', () => {
+    it("should handle both throttling and debouncing", () => {
       vi.useFakeTimers();
       const throttleMs = 50;
       const debounceMs = 100;
 
-      manager.addObserver('test-id', mockElement, mockCallback, { throttleMs, debounceMs });
+      manager.addObserver("test-id", mockElement, mockCallback, {
+        throttleMs,
+        debounceMs,
+      });
 
       const observerCallback = (global.ResizeObserver as any).mock.calls[0][0];
       const mockEntry = {
@@ -195,26 +203,26 @@ describe('ResizeObserverManager', () => {
     });
   });
 
-  describe('removeObserver', () => {
-    it('should remove and disconnect observer', () => {
-      manager.addObserver('test-id', mockElement, mockCallback);
+  describe("removeObserver", () => {
+    it("should remove and disconnect observer", () => {
+      manager.addObserver("test-id", mockElement, mockCallback);
 
-      manager.removeObserver('test-id');
+      manager.removeObserver("test-id");
 
       expect(mockObserver.disconnect).toHaveBeenCalled();
     });
 
-    it('should handle removing non-existent observer gracefully', () => {
+    it("should handle removing non-existent observer gracefully", () => {
       expect(() => {
-        manager.removeObserver('non-existent');
+        manager.removeObserver("non-existent");
       }).not.toThrow();
     });
 
-    it('should clear pending timeouts when removing observer', () => {
+    it("should clear pending timeouts when removing observer", () => {
       vi.useFakeTimers();
       const debounceMs = 200;
 
-      manager.addObserver('test-id', mockElement, mockCallback, { debounceMs });
+      manager.addObserver("test-id", mockElement, mockCallback, { debounceMs });
 
       const observerCallback = (global.ResizeObserver as any).mock.calls[0][0];
       const mockEntry = {
@@ -239,7 +247,7 @@ describe('ResizeObserverManager', () => {
       observerCallback([mockEntry]);
 
       // Remove observer before timeout expires
-      manager.removeObserver('test-id');
+      manager.removeObserver("test-id");
 
       // Advance time past debounce period
       vi.advanceTimersByTime(debounceMs);
@@ -251,59 +259,59 @@ describe('ResizeObserverManager', () => {
     });
   });
 
-  describe('hasObserver', () => {
-    it('should return true for existing observer', () => {
-      manager.addObserver('test-id', mockElement, mockCallback);
+  describe("hasObserver", () => {
+    it("should return true for existing observer", () => {
+      manager.addObserver("test-id", mockElement, mockCallback);
 
-      expect(manager.hasObserver('test-id')).toBe(true);
+      expect(manager.hasObserver("test-id")).toBe(true);
     });
 
-    it('should return false for non-existent observer', () => {
-      expect(manager.hasObserver('non-existent')).toBe(false);
+    it("should return false for non-existent observer", () => {
+      expect(manager.hasObserver("non-existent")).toBe(false);
     });
 
-    it('should return false after observer is removed', () => {
-      manager.addObserver('test-id', mockElement, mockCallback);
-      manager.removeObserver('test-id');
+    it("should return false after observer is removed", () => {
+      manager.addObserver("test-id", mockElement, mockCallback);
+      manager.removeObserver("test-id");
 
-      expect(manager.hasObserver('test-id')).toBe(false);
+      expect(manager.hasObserver("test-id")).toBe(false);
     });
   });
 
-  describe('getObserverIds', () => {
-    it('should return empty array when no observers', () => {
+  describe("getObserverIds", () => {
+    it("should return empty array when no observers", () => {
       expect(manager.getObserverIds()).toEqual([]);
     });
 
-    it('should return array of observer IDs', () => {
-      manager.addObserver('id1', mockElement, mockCallback);
-      manager.addObserver('id2', mockElement, mockCallback);
-      manager.addObserver('id3', mockElement, mockCallback);
+    it("should return array of observer IDs", () => {
+      manager.addObserver("id1", mockElement, mockCallback);
+      manager.addObserver("id2", mockElement, mockCallback);
+      manager.addObserver("id3", mockElement, mockCallback);
 
       const ids = manager.getObserverIds();
       expect(ids).toHaveLength(3);
-      expect(ids).toContain('id1');
-      expect(ids).toContain('id2');
-      expect(ids).toContain('id3');
+      expect(ids).toContain("id1");
+      expect(ids).toContain("id2");
+      expect(ids).toContain("id3");
     });
 
-    it('should update when observers are removed', () => {
-      manager.addObserver('id1', mockElement, mockCallback);
-      manager.addObserver('id2', mockElement, mockCallback);
+    it("should update when observers are removed", () => {
+      manager.addObserver("id1", mockElement, mockCallback);
+      manager.addObserver("id2", mockElement, mockCallback);
 
       expect(manager.getObserverIds()).toHaveLength(2);
 
-      manager.removeObserver('id1');
+      manager.removeObserver("id1");
 
       const ids = manager.getObserverIds();
       expect(ids).toHaveLength(1);
-      expect(ids).toContain('id2');
-      expect(ids).not.toContain('id1');
+      expect(ids).toContain("id2");
+      expect(ids).not.toContain("id1");
     });
   });
 
-  describe('cleanup', () => {
-    it('should disconnect all observers', () => {
+  describe("cleanup", () => {
+    it("should disconnect all observers", () => {
       const mockObserver2 = {
         observe: vi.fn(),
         unobserve: vi.fn(),
@@ -315,8 +323,8 @@ describe('ResizeObserverManager', () => {
         .mockImplementationOnce(() => mockObserver)
         .mockImplementationOnce(() => mockObserver2);
 
-      manager.addObserver('id1', mockElement, mockCallback);
-      manager.addObserver('id2', mockElement, mockCallback);
+      manager.addObserver("id1", mockElement, mockCallback);
+      manager.addObserver("id2", mockElement, mockCallback);
 
       manager.cleanup();
 
@@ -325,17 +333,17 @@ describe('ResizeObserverManager', () => {
       expect(manager.getObserverIds()).toHaveLength(0);
     });
 
-    it('should handle cleanup with no observers', () => {
+    it("should handle cleanup with no observers", () => {
       expect(() => {
         manager.cleanup();
       }).not.toThrow();
     });
 
-    it('should clear all pending timeouts during cleanup', () => {
+    it("should clear all pending timeouts during cleanup", () => {
       vi.useFakeTimers();
       const debounceMs = 200;
 
-      manager.addObserver('test-id', mockElement, mockCallback, { debounceMs });
+      manager.addObserver("test-id", mockElement, mockCallback, { debounceMs });
 
       const observerCallback = (global.ResizeObserver as any).mock.calls[0][0];
       const mockEntry = {
@@ -372,35 +380,35 @@ describe('ResizeObserverManager', () => {
     });
   });
 
-  describe('error handling', () => {
-    it('should handle ResizeObserver not available', () => {
+  describe("error handling", () => {
+    it("should handle ResizeObserver not available", () => {
       // Mock ResizeObserver as undefined
       const originalResizeObserver = global.ResizeObserver;
       (global as any).ResizeObserver = undefined;
 
       // The implementation catches errors, so it shouldn't throw
       expect(() => {
-        manager.addObserver('test-id', mockElement, mockCallback);
+        manager.addObserver("test-id", mockElement, mockCallback);
       }).not.toThrow();
 
       // Restore for other tests
       global.ResizeObserver = originalResizeObserver;
     });
 
-    it('should handle invalid element', () => {
+    it("should handle invalid element", () => {
       expect(() => {
-        manager.addObserver('test-id', null as any, mockCallback);
+        manager.addObserver("test-id", null as any, mockCallback);
       }).not.toThrow();
     });
 
-    it('should handle callback errors gracefully', () => {
+    it("should handle callback errors gracefully", () => {
       const errorCallback = vi.fn().mockImplementation(() => {
-        throw new Error('Callback error');
+        throw new Error("Callback error");
       });
 
       // Adding observer shouldn't throw
       expect(() => {
-        manager.addObserver('test-id', mockElement, errorCallback);
+        manager.addObserver("test-id", mockElement, errorCallback);
       }).not.toThrow();
 
       const observerCallback = (global.ResizeObserver as any).mock.calls[0][0];
@@ -425,7 +433,7 @@ describe('ResizeObserverManager', () => {
       // The current implementation doesn't catch callback errors, so it will throw
       expect(() => {
         observerCallback([mockEntry]);
-      }).toThrow('Callback error');
+      }).toThrow("Callback error");
 
       expect(errorCallback).toHaveBeenCalled();
     });

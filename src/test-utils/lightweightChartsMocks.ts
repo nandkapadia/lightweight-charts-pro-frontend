@@ -32,7 +32,7 @@
  * ```
  */
 
-import { vi } from 'vitest';
+import { vi } from "vitest";
 
 // Mock series object with all required methods
 export const mockSeries = {
@@ -48,7 +48,7 @@ export const mockSeries = {
   dataByIndex: vi.fn().mockReturnValue(null),
   subscribeDataChanged: vi.fn(),
   unsubscribeDataChanged: vi.fn(),
-  seriesType: vi.fn().mockReturnValue('Line'),
+  seriesType: vi.fn().mockReturnValue("Line"),
   attachPrimitive: vi.fn(),
   detachPrimitive: vi.fn(),
   createPriceLine: vi.fn().mockReturnValue({
@@ -162,10 +162,10 @@ export const mockChart = {
   applyOptions: vi.fn(),
   options: vi.fn().mockReturnValue({
     layout: {
-      background: { type: 'solid', color: '#FFFFFF' },
-      textColor: '#191919',
+      background: { type: "solid", color: "#FFFFFF" },
+      textColor: "#191919",
       fontSize: 12,
-      fontFamily: 'Arial',
+      fontFamily: "Arial",
     },
     crosshair: {
       mode: 1,
@@ -242,9 +242,11 @@ export const mockChart = {
 };
 
 // Mock createChart function
-export const createChart = vi.fn().mockImplementation((_container, _options) => {
-  return mockChart;
-});
+export const createChart = vi
+  .fn()
+  .mockImplementation((_container, _options) => {
+    return mockChart;
+  });
 
 // Mock createChartEx function
 export const createChartEx = vi
@@ -254,26 +256,26 @@ export const createChartEx = vi
   });
 
 // Mock utility functions
-export const isBusinessDay = vi.fn().mockImplementation(time => {
-  return typeof time === 'object' && time.year && time.month && time.day;
+export const isBusinessDay = vi.fn().mockImplementation((time) => {
+  return typeof time === "object" && time.year && time.month && time.day;
 });
 
-export const isUTCTimestamp = vi.fn().mockImplementation(time => {
-  return typeof time === 'number' && time > 0;
+export const isUTCTimestamp = vi.fn().mockImplementation((time) => {
+  return typeof time === "number" && time > 0;
 });
 
 // Series types
-export const AreaSeries = 'Area';
-export const BarSeries = 'Bar';
-export const BaselineSeries = 'Baseline';
-export const CandlestickSeries = 'Candlestick';
-export const HistogramSeries = 'Histogram';
-export const LineSeries = 'Line';
+export const AreaSeries = "Area";
+export const BarSeries = "Bar";
+export const BaselineSeries = "Baseline";
+export const CandlestickSeries = "Candlestick";
+export const HistogramSeries = "Histogram";
+export const LineSeries = "Line";
 
 // Enums and constants
 export const ColorType = {
-  Solid: 'solid',
-  VerticalGradient: 'gradient',
+  Solid: "solid",
+  VerticalGradient: "gradient",
 };
 
 export const CrosshairMode = {
@@ -333,10 +335,10 @@ export const MismatchDirection = {
 
 // Custom series and defaults
 export const customSeriesDefaultOptions = {
-  color: '#2196f3',
+  color: "#2196f3",
 };
 
-export const version = '5.0.8';
+export const version = "5.0.8";
 
 export const defaultHorzScaleBehavior = {
   options: vi.fn().mockReturnValue({}),
@@ -347,7 +349,9 @@ export const defaultHorzScaleBehavior = {
 export const resetMocks = () => {
   vi.clearAllMocks();
   createChart.mockImplementation((_container, _options) => mockChart);
-  mockChart.addSeries.mockImplementation((_seriesType, _options, _paneId) => mockSeries);
+  mockChart.addSeries.mockImplementation(
+    (_seriesType, _options, _paneId) => mockSeries,
+  );
 };
 
 // Default export for vi.mock()

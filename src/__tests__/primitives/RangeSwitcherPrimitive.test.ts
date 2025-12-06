@@ -17,13 +17,13 @@
  * - Cleanup and lifecycle
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 // Explicitly unmock the module we're testing
-vi.unmock('../../primitives/RangeSwitcherPrimitive');
+vi.unmock("../../primitives/RangeSwitcherPrimitive");
 
 // Mock BasePanePrimitive BEFORE importing RangeSwitcherPrimitive
-vi.mock('../../primitives/BasePanePrimitive', () => ({
+vi.mock("../../primitives/BasePanePrimitive", () => ({
   BasePanePrimitive: class MockBasePanePrimitive {
     protected id: string;
     protected config: any;
@@ -40,11 +40,11 @@ vi.mock('../../primitives/BasePanePrimitive', () => ({
     }
 
     protected getTemplate(): string {
-      return '';
+      return "";
     }
     protected renderContent(): void {}
     protected getContainerClassName(): string {
-      return 'mock-container';
+      return "mock-container";
     }
     protected getPaneId(): number {
       return 0;
@@ -69,7 +69,7 @@ vi.mock('../../primitives/BasePanePrimitive', () => ({
 }));
 
 // Mock PrimitiveDefaults
-vi.mock('../../primitives/PrimitiveDefaults', () => ({
+vi.mock("../../primitives/PrimitiveDefaults", () => ({
   TimeRangeSeconds: {
     FIVE_MINUTES: 300,
     FIFTEEN_MINUTES: 900,
@@ -85,18 +85,18 @@ vi.mock('../../primitives/PrimitiveDefaults', () => ({
   },
   DefaultRangeSwitcherConfig: {
     layout: {
-      CONTAINER_PADDING: '8px',
-      FLEX_DIRECTION: 'row',
+      CONTAINER_PADDING: "8px",
+      FLEX_DIRECTION: "row",
       CONTAINER_GAP: 4,
-      ALIGN_ITEMS: 'center',
-      JUSTIFY_CONTENT: 'flex-start',
+      ALIGN_ITEMS: "center",
+      JUSTIFY_CONTENT: "flex-start",
     },
   },
   ButtonColors: {
-    DEFAULT_BACKGROUND: 'rgba(255, 255, 255, 0.9)',
-    DEFAULT_COLOR: '#666',
-    HOVER_BACKGROUND: 'rgba(255, 255, 255, 1)',
-    HOVER_COLOR: '#333',
+    DEFAULT_BACKGROUND: "rgba(255, 255, 255, 0.9)",
+    DEFAULT_COLOR: "#666",
+    HOVER_BACKGROUND: "rgba(255, 255, 255, 1)",
+    HOVER_COLOR: "#333",
   },
   ButtonDimensions: {
     BORDER_RADIUS: 4,
@@ -104,27 +104,29 @@ vi.mock('../../primitives/PrimitiveDefaults', () => ({
     MIN_WIDTH_RANGE: 40,
   },
   ButtonEffects: {
-    DEFAULT_BORDER: '1px solid rgba(0, 0, 0, 0.1)',
-    RANGE_BORDER: '1px solid rgba(0, 0, 0, 0.1)',
-    DEFAULT_TRANSITION: 'all 0.2s ease',
-    RANGE_HOVER_BOX_SHADOW: '0 2px 4px rgba(0, 0, 0, 0.1)',
+    DEFAULT_BORDER: "1px solid rgba(0, 0, 0, 0.1)",
+    RANGE_BORDER: "1px solid rgba(0, 0, 0, 0.1)",
+    DEFAULT_TRANSITION: "all 0.2s ease",
+    RANGE_HOVER_BOX_SHADOW: "0 2px 4px rgba(0, 0, 0, 0.1)",
   },
   ButtonSpacing: {
-    RANGE_BUTTON_PADDING: '4px 8px',
-    RANGE_BUTTON_MARGIN: '0 2px',
+    RANGE_BUTTON_PADDING: "4px 8px",
+    RANGE_BUTTON_MARGIN: "0 2px",
   },
   CommonValues: {
     FONT_WEIGHT_MEDIUM: 500,
-    POINTER: 'pointer',
+    POINTER: "pointer",
   },
 }));
 
 // Mock PrimitiveStylingUtils
-vi.mock('../../primitives/PrimitiveStylingUtils', () => ({
+vi.mock("../../primitives/PrimitiveStylingUtils", () => ({
   PrimitiveStylingUtils: {
-    applyInteractionState: vi.fn((element: HTMLElement, baseStyles: any, stateStyles: any) => {
-      Object.assign(element.style, baseStyles, stateStyles);
-    }),
+    applyInteractionState: vi.fn(
+      (element: HTMLElement, baseStyles: any, stateStyles: any) => {
+        Object.assign(element.style, baseStyles, stateStyles);
+      },
+    ),
   },
   BaseStyleConfig: class {},
 }));
@@ -139,130 +141,134 @@ import {
   getSecondsFromRange,
   DefaultRangeConfigs,
   createRangeSwitcherPrimitive,
-} from '../../primitives/RangeSwitcherPrimitive';
+} from "../../primitives/RangeSwitcherPrimitive";
 
-describe('RangeSwitcherPrimitive - Helper Functions', () => {
-  describe('getRangeValue', () => {
-    it('should return range property when defined', () => {
-      const config: RangeConfig = { text: '1D', range: TimeRange.ONE_DAY };
+describe("RangeSwitcherPrimitive - Helper Functions", () => {
+  describe("getRangeValue", () => {
+    it("should return range property when defined", () => {
+      const config: RangeConfig = { text: "1D", range: TimeRange.ONE_DAY };
       expect(getRangeValue(config)).toBe(TimeRange.ONE_DAY);
     });
 
-    it('should return numeric range when defined', () => {
-      const config: RangeConfig = { text: 'Custom', range: 12345 };
+    it("should return numeric range when defined", () => {
+      const config: RangeConfig = { text: "Custom", range: 12345 };
       expect(getRangeValue(config)).toBe(12345);
     });
 
-    it('should return null for ALL range', () => {
-      const config: RangeConfig = { text: 'All', range: TimeRange.ALL };
+    it("should return null for ALL range", () => {
+      const config: RangeConfig = { text: "All", range: TimeRange.ALL };
       expect(getRangeValue(config)).toBe(TimeRange.ALL);
     });
 
-    it('should fall back to seconds property for backwards compatibility', () => {
-      const config: RangeConfig = { text: '1D', range: undefined as any, seconds: 86400 };
+    it("should fall back to seconds property for backwards compatibility", () => {
+      const config: RangeConfig = {
+        text: "1D",
+        range: undefined as any,
+        seconds: 86400,
+      };
       expect(getRangeValue(config)).toBe(86400);
     });
 
-    it('should return null when both properties are undefined', () => {
-      const config: RangeConfig = { text: 'All', range: undefined as any };
+    it("should return null when both properties are undefined", () => {
+      const config: RangeConfig = { text: "All", range: undefined as any };
       expect(getRangeValue(config)).toBe(null);
     });
   });
 
-  describe('isAllRange', () => {
-    it('should return true for null range', () => {
-      const config: RangeConfig = { text: 'All', range: null };
+  describe("isAllRange", () => {
+    it("should return true for null range", () => {
+      const config: RangeConfig = { text: "All", range: null };
       expect(isAllRange(config)).toBe(true);
     });
 
-    it('should return true for TimeRange.ALL', () => {
-      const config: RangeConfig = { text: 'All', range: TimeRange.ALL };
+    it("should return true for TimeRange.ALL", () => {
+      const config: RangeConfig = { text: "All", range: TimeRange.ALL };
       expect(isAllRange(config)).toBe(true);
     });
 
-    it('should return false for numeric range', () => {
-      const config: RangeConfig = { text: '1D', range: 86400 };
+    it("should return false for numeric range", () => {
+      const config: RangeConfig = { text: "1D", range: 86400 };
       expect(isAllRange(config)).toBe(false);
     });
 
-    it('should return false for TimeRange enum values', () => {
-      const config: RangeConfig = { text: '1D', range: TimeRange.ONE_DAY };
+    it("should return false for TimeRange enum values", () => {
+      const config: RangeConfig = { text: "1D", range: TimeRange.ONE_DAY };
       expect(isAllRange(config)).toBe(false);
     });
   });
 
-  describe('getSecondsFromRange', () => {
-    it('should return null for null range', () => {
+  describe("getSecondsFromRange", () => {
+    it("should return null for null range", () => {
       expect(getSecondsFromRange(null)).toBe(null);
     });
 
-    it('should return null for TimeRange.ALL', () => {
+    it("should return null for TimeRange.ALL", () => {
       expect(getSecondsFromRange(TimeRange.ALL)).toBe(null);
     });
 
-    it('should return numeric value directly', () => {
+    it("should return numeric value directly", () => {
       expect(getSecondsFromRange(12345)).toBe(12345);
     });
 
-    it('should convert FIVE_MINUTES to seconds', () => {
+    it("should convert FIVE_MINUTES to seconds", () => {
       expect(getSecondsFromRange(TimeRange.FIVE_MINUTES)).toBe(300);
     });
 
-    it('should convert FIFTEEN_MINUTES to seconds', () => {
+    it("should convert FIFTEEN_MINUTES to seconds", () => {
       expect(getSecondsFromRange(TimeRange.FIFTEEN_MINUTES)).toBe(900);
     });
 
-    it('should convert THIRTY_MINUTES to seconds', () => {
+    it("should convert THIRTY_MINUTES to seconds", () => {
       expect(getSecondsFromRange(TimeRange.THIRTY_MINUTES)).toBe(1800);
     });
 
-    it('should convert ONE_HOUR to seconds', () => {
+    it("should convert ONE_HOUR to seconds", () => {
       expect(getSecondsFromRange(TimeRange.ONE_HOUR)).toBe(3600);
     });
 
-    it('should convert FOUR_HOURS to seconds', () => {
+    it("should convert FOUR_HOURS to seconds", () => {
       expect(getSecondsFromRange(TimeRange.FOUR_HOURS)).toBe(14400);
     });
 
-    it('should convert ONE_DAY to seconds', () => {
+    it("should convert ONE_DAY to seconds", () => {
       expect(getSecondsFromRange(TimeRange.ONE_DAY)).toBe(86400);
     });
 
-    it('should convert ONE_WEEK to seconds', () => {
+    it("should convert ONE_WEEK to seconds", () => {
       expect(getSecondsFromRange(TimeRange.ONE_WEEK)).toBe(604800);
     });
 
-    it('should convert TWO_WEEKS to seconds', () => {
+    it("should convert TWO_WEEKS to seconds", () => {
       expect(getSecondsFromRange(TimeRange.TWO_WEEKS)).toBe(604800 * 2);
     });
 
-    it('should convert ONE_MONTH to seconds', () => {
+    it("should convert ONE_MONTH to seconds", () => {
       expect(getSecondsFromRange(TimeRange.ONE_MONTH)).toBe(2592000);
     });
 
-    it('should convert THREE_MONTHS to seconds', () => {
+    it("should convert THREE_MONTHS to seconds", () => {
       expect(getSecondsFromRange(TimeRange.THREE_MONTHS)).toBe(7776000);
     });
 
-    it('should convert SIX_MONTHS to seconds', () => {
+    it("should convert SIX_MONTHS to seconds", () => {
       expect(getSecondsFromRange(TimeRange.SIX_MONTHS)).toBe(15552000);
     });
 
-    it('should convert ONE_YEAR to seconds', () => {
+    it("should convert ONE_YEAR to seconds", () => {
       expect(getSecondsFromRange(TimeRange.ONE_YEAR)).toBe(31536000);
     });
 
-    it('should convert TWO_YEARS to seconds', () => {
+    it("should convert TWO_YEARS to seconds", () => {
       expect(getSecondsFromRange(TimeRange.TWO_YEARS)).toBe(31536000 * 2);
     });
 
-    it('should convert FIVE_YEARS to seconds', () => {
+    it("should convert FIVE_YEARS to seconds", () => {
       expect(getSecondsFromRange(TimeRange.FIVE_YEARS)).toBe(157680000);
     });
   });
 });
 
-describe('RangeSwitcherPrimitive - Construction and Configuration', () => {
+describe("RangeSwitcherPrimitive - Construction and Configuration", () => {
   // Mock chart kept for potential future use
   // @ts-expect-error - Mock chart intentionally unused for future use
   const _mockChart = {
@@ -273,14 +279,14 @@ describe('RangeSwitcherPrimitive - Construction and Configuration', () => {
     })),
   };
 
-  it('should create instance with required config', () => {
+  it("should create instance with required config", () => {
     const ranges: RangeConfig[] = [
-      { text: '1D', range: TimeRange.ONE_DAY },
-      { text: 'All', range: TimeRange.ALL },
+      { text: "1D", range: TimeRange.ONE_DAY },
+      { text: "All", range: TimeRange.ALL },
     ];
 
-    const primitive = new RangeSwitcherPrimitive('test-switcher', {
-      corner: 'top-right',
+    const primitive = new RangeSwitcherPrimitive("test-switcher", {
+      corner: "top-right",
       ranges,
     });
 
@@ -288,44 +294,44 @@ describe('RangeSwitcherPrimitive - Construction and Configuration', () => {
     expect((primitive as any).config.ranges).toEqual(ranges);
   });
 
-  it('should apply default priority', () => {
-    const primitive = new RangeSwitcherPrimitive('test-switcher', {
-      corner: 'top-right',
+  it("should apply default priority", () => {
+    const primitive = new RangeSwitcherPrimitive("test-switcher", {
+      corner: "top-right",
       ranges: [],
     });
 
     expect((primitive as any).config.priority).toBe(100); // PrimitivePriority.RANGE_SWITCHER
   });
 
-  it('should apply default visibility', () => {
-    const primitive = new RangeSwitcherPrimitive('test-switcher', {
-      corner: 'top-right',
+  it("should apply default visibility", () => {
+    const primitive = new RangeSwitcherPrimitive("test-switcher", {
+      corner: "top-right",
       ranges: [],
     });
 
     expect((primitive as any).config.visible).toBe(true);
   });
 
-  it('should merge custom style with defaults', () => {
-    const primitive = new RangeSwitcherPrimitive('test-switcher', {
-      corner: 'top-right',
+  it("should merge custom style with defaults", () => {
+    const primitive = new RangeSwitcherPrimitive("test-switcher", {
+      corner: "top-right",
       ranges: [],
       style: {
         button: {
-          backgroundColor: 'red',
+          backgroundColor: "red",
         },
       },
     });
 
-    expect((primitive as any).config.style.button.backgroundColor).toBe('red');
+    expect((primitive as any).config.style.button.backgroundColor).toBe("red");
     // Style merging happens at different levels, custom style overrides defaults
     expect((primitive as any).config.style.button).toBeDefined();
   });
 
-  it('should accept onRangeChange callback', () => {
+  it("should accept onRangeChange callback", () => {
     const callback = vi.fn();
-    const primitive = new RangeSwitcherPrimitive('test-switcher', {
-      corner: 'top-right',
+    const primitive = new RangeSwitcherPrimitive("test-switcher", {
+      corner: "top-right",
       ranges: [],
       onRangeChange: callback,
     });
@@ -334,23 +340,23 @@ describe('RangeSwitcherPrimitive - Construction and Configuration', () => {
   });
 });
 
-describe('RangeSwitcherPrimitive - Button Creation', () => {
+describe("RangeSwitcherPrimitive - Button Creation", () => {
   let primitive: RangeSwitcherPrimitive;
   let mockContainer: HTMLDivElement;
 
   beforeEach(() => {
     const ranges: RangeConfig[] = [
-      { text: '1D', range: TimeRange.ONE_DAY },
-      { text: '1W', range: TimeRange.ONE_WEEK },
-      { text: 'All', range: TimeRange.ALL },
+      { text: "1D", range: TimeRange.ONE_DAY },
+      { text: "1W", range: TimeRange.ONE_WEEK },
+      { text: "All", range: TimeRange.ALL },
     ];
 
-    primitive = new RangeSwitcherPrimitive('test-switcher', {
-      corner: 'top-right',
+    primitive = new RangeSwitcherPrimitive("test-switcher", {
+      corner: "top-right",
       ranges,
     });
 
-    mockContainer = document.createElement('div');
+    mockContainer = document.createElement("div");
     (primitive as any).containerElement = mockContainer;
     (primitive as any).mounted = true;
   });
@@ -359,63 +365,69 @@ describe('RangeSwitcherPrimitive - Button Creation', () => {
     vi.clearAllMocks();
   });
 
-  it('should create buttons for each range', () => {
+  it("should create buttons for each range", () => {
     (primitive as any).renderContent();
 
-    const buttons = mockContainer.querySelectorAll('button.range-button');
+    const buttons = mockContainer.querySelectorAll("button.range-button");
     expect(buttons.length).toBe(3);
-    expect(buttons[0].textContent).toBe('1D');
-    expect(buttons[1].textContent).toBe('1W');
-    expect(buttons[2].textContent).toBe('All');
+    expect(buttons[0].textContent).toBe("1D");
+    expect(buttons[1].textContent).toBe("1W");
+    expect(buttons[2].textContent).toBe("All");
   });
 
-  it('should set data-range-index attribute', () => {
+  it("should set data-range-index attribute", () => {
     (primitive as any).renderContent();
 
-    const buttons = mockContainer.querySelectorAll('button.range-button');
-    expect(buttons[0].getAttribute('data-range-index')).toBe('0');
-    expect(buttons[1].getAttribute('data-range-index')).toBe('1');
-    expect(buttons[2].getAttribute('data-range-index')).toBe('2');
+    const buttons = mockContainer.querySelectorAll("button.range-button");
+    expect(buttons[0].getAttribute("data-range-index")).toBe("0");
+    expect(buttons[1].getAttribute("data-range-index")).toBe("1");
+    expect(buttons[2].getAttribute("data-range-index")).toBe("2");
   });
 
-  it('should set aria-label for accessibility', () => {
+  it("should set aria-label for accessibility", () => {
     (primitive as any).renderContent();
 
-    const buttons = mockContainer.querySelectorAll('button.range-button');
-    expect(buttons[0].getAttribute('aria-label')).toBe('Switch to 1D time range');
-    expect(buttons[2].getAttribute('aria-label')).toBe('Switch to All time range');
+    const buttons = mockContainer.querySelectorAll("button.range-button");
+    expect(buttons[0].getAttribute("aria-label")).toBe(
+      "Switch to 1D time range",
+    );
+    expect(buttons[2].getAttribute("aria-label")).toBe(
+      "Switch to All time range",
+    );
   });
 
-  it('should set data-range-seconds attribute for non-null ranges', () => {
+  it("should set data-range-seconds attribute for non-null ranges", () => {
     (primitive as any).renderContent();
 
-    const buttons = mockContainer.querySelectorAll('button.range-button');
-    expect(buttons[0].getAttribute('data-range-seconds')).toBe('86400'); // 1 day
-    expect(buttons[1].getAttribute('data-range-seconds')).toBe('604800'); // 1 week
-    expect(buttons[2].hasAttribute('data-range-seconds')).toBe(false); // All
+    const buttons = mockContainer.querySelectorAll("button.range-button");
+    expect(buttons[0].getAttribute("data-range-seconds")).toBe("86400"); // 1 day
+    expect(buttons[1].getAttribute("data-range-seconds")).toBe("604800"); // 1 week
+    expect(buttons[2].hasAttribute("data-range-seconds")).toBe(false); // All
   });
 
-  it('should not recreate buttons if already rendered', () => {
+  it("should not recreate buttons if already rendered", () => {
     (primitive as any).renderContent();
-    const firstButtons = mockContainer.querySelectorAll('button.range-button');
+    const firstButtons = mockContainer.querySelectorAll("button.range-button");
 
     (primitive as any).renderContent();
-    const secondButtons = mockContainer.querySelectorAll('button.range-button');
+    const secondButtons = mockContainer.querySelectorAll("button.range-button");
 
     expect(firstButtons.length).toBe(secondButtons.length);
     expect((primitive as any).buttonElements.length).toBe(3);
   });
 
-  it('should apply container styling', () => {
+  it("should apply container styling", () => {
     (primitive as any).renderContent();
 
-    const container = mockContainer.querySelector('.range-switcher-container') as HTMLElement;
+    const container = mockContainer.querySelector(
+      ".range-switcher-container",
+    ) as HTMLElement;
     expect(container).toBeDefined();
-    expect(container.style.pointerEvents).toBe('auto');
+    expect(container.style.pointerEvents).toBe("auto");
   });
 });
 
-describe('RangeSwitcherPrimitive - Event Handling', () => {
+describe("RangeSwitcherPrimitive - Event Handling", () => {
   let primitive: RangeSwitcherPrimitive;
   let mockContainer: HTMLDivElement;
   let mockChart: any;
@@ -430,16 +442,16 @@ describe('RangeSwitcherPrimitive - Event Handling', () => {
     };
 
     const ranges: RangeConfig[] = [
-      { text: '1D', range: TimeRange.ONE_DAY },
-      { text: 'All', range: TimeRange.ALL },
+      { text: "1D", range: TimeRange.ONE_DAY },
+      { text: "All", range: TimeRange.ALL },
     ];
 
-    primitive = new RangeSwitcherPrimitive('test-switcher', {
-      corner: 'top-right',
+    primitive = new RangeSwitcherPrimitive("test-switcher", {
+      corner: "top-right",
       ranges,
     });
 
-    mockContainer = document.createElement('div');
+    mockContainer = document.createElement("div");
     (primitive as any).containerElement = mockContainer;
     (primitive as any).chart = mockChart;
     (primitive as any).mounted = true;
@@ -450,8 +462,8 @@ describe('RangeSwitcherPrimitive - Event Handling', () => {
     vi.clearAllMocks();
   });
 
-  it('should handle button click', () => {
-    const buttons = mockContainer.querySelectorAll('button.range-button');
+  it("should handle button click", () => {
+    const buttons = mockContainer.querySelectorAll("button.range-button");
     const button = buttons[0] as HTMLButtonElement;
 
     button.click();
@@ -459,43 +471,49 @@ describe('RangeSwitcherPrimitive - Event Handling', () => {
     expect(mockChart.timeScale).toHaveBeenCalled();
   });
 
-  it('should call onRangeChange callback on click', () => {
+  it("should call onRangeChange callback on click", () => {
     const callback = vi.fn();
     (primitive as any).config.onRangeChange = callback;
 
-    const buttons = mockContainer.querySelectorAll('button.range-button');
+    const buttons = mockContainer.querySelectorAll("button.range-button");
     const button = buttons[0] as HTMLButtonElement;
 
     button.click();
 
-    expect(callback).toHaveBeenCalledWith({ text: '1D', range: TimeRange.ONE_DAY }, 0);
+    expect(callback).toHaveBeenCalledWith(
+      { text: "1D", range: TimeRange.ONE_DAY },
+      0,
+    );
   });
 
-  it('should emit custom event on range change', () => {
+  it("should emit custom event on range change", () => {
     const mockEventManager = {
       emitCustomEvent: vi.fn(),
       subscribe: vi.fn(),
     };
     (primitive as any).eventManager = mockEventManager;
 
-    const buttons = mockContainer.querySelectorAll('button.range-button');
+    const buttons = mockContainer.querySelectorAll("button.range-button");
     const button = buttons[0] as HTMLButtonElement;
 
     button.click();
 
-    expect(mockEventManager.emitCustomEvent).toHaveBeenCalledWith('rangeChange', {
-      range: { text: '1D', range: TimeRange.ONE_DAY },
-      index: 0,
-    });
+    expect(mockEventManager.emitCustomEvent).toHaveBeenCalledWith(
+      "rangeChange",
+      {
+        range: { text: "1D", range: TimeRange.ONE_DAY },
+        index: 0,
+      },
+    );
   });
 
-  it('should prevent default and stop propagation on click', () => {
-    const buttons = mockContainer.querySelectorAll('button.range-button');
+  it("should prevent default and stop propagation on click", () => {
+    const buttons = mockContainer.querySelectorAll("button.range-button");
     const button = buttons[0] as HTMLButtonElement;
 
-    const event = new MouseEvent('click', { bubbles: true, cancelable: true });
-    const preventDefaultSpy = vi.spyOn(event, 'preventDefault');
-    const stopPropagationSpy = vi.spyOn(event, 'stopPropagation');
+    const event = new MouseEvent("click", { bubbles: true, cancelable: true });
+    const preventDefaultSpy = vi.spyOn(event, "preventDefault");
+    const stopPropagationSpy = vi.spyOn(event, "stopPropagation");
 
     button.dispatchEvent(event);
 
@@ -503,8 +521,8 @@ describe('RangeSwitcherPrimitive - Event Handling', () => {
     expect(stopPropagationSpy).toHaveBeenCalled();
   });
 
-  it('should cleanup event listeners on detached', () => {
-    const buttons = mockContainer.querySelectorAll('button.range-button');
+  it("should cleanup event listeners on detached", () => {
+    const buttons = mockContainer.querySelectorAll("button.range-button");
     expect(buttons.length).toBeGreaterThan(0);
 
     primitive.detached();
@@ -513,7 +531,7 @@ describe('RangeSwitcherPrimitive - Event Handling', () => {
   });
 });
 
-describe('RangeSwitcherPrimitive - Range Application', () => {
+describe("RangeSwitcherPrimitive - Range Application", () => {
   let primitive: RangeSwitcherPrimitive;
   let mockChart: any;
   let mockTimeScale: any;
@@ -530,12 +548,12 @@ describe('RangeSwitcherPrimitive - Range Application', () => {
     };
 
     const ranges: RangeConfig[] = [
-      { text: '1D', range: TimeRange.ONE_DAY },
-      { text: 'All', range: TimeRange.ALL },
+      { text: "1D", range: TimeRange.ONE_DAY },
+      { text: "All", range: TimeRange.ALL },
     ];
 
-    primitive = new RangeSwitcherPrimitive('test-switcher', {
-      corner: 'top-right',
+    primitive = new RangeSwitcherPrimitive("test-switcher", {
+      corner: "top-right",
       ranges,
     });
 
@@ -546,8 +564,8 @@ describe('RangeSwitcherPrimitive - Range Application', () => {
     vi.clearAllMocks();
   });
 
-  it('should apply specific range to chart', () => {
-    const range: RangeConfig = { text: '1D', range: TimeRange.ONE_DAY };
+  it("should apply specific range to chart", () => {
+    const range: RangeConfig = { text: "1D", range: TimeRange.ONE_DAY };
     (primitive as any).applyRangeToChart(range);
 
     expect(mockChart.timeScale).toHaveBeenCalled();
@@ -555,7 +573,7 @@ describe('RangeSwitcherPrimitive - Range Application', () => {
   });
 
   it('should apply "All" range using fitContent', () => {
-    const range: RangeConfig = { text: 'All', range: TimeRange.ALL };
+    const range: RangeConfig = { text: "All", range: TimeRange.ALL };
     (primitive as any).applyRangeToChart(range);
 
     expect(mockChart.timeScale).toHaveBeenCalled();
@@ -563,17 +581,17 @@ describe('RangeSwitcherPrimitive - Range Application', () => {
     expect(mockTimeScale.setVisibleRange).not.toHaveBeenCalled();
   });
 
-  it('should apply null range using fitContent', () => {
-    const range: RangeConfig = { text: 'All', range: null };
+  it("should apply null range using fitContent", () => {
+    const range: RangeConfig = { text: "All", range: null };
     (primitive as any).applyRangeToChart(range);
 
     expect(mockTimeScale.fitContent).toHaveBeenCalled();
   });
 
-  it('should calculate range from current end time', () => {
+  it("should calculate range from current end time", () => {
     mockTimeScale.getVisibleRange.mockReturnValue({ from: 1000, to: 2000 });
 
-    const range: RangeConfig = { text: '1D', range: TimeRange.ONE_DAY };
+    const range: RangeConfig = { text: "1D", range: TimeRange.ONE_DAY };
     (primitive as any).applyRangeToChart(range);
 
     expect(mockTimeScale.setVisibleRange).toHaveBeenCalledWith({
@@ -582,11 +600,11 @@ describe('RangeSwitcherPrimitive - Range Application', () => {
     });
   });
 
-  it('should use current time if no visible range', () => {
+  it("should use current time if no visible range", () => {
     mockTimeScale.getVisibleRange.mockReturnValue(null);
     const now = Date.now() / 1000;
 
-    const range: RangeConfig = { text: '1D', range: TimeRange.ONE_DAY };
+    const range: RangeConfig = { text: "1D", range: TimeRange.ONE_DAY };
     (primitive as any).applyRangeToChart(range);
 
     expect(mockTimeScale.setVisibleRange).toHaveBeenCalled();
@@ -594,17 +612,17 @@ describe('RangeSwitcherPrimitive - Range Application', () => {
     expect(call.to).toBeCloseTo(now, -2); // Within 100 seconds
   });
 
-  it('should handle chart errors silently', () => {
+  it("should handle chart errors silently", () => {
     mockChart.timeScale.mockImplementation(() => {
-      throw new Error('Chart error');
+      throw new Error("Chart error");
     });
 
-    const range: RangeConfig = { text: '1D', range: TimeRange.ONE_DAY };
+    const range: RangeConfig = { text: "1D", range: TimeRange.ONE_DAY };
     expect(() => (primitive as any).applyRangeToChart(range)).not.toThrow();
   });
 });
 
-describe('RangeSwitcherPrimitive - Data Timespan', () => {
+describe("RangeSwitcherPrimitive - Data Timespan", () => {
   let primitive: RangeSwitcherPrimitive;
   let mockChart: any;
   let mockTimeScale: any;
@@ -620,8 +638,8 @@ describe('RangeSwitcherPrimitive - Data Timespan', () => {
       timeScale: vi.fn(() => mockTimeScale),
     };
 
-    primitive = new RangeSwitcherPrimitive('test-switcher', {
-      corner: 'top-right',
+    primitive = new RangeSwitcherPrimitive("test-switcher", {
+      corner: "top-right",
       ranges: [],
     });
 
@@ -632,14 +650,14 @@ describe('RangeSwitcherPrimitive - Data Timespan', () => {
     vi.clearAllMocks();
   });
 
-  it('should call fitContent to calculate data timespan', () => {
+  it("should call fitContent to calculate data timespan", () => {
     (primitive as any).getDataTimespan();
 
     expect(mockChart.timeScale).toHaveBeenCalled();
     expect(mockTimeScale.fitContent).toHaveBeenCalled();
   });
 
-  it('should cache data timespan and return cached value', () => {
+  it("should cache data timespan and return cached value", () => {
     // Set a cached value directly
     (primitive as any).dataTimespan = 86400;
 
@@ -648,7 +666,7 @@ describe('RangeSwitcherPrimitive - Data Timespan', () => {
     expect(timespan).toBe(86400);
   });
 
-  it('should return null if chart is unavailable', () => {
+  it("should return null if chart is unavailable", () => {
     (primitive as any).chart = null;
 
     const timespan = (primitive as any).getDataTimespan();
@@ -656,7 +674,7 @@ describe('RangeSwitcherPrimitive - Data Timespan', () => {
     expect(timespan).toBe(null);
   });
 
-  it('should return null if range is invalid', () => {
+  it("should return null if range is invalid", () => {
     mockTimeScale.getVisibleRange.mockReturnValue(null);
 
     const timespan = (primitive as any).getDataTimespan();
@@ -664,9 +682,9 @@ describe('RangeSwitcherPrimitive - Data Timespan', () => {
     expect(timespan).toBe(null);
   });
 
-  it('should handle errors and return null', () => {
+  it("should handle errors and return null", () => {
     mockChart.timeScale.mockImplementation(() => {
-      throw new Error('Error');
+      throw new Error("Error");
     });
 
     const timespan = (primitive as any).getDataTimespan();
@@ -674,7 +692,7 @@ describe('RangeSwitcherPrimitive - Data Timespan', () => {
     expect(timespan).toBe(null);
   });
 
-  it('should invalidate cached timespan', () => {
+  it("should invalidate cached timespan", () => {
     mockTimeScale.getVisibleRange.mockReturnValue({ from: 0, to: 1000 });
 
     (primitive as any).getDataTimespan(); // Cache it
@@ -684,19 +702,19 @@ describe('RangeSwitcherPrimitive - Data Timespan', () => {
   });
 });
 
-describe('RangeSwitcherPrimitive - Range Visibility', () => {
+describe("RangeSwitcherPrimitive - Range Visibility", () => {
   let primitive: RangeSwitcherPrimitive;
 
   beforeEach(() => {
     const ranges: RangeConfig[] = [
-      { text: '1D', range: TimeRange.ONE_DAY },
-      { text: '1W', range: TimeRange.ONE_WEEK },
-      { text: '1M', range: TimeRange.ONE_MONTH },
-      { text: 'All', range: TimeRange.ALL },
+      { text: "1D", range: TimeRange.ONE_DAY },
+      { text: "1W", range: TimeRange.ONE_WEEK },
+      { text: "1M", range: TimeRange.ONE_MONTH },
+      { text: "All", range: TimeRange.ALL },
     ];
 
-    primitive = new RangeSwitcherPrimitive('test-switcher', {
-      corner: 'top-right',
+    primitive = new RangeSwitcherPrimitive("test-switcher", {
+      corner: "top-right",
       ranges,
     });
 
@@ -704,70 +722,70 @@ describe('RangeSwitcherPrimitive - Range Visibility', () => {
     (primitive as any).getDataTimespan = vi.fn(() => 604800);
   });
 
-  it('should show ranges smaller than data timespan', () => {
-    const range: RangeConfig = { text: '1D', range: TimeRange.ONE_DAY };
+  it("should show ranges smaller than data timespan", () => {
+    const range: RangeConfig = { text: "1D", range: TimeRange.ONE_DAY };
     expect((primitive as any).isRangeValidForData(range)).toBe(true);
   });
 
-  it('should show ranges equal to data timespan', () => {
-    const range: RangeConfig = { text: '1W', range: TimeRange.ONE_WEEK };
+  it("should show ranges equal to data timespan", () => {
+    const range: RangeConfig = { text: "1W", range: TimeRange.ONE_WEEK };
     expect((primitive as any).isRangeValidForData(range)).toBe(true);
   });
 
-  it('should hide ranges larger than data timespan', () => {
-    const range: RangeConfig = { text: '1M', range: TimeRange.ONE_MONTH };
+  it("should hide ranges larger than data timespan", () => {
+    const range: RangeConfig = { text: "1M", range: TimeRange.ONE_MONTH };
     expect((primitive as any).isRangeValidForData(range)).toBe(false);
   });
 
   it('should always show "All" range', () => {
-    const range: RangeConfig = { text: 'All', range: TimeRange.ALL };
+    const range: RangeConfig = { text: "All", range: TimeRange.ALL };
     expect((primitive as any).isRangeValidForData(range)).toBe(true);
   });
 
-  it('should apply buffer multiplier (10%)', () => {
+  it("should apply buffer multiplier (10%)", () => {
     // Data timespan is 604800 (7 days)
     // With 10% buffer: 665280 seconds
-    const range: RangeConfig = { text: 'Custom', range: 650000 };
+    const range: RangeConfig = { text: "Custom", range: 650000 };
     expect((primitive as any).isRangeValidForData(range)).toBe(true);
   });
 
-  it('should show all ranges if data timespan is unavailable', () => {
+  it("should show all ranges if data timespan is unavailable", () => {
     (primitive as any).getDataTimespan = vi.fn(() => null);
 
-    const range: RangeConfig = { text: '1Y', range: TimeRange.ONE_YEAR };
+    const range: RangeConfig = { text: "1Y", range: TimeRange.ONE_YEAR };
     expect((primitive as any).isRangeValidForData(range)).toBe(true);
   });
 });
 
-describe('RangeSwitcherPrimitive - Public API', () => {
+describe("RangeSwitcherPrimitive - Public API", () => {
   let primitive: RangeSwitcherPrimitive;
   let mockContainer: HTMLDivElement;
 
   beforeEach(() => {
-    const ranges: RangeConfig[] = [{ text: '1D', range: TimeRange.ONE_DAY }];
+    const ranges: RangeConfig[] = [{ text: "1D", range: TimeRange.ONE_DAY }];
 
-    primitive = new RangeSwitcherPrimitive('test-switcher', {
-      corner: 'top-right',
+    primitive = new RangeSwitcherPrimitive("test-switcher", {
+      corner: "top-right",
       ranges,
     });
 
-    mockContainer = document.createElement('div');
+    mockContainer = document.createElement("div");
     (primitive as any).containerElement = mockContainer;
     (primitive as any).mounted = true;
   });
 
-  describe('addRange', () => {
-    it('should add new range to config', () => {
-      const newRange: RangeConfig = { text: '1W', range: TimeRange.ONE_WEEK };
+  describe("addRange", () => {
+    it("should add new range to config", () => {
+      const newRange: RangeConfig = { text: "1W", range: TimeRange.ONE_WEEK };
       primitive.addRange(newRange);
 
       expect((primitive as any).config.ranges.length).toBe(2);
       expect((primitive as any).config.ranges[1]).toEqual(newRange);
     });
 
-    it('should invalidate cached timespan', () => {
-      const spy = vi.spyOn(primitive, 'invalidateDataTimespan');
-      const newRange: RangeConfig = { text: '1W', range: TimeRange.ONE_WEEK };
+    it("should invalidate cached timespan", () => {
+      const spy = vi.spyOn(primitive, "invalidateDataTimespan");
+      const newRange: RangeConfig = { text: "1W", range: TimeRange.ONE_WEEK };
 
       primitive.addRange(newRange);
 
@@ -775,27 +793,27 @@ describe('RangeSwitcherPrimitive - Public API', () => {
     });
   });
 
-  describe('removeRange', () => {
+  describe("removeRange", () => {
     beforeEach(() => {
-      primitive.addRange({ text: '1W', range: TimeRange.ONE_WEEK });
-      primitive.addRange({ text: '1M', range: TimeRange.ONE_MONTH });
+      primitive.addRange({ text: "1W", range: TimeRange.ONE_WEEK });
+      primitive.addRange({ text: "1M", range: TimeRange.ONE_MONTH });
     });
 
-    it('should remove range at index', () => {
+    it("should remove range at index", () => {
       primitive.removeRange(1);
 
       expect((primitive as any).config.ranges.length).toBe(2);
-      expect((primitive as any).config.ranges[1].text).toBe('1M');
+      expect((primitive as any).config.ranges[1].text).toBe("1M");
     });
 
-    it('should not remove if index is out of bounds', () => {
+    it("should not remove if index is out of bounds", () => {
       const initialLength = (primitive as any).config.ranges.length;
       primitive.removeRange(99);
 
       expect((primitive as any).config.ranges.length).toBe(initialLength);
     });
 
-    it('should not remove if index is negative', () => {
+    it("should not remove if index is negative", () => {
       const initialLength = (primitive as any).config.ranges.length;
       primitive.removeRange(-1);
 
@@ -803,11 +821,11 @@ describe('RangeSwitcherPrimitive - Public API', () => {
     });
   });
 
-  describe('updateRanges', () => {
-    it('should replace all ranges', () => {
+  describe("updateRanges", () => {
+    it("should replace all ranges", () => {
       const newRanges: RangeConfig[] = [
-        { text: '5M', range: TimeRange.FIVE_MINUTES },
-        { text: '15M', range: TimeRange.FIFTEEN_MINUTES },
+        { text: "5M", range: TimeRange.FIVE_MINUTES },
+        { text: "15M", range: TimeRange.FIFTEEN_MINUTES },
       ];
 
       primitive.updateRanges(newRanges);
@@ -815,16 +833,16 @@ describe('RangeSwitcherPrimitive - Public API', () => {
       expect((primitive as any).config.ranges).toEqual(newRanges);
     });
 
-    it('should invalidate cached timespan', () => {
-      const spy = vi.spyOn(primitive, 'invalidateDataTimespan');
+    it("should invalidate cached timespan", () => {
+      const spy = vi.spyOn(primitive, "invalidateDataTimespan");
       primitive.updateRanges([]);
 
       expect(spy).toHaveBeenCalled();
     });
   });
 
-  describe('getDataTimespanSeconds', () => {
-    it('should return cached data timespan', () => {
+  describe("getDataTimespanSeconds", () => {
+    it("should return cached data timespan", () => {
       // Add a mock chart so the method can access it
       const mockChart = { timeScale: vi.fn() };
       (primitive as any).chart = mockChart;
@@ -837,7 +855,7 @@ describe('RangeSwitcherPrimitive - Public API', () => {
       expect(result).toBe(86400);
     });
 
-    it('should return null if no data timespan is cached', () => {
+    it("should return null if no data timespan is cached", () => {
       (primitive as any).chart = null; // No chart = no timespan
 
       const result = primitive.getDataTimespanSeconds();
@@ -846,53 +864,53 @@ describe('RangeSwitcherPrimitive - Public API', () => {
     });
   });
 
-  describe('getHiddenRanges', () => {
+  describe("getHiddenRanges", () => {
     beforeEach(() => {
       (primitive as any).config.ranges = [
-        { text: '1D', range: TimeRange.ONE_DAY },
-        { text: '1M', range: TimeRange.ONE_MONTH },
-        { text: 'All', range: TimeRange.ALL },
+        { text: "1D", range: TimeRange.ONE_DAY },
+        { text: "1M", range: TimeRange.ONE_MONTH },
+        { text: "All", range: TimeRange.ALL },
       ];
       (primitive as any).getDataTimespan = vi.fn(() => 86400); // 1 day of data
     });
 
-    it('should return ranges that exceed data timespan', () => {
+    it("should return ranges that exceed data timespan", () => {
       const hidden = primitive.getHiddenRanges();
 
       expect(hidden.length).toBe(1);
-      expect(hidden[0].range.text).toBe('1M');
-      expect(hidden[0].reason).toBe('exceeds-data-range');
+      expect(hidden[0].range.text).toBe("1M");
+      expect(hidden[0].reason).toBe("exceeds-data-range");
     });
 
     it('should not include "All" range', () => {
       const hidden = primitive.getHiddenRanges();
 
-      expect(hidden.every(h => h.range.text !== 'All')).toBe(true);
+      expect(hidden.every((h) => h.range.text !== "All")).toBe(true);
     });
   });
 
-  describe('getVisibleRangeInfo', () => {
+  describe("getVisibleRangeInfo", () => {
     beforeEach(() => {
       (primitive as any).config.ranges = [
-        { text: '1D', range: TimeRange.ONE_DAY },
-        { text: '1M', range: TimeRange.ONE_MONTH },
-        { text: 'All', range: TimeRange.ALL },
+        { text: "1D", range: TimeRange.ONE_DAY },
+        { text: "1M", range: TimeRange.ONE_MONTH },
+        { text: "All", range: TimeRange.ALL },
       ];
       (primitive as any).getDataTimespan = vi.fn(() => 86400); // 1 day of data
     });
 
-    it('should return visible ranges with info', () => {
+    it("should return visible ranges with info", () => {
       const visible = primitive.getVisibleRangeInfo();
 
       expect(visible.length).toBe(2); // 1D and All
-      expect(visible[0].range.text).toBe('1D');
-      expect(visible[1].range.text).toBe('All');
+      expect(visible[0].range.text).toBe("1D");
+      expect(visible[1].range.text).toBe("All");
       expect(visible[0].dataTimespan).toBe(86400);
     });
   });
 
-  describe('triggerRangeChange', () => {
-    it('should programmatically trigger range change', () => {
+  describe("triggerRangeChange", () => {
+    it("should programmatically trigger range change", () => {
       const mockChart = {
         timeScale: vi.fn(() => ({
           fitContent: vi.fn(),
@@ -907,15 +925,18 @@ describe('RangeSwitcherPrimitive - Public API', () => {
 
       primitive.triggerRangeChange(0);
 
-      expect(callback).toHaveBeenCalledWith({ text: '1D', range: TimeRange.ONE_DAY }, 0);
+      expect(callback).toHaveBeenCalledWith(
+        { text: "1D", range: TimeRange.ONE_DAY },
+        0,
+      );
     });
   });
 });
 
-describe('RangeSwitcherPrimitive - Factory and Defaults', () => {
-  it('should create primitive using factory function', () => {
-    const primitive = createRangeSwitcherPrimitive('test-switcher', {
-      corner: 'top-right',
+describe("RangeSwitcherPrimitive - Factory and Defaults", () => {
+  it("should create primitive using factory function", () => {
+    const primitive = createRangeSwitcherPrimitive("test-switcher", {
+      corner: "top-right",
       ranges: [...DefaultRangeConfigs.trading],
     });
 
@@ -923,39 +944,39 @@ describe('RangeSwitcherPrimitive - Factory and Defaults', () => {
     expect((primitive as any).config.ranges.length).toBe(6);
   });
 
-  it('should provide trading range configs', () => {
+  it("should provide trading range configs", () => {
     expect(DefaultRangeConfigs.trading.length).toBe(6);
-    expect(DefaultRangeConfigs.trading[0].text).toBe('1D');
-    expect(DefaultRangeConfigs.trading[5].text).toBe('All');
+    expect(DefaultRangeConfigs.trading[0].text).toBe("1D");
+    expect(DefaultRangeConfigs.trading[5].text).toBe("All");
   });
 
-  it('should provide short-term range configs', () => {
+  it("should provide short-term range configs", () => {
     expect(DefaultRangeConfigs.shortTerm.length).toBe(7);
-    expect(DefaultRangeConfigs.shortTerm[0].text).toBe('5M');
+    expect(DefaultRangeConfigs.shortTerm[0].text).toBe("5M");
   });
 
-  it('should provide long-term range configs', () => {
+  it("should provide long-term range configs", () => {
     expect(DefaultRangeConfigs.longTerm.length).toBe(7);
-    expect(DefaultRangeConfigs.longTerm[0].text).toBe('1M');
+    expect(DefaultRangeConfigs.longTerm[0].text).toBe("1M");
   });
 
-  it('should provide minimal range configs', () => {
+  it("should provide minimal range configs", () => {
     expect(DefaultRangeConfigs.minimal.length).toBe(4);
-    expect(DefaultRangeConfigs.minimal[0].text).toBe('1D');
+    expect(DefaultRangeConfigs.minimal[0].text).toBe("1D");
   });
 });
 
-describe('RangeSwitcherPrimitive - Lifecycle and Cleanup', () => {
+describe("RangeSwitcherPrimitive - Lifecycle and Cleanup", () => {
   let primitive: RangeSwitcherPrimitive;
 
   beforeEach(() => {
-    primitive = new RangeSwitcherPrimitive('test-switcher', {
-      corner: 'top-right',
-      ranges: [{ text: '1D', range: TimeRange.ONE_DAY }],
+    primitive = new RangeSwitcherPrimitive("test-switcher", {
+      corner: "top-right",
+      ranges: [{ text: "1D", range: TimeRange.ONE_DAY }],
     });
   });
 
-  it('should cleanup interval on detached', () => {
+  it("should cleanup interval on detached", () => {
     (primitive as any).dataChangeIntervalId = setInterval(() => {}, 1000);
     // Store interval ID for potential future verification
     // @ts-expect-error - Interval ID intentionally unused for future verification
@@ -966,28 +987,32 @@ describe('RangeSwitcherPrimitive - Lifecycle and Cleanup', () => {
     expect((primitive as any).dataChangeIntervalId).toBe(null);
   });
 
-  it('should cleanup button event listeners on detached', () => {
-    const mockContainer = document.createElement('div');
+  it("should cleanup button event listeners on detached", () => {
+    const mockContainer = document.createElement("div");
     (primitive as any).containerElement = mockContainer;
     (primitive as any).mounted = true;
     (primitive as any).renderContent();
 
-    expect((primitive as any).buttonEventCleanupFunctions.length).toBeGreaterThan(0);
+    expect(
+      (primitive as any).buttonEventCleanupFunctions.length,
+    ).toBeGreaterThan(0);
 
     primitive.detached();
 
     expect((primitive as any).buttonEventCleanupFunctions.length).toBe(0);
   });
 
-  it('should return empty template', () => {
-    expect((primitive as any).getTemplate()).toBe('');
+  it("should return empty template", () => {
+    expect((primitive as any).getTemplate()).toBe("");
   });
 
-  it('should return correct container class name', () => {
-    expect((primitive as any).getContainerClassName()).toBe('range-switcher-primitive');
+  it("should return correct container class name", () => {
+    expect((primitive as any).getContainerClassName()).toBe(
+      "range-switcher-primitive",
+    );
   });
 
-  it('should always use pane 0 (chart-level)', () => {
+  it("should always use pane 0 (chart-level)", () => {
     expect((primitive as any).getPaneId()).toBe(0);
   });
 });

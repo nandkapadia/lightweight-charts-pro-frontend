@@ -75,7 +75,7 @@ export class PerformanceTestHelpers {
   static measureSync<T>(
     operation: string,
     fn: () => T,
-    expectedThreshold?: number
+    expectedThreshold?: number,
   ): PerformanceReport {
     const threshold = expectedThreshold ?? this.getThreshold(operation);
     const startMemory = this.getCurrentMemoryUsage();
@@ -96,7 +96,12 @@ export class PerformanceTestHelpers {
       memoryDelta,
       passed: duration <= threshold,
       threshold,
-      recommendations: this.generateRecommendations(operation, duration, threshold, memoryDelta),
+      recommendations: this.generateRecommendations(
+        operation,
+        duration,
+        threshold,
+        memoryDelta,
+      ),
       detailed: {
         startTime,
         endTime,
@@ -113,7 +118,7 @@ export class PerformanceTestHelpers {
   static async measureAsync<T>(
     operation: string,
     fn: () => Promise<T>,
-    expectedThreshold?: number
+    expectedThreshold?: number,
   ): Promise<PerformanceReport> {
     const threshold = expectedThreshold ?? this.getThreshold(operation);
     const startMemory = this.getCurrentMemoryUsage();
@@ -134,7 +139,12 @@ export class PerformanceTestHelpers {
       memoryDelta,
       passed: duration <= threshold,
       threshold,
-      recommendations: this.generateRecommendations(operation, duration, threshold, memoryDelta),
+      recommendations: this.generateRecommendations(
+        operation,
+        duration,
+        threshold,
+        memoryDelta,
+      ),
       detailed: {
         startTime,
         endTime,
@@ -152,7 +162,7 @@ export class PerformanceTestHelpers {
     operation: string,
     fn: () => T | Promise<T>,
     iterations: number = 100,
-    warmupIterations: number = 10
+    warmupIterations: number = 10,
   ): Promise<BenchmarkResult> {
     const samples: number[] = [];
 
@@ -180,12 +190,14 @@ export class PerformanceTestHelpers {
     const totalTime = overallEndTime - overallStartTime;
 
     // Calculate statistics
-    const averageTime = samples.reduce((sum, time) => sum + time, 0) / samples.length;
+    const averageTime =
+      samples.reduce((sum, time) => sum + time, 0) / samples.length;
     const minTime = Math.min(...samples);
     const maxTime = Math.max(...samples);
 
     const variance =
-      samples.reduce((sum, time) => sum + Math.pow(time - averageTime, 2), 0) / samples.length;
+      samples.reduce((sum, time) => sum + Math.pow(time - averageTime, 2), 0) /
+      samples.length;
     const standardDeviation = Math.sqrt(variance);
 
     const throughput = 1000 / averageTime; // operations per second
@@ -213,7 +225,7 @@ export class PerformanceTestHelpers {
   static async monitorFrameRate<T>(
     operation: string,
     fn: () => T | Promise<T>,
-    duration: number = 1000
+    duration: number = 1000,
   ): Promise<{
     result: T;
     frameRate: number;
@@ -233,8 +245,8 @@ export class PerformanceTestHelpers {
     // Start monitoring - use global requestAnimationFrame with fallback
     const startMonitoring = () => {
       const raf =
-        (typeof global !== 'undefined' && global.requestAnimationFrame) ||
-        (typeof window !== 'undefined' && window.requestAnimationFrame);
+        (typeof global !== "undefined" && global.requestAnimationFrame) ||
+        (typeof window !== "undefined" && window.requestAnimationFrame);
       if (raf) {
         animationId = raf(() => {
           frameCallback();
@@ -255,25 +267,28 @@ export class PerformanceTestHelpers {
     const result = await fn();
 
     // Stop monitoring after duration
-    await new Promise(resolve => setTimeout(resolve, duration));
+    await new Promise((resolve) => setTimeout(resolve, duration));
 
     // Cancel animation frame with fallback
     const caf =
-      (typeof global !== 'undefined' && global.cancelAnimationFrame) ||
-      (typeof window !== 'undefined' && window.cancelAnimationFrame);
+      (typeof global !== "undefined" && global.cancelAnimationFrame) ||
+      (typeof window !== "undefined" && window.cancelAnimationFrame);
     if (caf && animationId) {
       caf(animationId);
-    } else if (typeof animationId === 'number') {
+    } else if (typeof animationId === "number") {
       clearTimeout(animationId);
     }
 
     // Calculate frame rate
     const totalFrames = frames.length;
     const actualDuration = frames.reduce((sum, time) => sum + time, 0);
-    const frameRate = totalFrames > 0 ? (1000 * totalFrames) / actualDuration : 0;
+    const frameRate =
+      totalFrames > 0 ? (1000 * totalFrames) / actualDuration : 0;
 
     const targetFrameTime = 1000 / 60; // 60fps
-    const droppedFrames = frames.filter(time => time > targetFrameTime * 1.5).length;
+    const droppedFrames = frames.filter(
+      (time) => time > targetFrameTime * 1.5,
+    ).length;
 
     const passed = frameRate >= this.thresholds.frameRate;
 
@@ -293,7 +308,7 @@ export class PerformanceTestHelpers {
     currentFn: () => any,
     baselineFn: () => any,
     iterations: number = 50,
-    regressionThreshold: number = 1.2 // 20% regression threshold
+    regressionThreshold: number = 1.2, // 20% regression threshold
   ): Promise<{
     currentPerformance: BenchmarkResult;
     baselinePerformance: BenchmarkResult;
@@ -322,7 +337,7 @@ export class PerformanceTestHelpers {
   static async profileMemory<T>(
     operation: string,
     fn: () => T | Promise<T>,
-    samplingInterval: number = 100
+    samplingInterval: number = 100,
   ): Promise<{
     result: T;
     memoryProfile: {
@@ -355,15 +370,16 @@ export class PerformanceTestHelpers {
       // Force garbage collection and take final measurement
       if (global.gc) {
         global.gc();
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise((resolve) => setTimeout(resolve, 100));
       }
 
       const finalMemory = this.getCurrentMemoryUsage();
 
       // Calculate memory statistics
-      const memoryValues = samples.map(s => s.memory);
+      const memoryValues = samples.map((s) => s.memory);
       const peak = Math.max(...memoryValues, finalMemory);
-      const average = memoryValues.reduce((sum, mem) => sum + mem, 0) / memoryValues.length;
+      const average =
+        memoryValues.reduce((sum, mem) => sum + mem, 0) / memoryValues.length;
       const leaked = Math.max(0, finalMemory - startMemory);
 
       const passed = leaked <= this.thresholds.memoryUsage;
@@ -394,20 +410,23 @@ export class PerformanceTestHelpers {
     minTime: number;
     maxTime: number;
     standardDeviation: number;
-    trend: 'improving' | 'degrading' | 'stable';
+    trend: "improving" | "degrading" | "stable";
   } | null {
     const measurements = this.measurements.get(operation);
     if (!measurements || measurements.length === 0) {
       return null;
     }
 
-    const averageTime = measurements.reduce((sum, time) => sum + time, 0) / measurements.length;
+    const averageTime =
+      measurements.reduce((sum, time) => sum + time, 0) / measurements.length;
     const minTime = Math.min(...measurements);
     const maxTime = Math.max(...measurements);
 
     const variance =
-      measurements.reduce((sum, time) => sum + Math.pow(time - averageTime, 2), 0) /
-      measurements.length;
+      measurements.reduce(
+        (sum, time) => sum + Math.pow(time - averageTime, 2),
+        0,
+      ) / measurements.length;
     const standardDeviation = Math.sqrt(variance);
 
     // Calculate trend (last 25% vs first 25% of measurements)
@@ -423,20 +442,22 @@ export class PerformanceTestHelpers {
         minTime,
         maxTime,
         standardDeviation,
-        trend: 'stable',
+        trend: "stable",
       };
     }
 
-    const firstAvg = firstQuarter.reduce((sum, time) => sum + time, 0) / firstQuarter.length;
-    const lastAvg = lastQuarter.reduce((sum, time) => sum + time, 0) / lastQuarter.length;
+    const firstAvg =
+      firstQuarter.reduce((sum, time) => sum + time, 0) / firstQuarter.length;
+    const lastAvg =
+      lastQuarter.reduce((sum, time) => sum + time, 0) / lastQuarter.length;
 
-    let trend: 'improving' | 'degrading' | 'stable' = 'stable';
+    let trend: "improving" | "degrading" | "stable" = "stable";
     const changeRatio = lastAvg / firstAvg;
 
     if (changeRatio > 1.1) {
-      trend = 'degrading';
+      trend = "degrading";
     } else if (changeRatio < 0.9) {
-      trend = 'improving';
+      trend = "improving";
     }
 
     return {
@@ -470,7 +491,7 @@ export class PerformanceTestHelpers {
   static async setMemoryBaseline(): Promise<void> {
     if (global.gc) {
       global.gc();
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
     }
     this.memoryBaseline = this.getCurrentMemoryUsage();
   }
@@ -487,25 +508,25 @@ export class PerformanceTestHelpers {
   private static getThreshold(operation: string): number {
     const normalizedOp = operation.toLowerCase();
 
-    if (normalizedOp.includes('chart') && normalizedOp.includes('create')) {
+    if (normalizedOp.includes("chart") && normalizedOp.includes("create")) {
       return this.thresholds.chartCreation;
     }
-    if (normalizedOp.includes('series') && normalizedOp.includes('add')) {
+    if (normalizedOp.includes("series") && normalizedOp.includes("add")) {
       return this.thresholds.seriesAddition;
     }
     if (
-      normalizedOp.includes('data') &&
-      (normalizedOp.includes('update') || normalizedOp.includes('set'))
+      normalizedOp.includes("data") &&
+      (normalizedOp.includes("update") || normalizedOp.includes("set"))
     ) {
       return this.thresholds.dataUpdate;
     }
-    if (normalizedOp.includes('resize')) {
+    if (normalizedOp.includes("resize")) {
       return this.thresholds.resize;
     }
     if (
-      normalizedOp.includes('cleanup') ||
-      normalizedOp.includes('destroy') ||
-      normalizedOp.includes('remove')
+      normalizedOp.includes("cleanup") ||
+      normalizedOp.includes("destroy") ||
+      normalizedOp.includes("remove")
     ) {
       return this.thresholds.cleanup;
     }
@@ -514,7 +535,10 @@ export class PerformanceTestHelpers {
     return 100;
   }
 
-  private static recordMeasurement(operation: string, ...durations: number[]): void {
+  private static recordMeasurement(
+    operation: string,
+    ...durations: number[]
+  ): void {
     if (!this.measurements.has(operation)) {
       this.measurements.set(operation, []);
     }
@@ -522,11 +546,11 @@ export class PerformanceTestHelpers {
   }
 
   private static getCurrentMemoryUsage(): number {
-    if (typeof performance !== 'undefined' && (performance as any).memory) {
+    if (typeof performance !== "undefined" && (performance as any).memory) {
       return (performance as any).memory.usedJSHeapSize;
     }
 
-    if (typeof process !== 'undefined' && process.memoryUsage) {
+    if (typeof process !== "undefined" && process.memoryUsage) {
       return process.memoryUsage().heapUsed;
     }
 
@@ -538,37 +562,47 @@ export class PerformanceTestHelpers {
     operation: string,
     duration: number,
     threshold: number,
-    memoryDelta: number
+    memoryDelta: number,
   ): string[] {
     const recommendations: string[] = [];
 
     if (duration > threshold) {
-      const overagePercentage = Math.round(((duration - threshold) / threshold) * 100);
+      const overagePercentage = Math.round(
+        ((duration - threshold) / threshold) * 100,
+      );
       recommendations.push(
-        `${operation} took ${duration.toFixed(2)}ms, exceeding threshold by ${overagePercentage}%`
+        `${operation} took ${duration.toFixed(2)}ms, exceeding threshold by ${overagePercentage}%`,
       );
 
       // Specific recommendations based on operation type
-      if (operation.toLowerCase().includes('chart')) {
-        recommendations.push('Consider reducing chart complexity or using progressive rendering');
+      if (operation.toLowerCase().includes("chart")) {
+        recommendations.push(
+          "Consider reducing chart complexity or using progressive rendering",
+        );
       }
-      if (operation.toLowerCase().includes('data')) {
-        recommendations.push('Consider data pagination or virtual scrolling for large datasets');
+      if (operation.toLowerCase().includes("data")) {
+        recommendations.push(
+          "Consider data pagination or virtual scrolling for large datasets",
+        );
       }
-      if (operation.toLowerCase().includes('series')) {
-        recommendations.push('Limit the number of concurrent series or use data aggregation');
+      if (operation.toLowerCase().includes("series")) {
+        recommendations.push(
+          "Limit the number of concurrent series or use data aggregation",
+        );
       }
     }
 
     if (memoryDelta > 1024 * 1024) {
       // 1MB
       recommendations.push(
-        `Operation used ${Math.round(memoryDelta / 1024)}KB of memory. Consider optimizing data structures.`
+        `Operation used ${Math.round(memoryDelta / 1024)}KB of memory. Consider optimizing data structures.`,
       );
     }
 
     if (recommendations.length === 0) {
-      recommendations.push(`${operation} performance is within acceptable limits`);
+      recommendations.push(
+        `${operation} performance is within acceptable limits`,
+      );
     }
 
     return recommendations;
@@ -585,12 +619,20 @@ export class PerformanceTestHelpers {
 export function performanceTest<T>(
   operation: string,
   fn: () => T | Promise<T>,
-  threshold?: number
+  threshold?: number,
 ) {
-  if (fn.constructor.name === 'AsyncFunction') {
-    return PerformanceTestHelpers.measureAsync(operation, fn as () => Promise<T>, threshold);
+  if (fn.constructor.name === "AsyncFunction") {
+    return PerformanceTestHelpers.measureAsync(
+      operation,
+      fn as () => Promise<T>,
+      threshold,
+    );
   } else {
-    return PerformanceTestHelpers.measureSync(operation, fn as () => T, threshold);
+    return PerformanceTestHelpers.measureSync(
+      operation,
+      fn as () => T,
+      threshold,
+    );
   }
 }
 
@@ -599,9 +641,13 @@ export function performanceTest<T>(
  */
 export async function testChartCreationPerformance(
   createChartFn: () => any,
-  iterations: number = 50
+  iterations: number = 50,
 ): Promise<BenchmarkResult> {
-  return PerformanceTestHelpers.benchmark('chart-creation', createChartFn, iterations);
+  return PerformanceTestHelpers.benchmark(
+    "chart-creation",
+    createChartFn,
+    iterations,
+  );
 }
 
 /**
@@ -609,9 +655,13 @@ export async function testChartCreationPerformance(
  */
 export async function testDataUpdatePerformance(
   updateDataFn: () => any,
-  iterations: number = 100
+  iterations: number = 100,
 ): Promise<BenchmarkResult> {
-  return PerformanceTestHelpers.benchmark('data-update', updateDataFn, iterations);
+  return PerformanceTestHelpers.benchmark(
+    "data-update",
+    updateDataFn,
+    iterations,
+  );
 }
 
 /**
@@ -619,7 +669,7 @@ export async function testDataUpdatePerformance(
  */
 export async function testMemoryPerformance<T>(
   operation: string,
-  fn: () => T | Promise<T>
+  fn: () => T | Promise<T>,
 ): Promise<{
   result: T;
   memoryProfile: any;

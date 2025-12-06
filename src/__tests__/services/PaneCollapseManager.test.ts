@@ -9,13 +9,13 @@
  * See: https://github.com/yourusername/yourrepo/issues/XXX
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { PaneCollapseManager } from '../../services/PaneCollapseManager';
-import type { IChartApi } from 'lightweight-charts';
-import { DIMENSIONS } from '../../config/positioningConfig';
-import { KeyedSingletonManager } from '../../utils/KeyedSingletonManager';
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { PaneCollapseManager } from "../../services/PaneCollapseManager";
+import type { IChartApi } from "lightweight-charts";
+import { DIMENSIONS } from "../../config/positioningConfig";
+import { KeyedSingletonManager } from "../../utils/KeyedSingletonManager";
 
-describe.skip('PaneCollapseManager', () => {
+describe.skip("PaneCollapseManager", () => {
   let mockChartApi: IChartApi;
   let mockChartElement: HTMLElement;
   let mockPaneElement: HTMLElement;
@@ -25,24 +25,24 @@ describe.skip('PaneCollapseManager', () => {
 
   beforeEach(() => {
     // Clear singleton instances between tests using KeyedSingletonManager
-    (KeyedSingletonManager as any).clearAllInstances('PaneCollapseManager');
+    (KeyedSingletonManager as any).clearAllInstances("PaneCollapseManager");
 
     // Create mock DOM elements - store multiple panes
     mockPaneElements = new Map();
     mockCanvasElements = new Map();
 
     // Create default pane (index 0)
-    mockCanvasElement = document.createElement('canvas');
-    mockCanvasElement.style.height = '200px';
+    mockCanvasElement = document.createElement("canvas");
+    mockCanvasElement.style.height = "200px";
     mockCanvasElements.set(0, mockCanvasElement);
 
-    mockPaneElement = document.createElement('div');
-    mockPaneElement.className = 'pane';
-    mockPaneElement.style.height = '200px';
+    mockPaneElement = document.createElement("div");
+    mockPaneElement.className = "pane";
+    mockPaneElement.style.height = "200px";
     mockPaneElement.appendChild(mockCanvasElement);
     mockPaneElements.set(0, mockPaneElement);
 
-    mockChartElement = document.createElement('div');
+    mockChartElement = document.createElement("div");
     mockChartElement.appendChild(mockPaneElement);
 
     // Mock chart API with complete pane API
@@ -55,13 +55,13 @@ describe.skip('PaneCollapseManager', () => {
           if (!target[index]) {
             // Create DOM elements for this pane if they don't exist
             if (!mockPaneElements.has(index)) {
-              const canvas = document.createElement('canvas');
-              canvas.style.height = '200px';
+              const canvas = document.createElement("canvas");
+              canvas.style.height = "200px";
               mockCanvasElements.set(index, canvas);
 
-              const pane = document.createElement('div');
-              pane.className = 'pane';
-              pane.style.height = '200px';
+              const pane = document.createElement("div");
+              pane.className = "pane";
+              pane.style.height = "200px";
               pane.appendChild(canvas);
               mockPaneElements.set(index, pane);
             }
@@ -78,11 +78,11 @@ describe.skip('PaneCollapseManager', () => {
                 paneElement.style.maxHeight = `${height}px`;
                 // Hide canvas when collapsing
                 if (height <= 40 && canvasElement) {
-                  canvasElement.style.height = '0px';
-                  canvasElement.style.display = 'none';
+                  canvasElement.style.height = "0px";
+                  canvasElement.style.display = "none";
                 } else if (canvasElement) {
-                  canvasElement.style.height = '';
-                  canvasElement.style.display = '';
+                  canvasElement.style.height = "";
+                  canvasElement.style.display = "";
                 }
               }),
             };
@@ -106,45 +106,66 @@ describe.skip('PaneCollapseManager', () => {
     vi.clearAllMocks();
   });
 
-  describe('Singleton Pattern', () => {
-    it('should return same instance for same chartId', () => {
-      const instance1 = PaneCollapseManager.getInstance(mockChartApi, 'chart-1');
-      const instance2 = PaneCollapseManager.getInstance(mockChartApi, 'chart-1');
+  describe("Singleton Pattern", () => {
+    it("should return same instance for same chartId", () => {
+      const instance1 = PaneCollapseManager.getInstance(
+        mockChartApi,
+        "chart-1",
+      );
+      const instance2 = PaneCollapseManager.getInstance(
+        mockChartApi,
+        "chart-1",
+      );
 
       expect(instance1).toBe(instance2);
     });
 
-    it('should return different instances for different chartIds', () => {
-      const instance1 = PaneCollapseManager.getInstance(mockChartApi, 'chart-1');
-      const instance2 = PaneCollapseManager.getInstance(mockChartApi, 'chart-2');
+    it("should return different instances for different chartIds", () => {
+      const instance1 = PaneCollapseManager.getInstance(
+        mockChartApi,
+        "chart-1",
+      );
+      const instance2 = PaneCollapseManager.getInstance(
+        mockChartApi,
+        "chart-2",
+      );
 
       expect(instance1).not.toBe(instance2);
     });
 
     it('should use "default" chartId when not specified', () => {
       const instance1 = PaneCollapseManager.getInstance(mockChartApi);
-      const instance2 = PaneCollapseManager.getInstance(mockChartApi, 'default');
+      const instance2 = PaneCollapseManager.getInstance(
+        mockChartApi,
+        "default",
+      );
 
       expect(instance1).toBe(instance2);
     });
 
-    it('should create new instance after destroyInstance', () => {
-      const instance1 = PaneCollapseManager.getInstance(mockChartApi, 'chart-1');
-      PaneCollapseManager.destroyInstance('chart-1');
-      const instance2 = PaneCollapseManager.getInstance(mockChartApi, 'chart-1');
+    it("should create new instance after destroyInstance", () => {
+      const instance1 = PaneCollapseManager.getInstance(
+        mockChartApi,
+        "chart-1",
+      );
+      PaneCollapseManager.destroyInstance("chart-1");
+      const instance2 = PaneCollapseManager.getInstance(
+        mockChartApi,
+        "chart-1",
+      );
 
       expect(instance1).not.toBe(instance2);
     });
 
-    it('should handle destroyInstance for non-existent chartId gracefully', () => {
+    it("should handle destroyInstance for non-existent chartId gracefully", () => {
       expect(() => {
-        PaneCollapseManager.destroyInstance('non-existent');
+        PaneCollapseManager.destroyInstance("non-existent");
       }).not.toThrow();
     });
   });
 
-  describe('Pane Initialization', () => {
-    it('should initialize pane state', () => {
+  describe("Pane Initialization", () => {
+    it("should initialize pane state", () => {
       const manager = PaneCollapseManager.getInstance(mockChartApi);
       manager.initializePane(0);
 
@@ -156,8 +177,8 @@ describe.skip('PaneCollapseManager', () => {
       expect(state?.collapsedHeight).toBe(DIMENSIONS.pane.collapsedHeight);
     });
 
-    it('should use custom collapsed height from config', () => {
-      const manager = PaneCollapseManager.getInstance(mockChartApi, 'chart-1', {
+    it("should use custom collapsed height from config", () => {
+      const manager = PaneCollapseManager.getInstance(mockChartApi, "chart-1", {
         collapsedHeight: 50,
       });
       manager.initializePane(0);
@@ -167,7 +188,7 @@ describe.skip('PaneCollapseManager', () => {
       expect(state?.collapsedHeight).toBe(50);
     });
 
-    it('should not reinitialize existing pane', () => {
+    it("should not reinitialize existing pane", () => {
       const manager = PaneCollapseManager.getInstance(mockChartApi);
       manager.initializePane(0);
 
@@ -178,7 +199,7 @@ describe.skip('PaneCollapseManager', () => {
       expect(state1).toBe(state2);
     });
 
-    it('should return undefined for uninitialized pane', () => {
+    it("should return undefined for uninitialized pane", () => {
       const manager = PaneCollapseManager.getInstance(mockChartApi);
 
       const state = manager.getState(99);
@@ -187,14 +208,14 @@ describe.skip('PaneCollapseManager', () => {
     });
   });
 
-  describe('isCollapsed', () => {
-    it('should return false for uninitialized pane', () => {
+  describe("isCollapsed", () => {
+    it("should return false for uninitialized pane", () => {
       const manager = PaneCollapseManager.getInstance(mockChartApi);
 
       expect(manager.isCollapsed(0)).toBe(false);
     });
 
-    it('should return correct collapsed state', () => {
+    it("should return correct collapsed state", () => {
       const manager = PaneCollapseManager.getInstance(mockChartApi);
       manager.initializePane(0);
 
@@ -206,20 +227,20 @@ describe.skip('PaneCollapseManager', () => {
     });
   });
 
-  describe('Collapse Functionality', () => {
-    it('should collapse pane correctly', () => {
+  describe("Collapse Functionality", () => {
+    it("should collapse pane correctly", () => {
       const manager = PaneCollapseManager.getInstance(mockChartApi);
       manager.initializePane(0);
 
       // Mock chartElement.querySelector to return pane
       mockChartElement.querySelector = vi.fn((selector: string) => {
-        if (selector.includes('pane')) return mockPaneElement;
+        if (selector.includes("pane")) return mockPaneElement;
         return null;
       });
 
       // Mock paneElement.querySelector to return canvas
       mockPaneElement.querySelector = vi.fn((selector: string) => {
-        if (selector === 'canvas') return mockCanvasElement;
+        if (selector === "canvas") return mockCanvasElement;
         return null;
       });
 
@@ -230,14 +251,14 @@ describe.skip('PaneCollapseManager', () => {
       expect(state?.originalHeight).toBe(200);
 
       // Check DOM manipulation
-      expect(mockPaneElement.style.height).toBe('40px');
-      expect(mockPaneElement.style.minHeight).toBe('40px');
-      expect(mockPaneElement.style.maxHeight).toBe('40px');
-      expect(mockCanvasElement.style.height).toBe('0px');
-      expect(mockCanvasElement.style.display).toBe('none');
+      expect(mockPaneElement.style.height).toBe("40px");
+      expect(mockPaneElement.style.minHeight).toBe("40px");
+      expect(mockPaneElement.style.maxHeight).toBe("40px");
+      expect(mockCanvasElement.style.height).toBe("0px");
+      expect(mockCanvasElement.style.display).toBe("none");
     });
 
-    it('should not collapse already collapsed pane', () => {
+    it("should not collapse already collapsed pane", () => {
       const manager = PaneCollapseManager.getInstance(mockChartApi);
       manager.initializePane(0);
 
@@ -252,9 +273,9 @@ describe.skip('PaneCollapseManager', () => {
       expect(heightAfterFirstCollapse).toBe(heightAfterSecondCollapse);
     });
 
-    it('should call onPaneCollapse callback', () => {
+    it("should call onPaneCollapse callback", () => {
       const onPaneCollapse = vi.fn();
-      const manager = PaneCollapseManager.getInstance(mockChartApi, 'chart-1', {
+      const manager = PaneCollapseManager.getInstance(mockChartApi, "chart-1", {
         onPaneCollapse,
       });
       manager.initializePane(0);
@@ -266,7 +287,7 @@ describe.skip('PaneCollapseManager', () => {
       expect(onPaneCollapse).toHaveBeenCalledWith(0, true);
     });
 
-    it('should handle missing pane element gracefully', () => {
+    it("should handle missing pane element gracefully", () => {
       const manager = PaneCollapseManager.getInstance(mockChartApi);
       manager.initializePane(0);
 
@@ -280,12 +301,12 @@ describe.skip('PaneCollapseManager', () => {
       expect(state?.isCollapsed).toBe(false);
     });
 
-    it('should handle collapse without canvas element', () => {
+    it("should handle collapse without canvas element", () => {
       const manager = PaneCollapseManager.getInstance(mockChartApi);
       manager.initializePane(0);
 
-      const paneWithoutCanvas = document.createElement('div');
-      paneWithoutCanvas.style.height = '200px';
+      const paneWithoutCanvas = document.createElement("div");
+      paneWithoutCanvas.style.height = "200px";
 
       mockChartElement.querySelector = vi.fn(() => paneWithoutCanvas);
 
@@ -293,24 +314,24 @@ describe.skip('PaneCollapseManager', () => {
         manager.collapse(0);
       }).not.toThrow();
 
-      expect(paneWithoutCanvas.style.height).toBe('40px');
+      expect(paneWithoutCanvas.style.height).toBe("40px");
     });
   });
 
-  describe('Expand Functionality', () => {
-    it('should expand collapsed pane correctly', () => {
+  describe("Expand Functionality", () => {
+    it("should expand collapsed pane correctly", () => {
       const manager = PaneCollapseManager.getInstance(mockChartApi);
       manager.initializePane(0);
 
       // Mock chartElement.querySelector to return pane
       mockChartElement.querySelector = vi.fn((selector: string) => {
-        if (selector.includes('pane')) return mockPaneElement;
+        if (selector.includes("pane")) return mockPaneElement;
         return null;
       });
 
       // Mock paneElement.querySelector to return canvas
       mockPaneElement.querySelector = vi.fn((selector: string) => {
-        if (selector === 'canvas') return mockCanvasElement;
+        if (selector === "canvas") return mockCanvasElement;
         return null;
       });
 
@@ -325,14 +346,14 @@ describe.skip('PaneCollapseManager', () => {
       expect(state?.isCollapsed).toBe(false);
 
       // Check DOM restoration
-      expect(mockPaneElement.style.height).toBe('');
-      expect(mockPaneElement.style.minHeight).toBe('');
-      expect(mockPaneElement.style.maxHeight).toBe('');
-      expect(mockCanvasElement.style.height).toBe('');
-      expect(mockCanvasElement.style.display).toBe('');
+      expect(mockPaneElement.style.height).toBe("");
+      expect(mockPaneElement.style.minHeight).toBe("");
+      expect(mockPaneElement.style.maxHeight).toBe("");
+      expect(mockCanvasElement.style.height).toBe("");
+      expect(mockCanvasElement.style.display).toBe("");
     });
 
-    it('should not expand already expanded pane', () => {
+    it("should not expand already expanded pane", () => {
       const manager = PaneCollapseManager.getInstance(mockChartApi);
       manager.initializePane(0);
 
@@ -344,9 +365,9 @@ describe.skip('PaneCollapseManager', () => {
       expect(state?.isCollapsed).toBe(false);
     });
 
-    it('should call onPaneExpand callback', () => {
+    it("should call onPaneExpand callback", () => {
       const onPaneExpand = vi.fn();
-      const manager = PaneCollapseManager.getInstance(mockChartApi, 'chart-1', {
+      const manager = PaneCollapseManager.getInstance(mockChartApi, "chart-1", {
         onPaneExpand,
       });
       manager.initializePane(0);
@@ -359,7 +380,7 @@ describe.skip('PaneCollapseManager', () => {
       expect(onPaneExpand).toHaveBeenCalledWith(0, false);
     });
 
-    it('should trigger chart resize on expand', () => {
+    it("should trigger chart resize on expand", () => {
       const manager = PaneCollapseManager.getInstance(mockChartApi);
       manager.initializePane(0);
 
@@ -370,12 +391,12 @@ describe.skip('PaneCollapseManager', () => {
       });
 
       // Mock clientWidth and clientHeight using Object.defineProperty
-      Object.defineProperty(mockChartElement, 'clientWidth', {
+      Object.defineProperty(mockChartElement, "clientWidth", {
         writable: false,
         configurable: true,
         value: 800,
       });
-      Object.defineProperty(mockChartElement, 'clientHeight', {
+      Object.defineProperty(mockChartElement, "clientHeight", {
         writable: false,
         configurable: true,
         value: 600,
@@ -387,7 +408,7 @@ describe.skip('PaneCollapseManager', () => {
       expect(mockChartApi.resize).toHaveBeenCalledWith(800, 600);
     });
 
-    it('should handle missing pane element gracefully on expand', () => {
+    it("should handle missing pane element gracefully on expand", () => {
       const manager = PaneCollapseManager.getInstance(mockChartApi);
       manager.initializePane(0);
 
@@ -399,8 +420,8 @@ describe.skip('PaneCollapseManager', () => {
     });
   });
 
-  describe('Toggle Functionality', () => {
-    it('should toggle from expanded to collapsed', () => {
+  describe("Toggle Functionality", () => {
+    it("should toggle from expanded to collapsed", () => {
       const manager = PaneCollapseManager.getInstance(mockChartApi);
       manager.initializePane(0);
 
@@ -413,7 +434,7 @@ describe.skip('PaneCollapseManager', () => {
       expect(manager.isCollapsed(0)).toBe(true);
     });
 
-    it('should toggle from collapsed to expanded', () => {
+    it("should toggle from collapsed to expanded", () => {
       const manager = PaneCollapseManager.getInstance(mockChartApi);
       manager.initializePane(0);
 
@@ -427,7 +448,7 @@ describe.skip('PaneCollapseManager', () => {
       expect(manager.isCollapsed(0)).toBe(false);
     });
 
-    it('should handle toggle on uninitialized pane gracefully', () => {
+    it("should handle toggle on uninitialized pane gracefully", () => {
       const manager = PaneCollapseManager.getInstance(mockChartApi);
 
       expect(() => {
@@ -435,7 +456,7 @@ describe.skip('PaneCollapseManager', () => {
       }).not.toThrow();
     });
 
-    it('should toggle multiple times correctly', () => {
+    it("should toggle multiple times correctly", () => {
       const manager = PaneCollapseManager.getInstance(mockChartApi);
       manager.initializePane(0);
 
@@ -452,8 +473,8 @@ describe.skip('PaneCollapseManager', () => {
     });
   });
 
-  describe('Multiple Panes', () => {
-    it('should manage multiple panes independently', () => {
+  describe("Multiple Panes", () => {
+    it("should manage multiple panes independently", () => {
       const manager = PaneCollapseManager.getInstance(mockChartApi);
       manager.initializePane(0);
       manager.initializePane(1);
@@ -469,11 +490,11 @@ describe.skip('PaneCollapseManager', () => {
       expect(manager.isCollapsed(2)).toBe(true);
     });
 
-    it('should share manager instance across multiple panes', () => {
-      const manager1 = PaneCollapseManager.getInstance(mockChartApi, 'chart-1');
+    it("should share manager instance across multiple panes", () => {
+      const manager1 = PaneCollapseManager.getInstance(mockChartApi, "chart-1");
       manager1.initializePane(0);
 
-      const manager2 = PaneCollapseManager.getInstance(mockChartApi, 'chart-1');
+      const manager2 = PaneCollapseManager.getInstance(mockChartApi, "chart-1");
       manager2.initializePane(1);
 
       expect(manager1).toBe(manager2);
@@ -485,9 +506,9 @@ describe.skip('PaneCollapseManager', () => {
     });
   });
 
-  describe('Destroy', () => {
-    it('should clear all pane states on destroy', () => {
-      const manager = PaneCollapseManager.getInstance(mockChartApi, 'chart-1');
+  describe("Destroy", () => {
+    it("should clear all pane states on destroy", () => {
+      const manager = PaneCollapseManager.getInstance(mockChartApi, "chart-1");
       manager.initializePane(0);
       manager.initializePane(1);
 
@@ -500,28 +521,31 @@ describe.skip('PaneCollapseManager', () => {
       expect(manager.getState(1)).toBeUndefined();
     });
 
-    it('should destroy singleton instance via destroyInstance', () => {
-      const manager = PaneCollapseManager.getInstance(mockChartApi, 'chart-1');
+    it("should destroy singleton instance via destroyInstance", () => {
+      const manager = PaneCollapseManager.getInstance(mockChartApi, "chart-1");
       manager.initializePane(0);
 
       expect(manager.getState(0)).toBeDefined();
 
-      PaneCollapseManager.destroyInstance('chart-1');
+      PaneCollapseManager.destroyInstance("chart-1");
 
       // Getting instance again should create new one with clean state
-      const newManager = PaneCollapseManager.getInstance(mockChartApi, 'chart-1');
+      const newManager = PaneCollapseManager.getInstance(
+        mockChartApi,
+        "chart-1",
+      );
       expect(newManager.getState(0)).toBeUndefined();
     });
   });
 
-  describe('Error Handling', () => {
-    it('should handle errors in collapse gracefully', () => {
+  describe("Error Handling", () => {
+    it("should handle errors in collapse gracefully", () => {
       const manager = PaneCollapseManager.getInstance(mockChartApi);
       manager.initializePane(0);
 
       // Mock chartElement to throw error
       mockChartApi.chartElement = vi.fn(() => {
-        throw new Error('Chart element error');
+        throw new Error("Chart element error");
       });
 
       expect(() => {
@@ -532,7 +556,7 @@ describe.skip('PaneCollapseManager', () => {
       expect(manager.isCollapsed(0)).toBe(false);
     });
 
-    it('should handle errors in expand gracefully', () => {
+    it("should handle errors in expand gracefully", () => {
       const manager = PaneCollapseManager.getInstance(mockChartApi);
       manager.initializePane(0);
 
@@ -541,7 +565,7 @@ describe.skip('PaneCollapseManager', () => {
 
       // Mock chartElement to throw error
       mockChartApi.chartElement = vi.fn(() => {
-        throw new Error('Chart element error');
+        throw new Error("Chart element error");
       });
 
       expect(() => {
@@ -552,12 +576,12 @@ describe.skip('PaneCollapseManager', () => {
       expect(manager.isCollapsed(0)).toBe(true);
     });
 
-    it('should handle errors in toggle gracefully', () => {
+    it("should handle errors in toggle gracefully", () => {
       const manager = PaneCollapseManager.getInstance(mockChartApi);
       manager.initializePane(0);
 
       mockChartElement.querySelector = vi.fn(() => {
-        throw new Error('querySelector error');
+        throw new Error("querySelector error");
       });
 
       expect(() => {
@@ -566,8 +590,8 @@ describe.skip('PaneCollapseManager', () => {
     });
   });
 
-  describe('Configuration', () => {
-    it('should use default collapsed height when not specified', () => {
+  describe("Configuration", () => {
+    it("should use default collapsed height when not specified", () => {
       const manager = PaneCollapseManager.getInstance(mockChartApi);
       manager.initializePane(0);
 
@@ -575,8 +599,8 @@ describe.skip('PaneCollapseManager', () => {
       expect(state?.collapsedHeight).toBe(DIMENSIONS.pane.collapsedHeight);
     });
 
-    it('should use custom collapsed height from config', () => {
-      const manager = PaneCollapseManager.getInstance(mockChartApi, 'chart-1', {
+    it("should use custom collapsed height from config", () => {
+      const manager = PaneCollapseManager.getInstance(mockChartApi, "chart-1", {
         collapsedHeight: 60,
       });
       manager.initializePane(0);
@@ -587,14 +611,14 @@ describe.skip('PaneCollapseManager', () => {
       mockChartElement.querySelector = vi.fn(() => mockPaneElement);
       manager.collapse(0);
 
-      expect(mockPaneElement.style.height).toBe('60px');
+      expect(mockPaneElement.style.height).toBe("60px");
     });
 
-    it('should support both callbacks', () => {
+    it("should support both callbacks", () => {
       const onPaneCollapse = vi.fn();
       const onPaneExpand = vi.fn();
 
-      const manager = PaneCollapseManager.getInstance(mockChartApi, 'chart-1', {
+      const manager = PaneCollapseManager.getInstance(mockChartApi, "chart-1", {
         onPaneCollapse,
         onPaneExpand,
       });

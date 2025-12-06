@@ -3,10 +3,10 @@
  * This file is automatically loaded by Vitest before running tests
  */
 
-import '@testing-library/jest-dom';
+import "@testing-library/jest-dom";
 
 // Mock performance API globally
-Object.defineProperty(window, 'performance', {
+Object.defineProperty(window, "performance", {
   value: {
     now: vi.fn(() => Date.now()),
     mark: vi.fn(),
@@ -31,7 +31,7 @@ global.IntersectionObserver = vi.fn().mockImplementation(() => ({
 }));
 
 // Mock requestAnimationFrame and cancelAnimationFrame
-global.requestAnimationFrame = vi.fn(callback => {
+global.requestAnimationFrame = vi.fn((callback) => {
   setTimeout(callback, 0);
   return 1;
 });
@@ -39,9 +39,9 @@ global.requestAnimationFrame = vi.fn(callback => {
 global.cancelAnimationFrame = vi.fn();
 
 // Mock DOM methods
-Object.defineProperty(window, 'getComputedStyle', {
+Object.defineProperty(window, "getComputedStyle", {
   value: () => ({
-    getPropertyValue: () => '',
+    getPropertyValue: () => "",
   }),
 });
 
@@ -56,20 +56,20 @@ Element.prototype.getBoundingClientRect = vi.fn(
     x: 0,
     y: 0,
     toJSON: () => ({}),
-  })
+  }),
 );
 
-Object.defineProperty(HTMLElement.prototype, 'scrollHeight', {
+Object.defineProperty(HTMLElement.prototype, "scrollHeight", {
   configurable: true,
   value: 600,
 });
 
-Object.defineProperty(HTMLElement.prototype, 'offsetHeight', {
+Object.defineProperty(HTMLElement.prototype, "offsetHeight", {
   configurable: true,
   value: 600,
 });
 
-Object.defineProperty(HTMLElement.prototype, 'offsetWidth', {
+Object.defineProperty(HTMLElement.prototype, "offsetWidth", {
   configurable: true,
   value: 800,
 });
@@ -120,7 +120,7 @@ const mockCanvas = {
 // Mock document.createElement
 const originalCreateElement = document.createElement;
 document.createElement = vi.fn((tagName: any, options?: any) => {
-  if (tagName === 'canvas') {
+  if (tagName === "canvas") {
     return mockCanvas as any;
   }
   return originalCreateElement.call(document, tagName, options);
@@ -130,7 +130,10 @@ document.createElement = vi.fn((tagName: any, options?: any) => {
 const originalError = console.error;
 beforeAll(() => {
   console.error = (...args: any[]) => {
-    if (typeof args[0] === 'string' && args[0].includes('Warning: ReactDOMTestUtils.act')) {
+    if (
+      typeof args[0] === "string" &&
+      args[0].includes("Warning: ReactDOMTestUtils.act")
+    ) {
       return;
     }
     originalError.call(console, ...args);

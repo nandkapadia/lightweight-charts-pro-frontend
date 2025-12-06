@@ -28,6 +28,11 @@ import {
   extractDefaultOptions,
 } from "./core/UnifiedSeriesDescriptor";
 import { BUILTIN_SERIES_DESCRIPTORS } from "./descriptors/builtinSeriesDescriptors";
+import {
+  normalizeTime,
+  createSortedTimeArray,
+  findNearestTimestamp,
+} from "../utils/timeNormalization";
 import { CUSTOM_SERIES_DESCRIPTORS } from "./descriptors/customSeriesDescriptors";
 import { cleanLineStyleOptions } from "../utils/lineStyle";
 import { logger } from "../utils/logger";
@@ -705,6 +710,10 @@ export function createSeriesWithConfig(
 /**
  * Apply timestamp snapping to markers to ensure they align with chart data
  *
+ * Performance: O(n log n + m log n) where n = chart data points, m = markers
+ * - O(n log n) for sorting chart times once
+ * - O(log n) binary search per marker
+ *
  * @param markers - Array of markers to snap
  * @param chartData - Chart data for timestamp reference
  * @returns Array of markers with snapped timestamps
@@ -717,38 +726,39 @@ function applyTimestampSnapping(
     return markers;
   }
 
-  // Extract available timestamps from chart data
-  const availableTimes = chartData
-    .map((item) => {
-      if (typeof item.time === "number") {
-        return item.time;
-      } else if (typeof item.time === "string") {
-        return Math.floor(new Date(item.time).getTime() / 1000);
-      }
-      return null;
-    })
-    .filter((time): time is number => time !== null);
+  // Extract and normalize timestamps WITHOUT timezone conversion
+  const chartTimes = chartData
+    .map((item) => item.time)
+    .filter((time): time is Time => time !== undefined && time !== null);
 
-  if (availableTimes.length === 0) {
+  if (chartTimes.length === 0) {
     return markers;
   }
 
-  // Apply timestamp snapping to each marker
+  // Create sorted time array for O(log n) binary search
+  const sortedTimes = createSortedTimeArray(chartTimes);
+
+  // Apply timestamp snapping to each marker using binary search
   return markers.map((marker) => {
-    if (marker.time && typeof marker.time === "number") {
-      // Find nearest available timestamp
-      const nearestTime = availableTimes.reduce((nearest, current) => {
-        const currentDiff = Math.abs(current - (marker.time as number));
-        const nearestDiff = Math.abs(nearest - (marker.time as number));
-        return currentDiff < nearestDiff ? current : nearest;
-      });
+    if (!marker.time) {
+      return marker;
+    }
+
+    try {
+      // Normalize marker time WITHOUT conversion
+      const markerTimestamp = normalizeTime(marker.time);
+
+      // Find nearest timestamp using O(log n) binary search
+      const nearestTime = findNearestTimestamp(markerTimestamp, sortedTimes);
 
       return {
         ...marker,
         time: nearestTime as Time,
       };
+    } catch {
+      // If normalization fails, return marker unchanged
+      return marker;
     }
-    return marker;
   }) as SeriesMarker<Time>[];
 }
 

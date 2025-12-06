@@ -1,4 +1,4 @@
-import { Time } from 'lightweight-charts';
+import { Time } from "lightweight-charts";
 /**
  * @fileoverview Tests for Ribbon Series - Hybrid ICustomSeries + ISeriesPrimitive Implementation
  *
@@ -10,8 +10,11 @@ import { Time } from 'lightweight-charts';
  * - Data handling and edge cases
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { createRibbonSeries, RibbonData } from '../../plugins/series/ribbonSeriesPlugin';
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import {
+  createRibbonSeries,
+  RibbonData,
+} from "../../plugins/series/ribbonSeriesPlugin";
 
 // Mock chart and series
 const mockPriceConverter = vi.fn((price: number) => 100 + price);
@@ -37,34 +40,34 @@ const mockCustomSeries = {
   data: vi.fn(() => []),
 };
 
-describe('Ribbon Series - Hybrid Implementation', () => {
+describe("Ribbon Series - Hybrid Implementation", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockChart.addCustomSeries.mockReturnValue(mockCustomSeries);
   });
 
-  describe('Factory Function', () => {
-    it('should create series with default options', () => {
+  describe("Factory Function", () => {
+    it("should create series with default options", () => {
       const series = createRibbonSeries(mockChart as any);
 
       expect(mockChart.addCustomSeries).toHaveBeenCalled();
       expect(series).toBeDefined();
     });
 
-    it('should create series with custom colors', () => {
+    it("should create series with custom colors", () => {
       createRibbonSeries(mockChart as any, {
-        upperLineColor: '#FF0000',
-        lowerLineColor: '#0000FF',
-        fillColor: 'rgba(255, 0, 0, 0.2)',
+        upperLineColor: "#FF0000",
+        lowerLineColor: "#0000FF",
+        fillColor: "rgba(255, 0, 0, 0.2)",
       });
 
       const options = mockChart.addCustomSeries.mock.calls[0][1];
-      expect(options.upperLineColor).toBe('#FF0000');
-      expect(options.lowerLineColor).toBe('#0000FF');
-      expect(options.fillColor).toBe('rgba(255, 0, 0, 0.2)');
+      expect(options.upperLineColor).toBe("#FF0000");
+      expect(options.lowerLineColor).toBe("#0000FF");
+      expect(options.fillColor).toBe("rgba(255, 0, 0, 0.2)");
     });
 
-    it('should set data on series when provided', () => {
+    it("should set data on series when provided", () => {
       const testData: RibbonData[] = [
         { time: 1000 as Time, upper: 110, lower: 90 },
         { time: 2000 as Time, upper: 115, lower: 85 },
@@ -75,7 +78,7 @@ describe('Ribbon Series - Hybrid Implementation', () => {
       expect(mockCustomSeries.setData).toHaveBeenCalledWith(testData);
     });
 
-    it('should use primitive rendering when usePrimitive is true', async () => {
+    it("should use primitive rendering when usePrimitive is true", async () => {
       createRibbonSeries(mockChart as any, {
         usePrimitive: true,
         zIndex: -100,
@@ -86,11 +89,11 @@ describe('Ribbon Series - Hybrid Implementation', () => {
       expect(options.lastValueVisible).toBe(false);
 
       // Wait for dynamic import
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
       expect(mockCustomSeries.attachPrimitive).toHaveBeenCalled();
     });
 
-    it('should not use primitive when usePrimitive is false', () => {
+    it("should not use primitive when usePrimitive is false", () => {
       createRibbonSeries(mockChart as any, {
         usePrimitive: false,
       });
@@ -102,23 +105,23 @@ describe('Ribbon Series - Hybrid Implementation', () => {
     });
   });
 
-  describe('Default Options', () => {
-    it('should have correct default values', () => {
+  describe("Default Options", () => {
+    it("should have correct default values", () => {
       createRibbonSeries(mockChart as any);
 
       const options = mockChart.addCustomSeries.mock.calls[0][1];
-      expect(options.upperLineColor).toBe('#4CAF50');
+      expect(options.upperLineColor).toBe("#4CAF50");
       expect(options.upperLineWidth).toBe(2);
       expect(options.upperLineVisible).toBe(true);
-      expect(options.lowerLineColor).toBe('#F44336');
+      expect(options.lowerLineColor).toBe("#F44336");
       expect(options.lowerLineWidth).toBe(2);
       expect(options.lowerLineVisible).toBe(true);
-      expect(options.fillColor).toBe('rgba(76, 175, 80, 0.1)');
+      expect(options.fillColor).toBe("rgba(76, 175, 80, 0.1)");
       expect(options.fillVisible).toBe(true);
-      expect(options.priceScaleId).toBe('right');
+      expect(options.priceScaleId).toBe("right");
     });
 
-    it('should use nullish coalescing for numeric defaults', () => {
+    it("should use nullish coalescing for numeric defaults", () => {
       createRibbonSeries(mockChart as any, {
         upperLineWidth: 1, // Use valid LineWidth (1-4)
       });
@@ -127,7 +130,7 @@ describe('Ribbon Series - Hybrid Implementation', () => {
       expect(options.upperLineWidth).toBe(1);
     });
 
-    it('should handle boolean options correctly', () => {
+    it("should handle boolean options correctly", () => {
       createRibbonSeries(mockChart as any, {
         upperLineVisible: false,
         fillVisible: false,
@@ -139,8 +142,8 @@ describe('Ribbon Series - Hybrid Implementation', () => {
     });
   });
 
-  describe('Data Validation', () => {
-    it('should handle valid data', () => {
+  describe("Data Validation", () => {
+    it("should handle valid data", () => {
       const validData: RibbonData[] = [
         { time: 1000 as Time, upper: 110, lower: 90 },
         { time: 2000 as Time, upper: 115, lower: 85 },
@@ -151,21 +154,21 @@ describe('Ribbon Series - Hybrid Implementation', () => {
       expect(mockCustomSeries.setData).toHaveBeenCalledWith(validData);
     });
 
-    it('should handle empty data array', () => {
+    it("should handle empty data array", () => {
       createRibbonSeries(mockChart as any, { data: [] });
 
       expect(mockCustomSeries.setData).not.toHaveBeenCalled();
     });
 
-    it('should handle missing optional data parameter', () => {
+    it("should handle missing optional data parameter", () => {
       expect(() => {
         createRibbonSeries(mockChart as any);
       }).not.toThrow();
     });
   });
 
-  describe('Line Style Conversion', () => {
-    it('should clamp line styles to valid range for primitives', () => {
+  describe("Line Style Conversion", () => {
+    it("should clamp line styles to valid range for primitives", () => {
       createRibbonSeries(mockChart as any, {
         usePrimitive: true,
         upperLineStyle: 4 as any, // Invalid, should be clamped to 2
@@ -176,7 +179,7 @@ describe('Ribbon Series - Hybrid Implementation', () => {
       expect(mockChart.addCustomSeries).toHaveBeenCalled();
     });
 
-    it('should accept valid line styles', () => {
+    it("should accept valid line styles", () => {
       createRibbonSeries(mockChart as any, {
         upperLineStyle: 0, // Solid
         lowerLineStyle: 2, // Dashed
@@ -188,8 +191,8 @@ describe('Ribbon Series - Hybrid Implementation', () => {
     });
   });
 
-  describe('Rendering Modes', () => {
-    it('should disable series rendering when primitive is used', () => {
+  describe("Rendering Modes", () => {
+    it("should disable series rendering when primitive is used", () => {
       createRibbonSeries(mockChart as any, {
         usePrimitive: true,
       });
@@ -198,7 +201,7 @@ describe('Ribbon Series - Hybrid Implementation', () => {
       expect(options._usePrimitive).toBe(true);
     });
 
-    it('should enable series rendering when primitive is not used', () => {
+    it("should enable series rendering when primitive is not used", () => {
       createRibbonSeries(mockChart as any, {
         usePrimitive: false,
       });
@@ -208,8 +211,8 @@ describe('Ribbon Series - Hybrid Implementation', () => {
     });
   });
 
-  describe('Z-Index Control', () => {
-    it('should use custom z-index for primitive', () => {
+  describe("Z-Index Control", () => {
+    it("should use custom z-index for primitive", () => {
       createRibbonSeries(mockChart as any, {
         usePrimitive: true,
         zIndex: 50,
@@ -219,7 +222,7 @@ describe('Ribbon Series - Hybrid Implementation', () => {
       expect(mockChart.addCustomSeries).toHaveBeenCalled();
     });
 
-    it('should use default z-index of -100 for background rendering', () => {
+    it("should use default z-index of -100 for background rendering", () => {
       createRibbonSeries(mockChart as any, {
         usePrimitive: true,
       });
@@ -229,32 +232,32 @@ describe('Ribbon Series - Hybrid Implementation', () => {
     });
   });
 
-  describe('Price Scale Options', () => {
-    it('should use custom price scale ID', () => {
+  describe("Price Scale Options", () => {
+    it("should use custom price scale ID", () => {
       createRibbonSeries(mockChart as any, {
-        priceScaleId: 'left',
+        priceScaleId: "left",
       });
 
       const options = mockChart.addCustomSeries.mock.calls[0][1];
-      expect(options.priceScaleId).toBe('left');
+      expect(options.priceScaleId).toBe("left");
     });
 
-    it('should default to right price scale', () => {
+    it("should default to right price scale", () => {
       createRibbonSeries(mockChart as any);
 
       const options = mockChart.addCustomSeries.mock.calls[0][1];
-      expect(options.priceScaleId).toBe('right');
+      expect(options.priceScaleId).toBe("right");
     });
   });
 
-  describe('Error Handling', () => {
-    it('should throw on null chart', () => {
+  describe("Error Handling", () => {
+    it("should throw on null chart", () => {
       expect(() => {
         createRibbonSeries(null as any);
       }).toThrow();
     });
 
-    it('should handle NaN values in data gracefully', () => {
+    it("should handle NaN values in data gracefully", () => {
       const invalidData: RibbonData[] = [
         { time: 1000 as Time, upper: NaN, lower: 90 },
         { time: 2000 as Time, upper: 115, lower: NaN },
@@ -265,7 +268,7 @@ describe('Ribbon Series - Hybrid Implementation', () => {
       }).not.toThrow();
     });
 
-    it('should handle Infinity values in data', () => {
+    it("should handle Infinity values in data", () => {
       const invalidData: RibbonData[] = [
         { time: 1000 as Time, upper: Infinity, lower: 90 },
         { time: 2000 as Time, upper: 115, lower: -Infinity },
@@ -277,25 +280,25 @@ describe('Ribbon Series - Hybrid Implementation', () => {
     });
   });
 
-  describe('Integration', () => {
-    it('should return series instance', () => {
+  describe("Integration", () => {
+    it("should return series instance", () => {
       const series = createRibbonSeries(mockChart as any);
       expect(series).toBe(mockCustomSeries);
     });
 
-    it('should work with full configuration', () => {
+    it("should work with full configuration", () => {
       const series = createRibbonSeries(mockChart as any, {
-        upperLineColor: '#4CAF50',
+        upperLineColor: "#4CAF50",
         upperLineWidth: 3,
         upperLineStyle: 1,
         upperLineVisible: true,
-        lowerLineColor: '#F44336',
+        lowerLineColor: "#F44336",
         lowerLineWidth: 2,
         lowerLineStyle: 2,
         lowerLineVisible: true,
-        fillColor: 'rgba(76, 175, 80, 0.3)',
+        fillColor: "rgba(76, 175, 80, 0.3)",
         fillVisible: true,
-        priceScaleId: 'right',
+        priceScaleId: "right",
         usePrimitive: true,
         zIndex: -100,
         data: [

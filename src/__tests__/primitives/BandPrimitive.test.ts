@@ -6,13 +6,13 @@
  * with z-order control for background rendering.
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from "vitest";
 
 // Unmock the module under test
-vi.unmock('../../primitives/BandPrimitive');
+vi.unmock("../../primitives/BandPrimitive");
 
 // Mock BaseSeriesPrimitive
-vi.mock('../../primitives/BaseSeriesPrimitive', () => ({
+vi.mock("../../primitives/BaseSeriesPrimitive", () => ({
   BaseSeriesPrimitive: class {
     protected _options: any;
     protected _chart: any;
@@ -44,7 +44,7 @@ vi.mock('../../primitives/BaseSeriesPrimitive', () => ({
     }
 
     protected _getDefaultZOrder(): string {
-      return 'normal';
+      return "normal";
     }
 
     getChart(): any {
@@ -107,13 +107,13 @@ vi.mock('../../primitives/BaseSeriesPrimitive', () => ({
       return 0;
     }
     text(): string {
-      return '';
+      return "";
     }
     textColor(): string {
-      return '#FFFFFF';
+      return "#FFFFFF";
     }
     backColor(): string {
-      return '#000000';
+      return "#000000";
     }
   },
   // Factory function for creating axis view classes (added for refactoring)
@@ -145,39 +145,41 @@ vi.mock('../../primitives/BaseSeriesPrimitive', () => ({
 
       text(): string {
         const lastItem = this._getLastVisibleItem();
-        if (!lastItem) return '';
+        if (!lastItem) return "";
         const fieldValue = lastItem[this._field];
-        if (fieldValue === null || fieldValue === undefined) return '';
+        if (fieldValue === null || fieldValue === undefined) return "";
         return fieldValue.toFixed(2);
       }
 
       textColor(): string {
-        return '#FFFFFF';
+        return "#FFFFFF";
       }
 
       backColor(): string {
         const options = this._source.getOptions();
-        return options[this._colorField] || '#000000';
+        return options[this._colorField] || "#000000";
       }
     };
   },
 }));
 
 // Mock color utils
-vi.mock('../../utils/colorUtils', () => ({
+vi.mock("../../utils/colorUtils", () => ({
   getSolidColorFromFill: vi.fn((color: string) => color),
 }));
 
 // Mock common rendering
-vi.mock('../../plugins/series/base/commonRendering', () => ({
-  convertToCoordinates: vi.fn((data: any[], chart: any, series: any, keys: string[]) => {
-    return data.map((item: any) => ({
-      x: item.time * 10,
-      upper: item.upper * 2,
-      middle: item.middle * 2,
-      lower: item.lower * 2,
-    }));
-  }),
+vi.mock("../../plugins/series/base/commonRendering", () => ({
+  convertToCoordinates: vi.fn(
+    (data: any[], chart: any, series: any, keys: string[]) => {
+      return data.map((item: any) => ({
+        x: item.time * 10,
+        upper: item.upper * 2,
+        middle: item.middle * 2,
+        lower: item.lower * 2,
+      }));
+    },
+  ),
   drawMultiLine: vi.fn(),
   drawFillArea: vi.fn(),
 }));
@@ -187,9 +189,9 @@ import {
   BandPrimitive,
   BandPrimitiveData,
   BandPrimitiveOptions,
-} from '../../primitives/BandPrimitive';
+} from "../../primitives/BandPrimitive";
 
-describe('BandPrimitive - Construction', () => {
+describe("BandPrimitive - Construction", () => {
   let mockChart: any;
   let defaultOptions: BandPrimitiveOptions;
 
@@ -201,32 +203,32 @@ describe('BandPrimitive - Construction', () => {
     };
 
     defaultOptions = {
-      upperLineColor: '#FF0000',
+      upperLineColor: "#FF0000",
       upperLineWidth: 2,
       upperLineStyle: 0,
       upperLineVisible: true,
-      middleLineColor: '#00FF00',
+      middleLineColor: "#00FF00",
       middleLineWidth: 2,
       middleLineStyle: 0,
       middleLineVisible: true,
-      lowerLineColor: '#0000FF',
+      lowerLineColor: "#0000FF",
       lowerLineWidth: 2,
       lowerLineStyle: 0,
       lowerLineVisible: true,
-      upperFillColor: 'rgba(255, 0, 0, 0.3)',
+      upperFillColor: "rgba(255, 0, 0, 0.3)",
       upperFill: true,
-      lowerFillColor: 'rgba(0, 0, 255, 0.3)',
+      lowerFillColor: "rgba(0, 0, 255, 0.3)",
       lowerFill: true,
     };
   });
 
-  it('should create primitive with default options', () => {
+  it("should create primitive with default options", () => {
     const primitive = new BandPrimitive(mockChart, defaultOptions);
     expect(primitive).toBeDefined();
     expect(primitive.getOptions()).toBeDefined();
   });
 
-  it('should initialize pane and axis views', () => {
+  it("should initialize pane and axis views", () => {
     const primitive = new BandPrimitive(mockChart, defaultOptions);
     const paneViews = primitive.paneViews();
     const axisViews = primitive.priceAxisViews();
@@ -235,13 +237,13 @@ describe('BandPrimitive - Construction', () => {
     expect(axisViews.length).toBe(3); // Upper, middle, and lower axis views
   });
 
-  it('should store chart reference', () => {
+  it("should store chart reference", () => {
     const primitive = new BandPrimitive(mockChart, defaultOptions);
     expect(primitive.getChart()).toBe(mockChart);
   });
 });
 
-describe('BandPrimitive - Data Processing', () => {
+describe("BandPrimitive - Data Processing", () => {
   let mockChart: any;
   let defaultOptions: BandPrimitiveOptions;
   let primitive: BandPrimitive;
@@ -254,28 +256,28 @@ describe('BandPrimitive - Data Processing', () => {
     };
 
     defaultOptions = {
-      upperLineColor: '#FF0000',
+      upperLineColor: "#FF0000",
       upperLineWidth: 2,
       upperLineStyle: 0,
       upperLineVisible: true,
-      middleLineColor: '#00FF00',
+      middleLineColor: "#00FF00",
       middleLineWidth: 2,
       middleLineStyle: 0,
       middleLineVisible: true,
-      lowerLineColor: '#0000FF',
+      lowerLineColor: "#0000FF",
       lowerLineWidth: 2,
       lowerLineStyle: 0,
       lowerLineVisible: true,
-      upperFillColor: 'rgba(255, 0, 0, 0.3)',
+      upperFillColor: "rgba(255, 0, 0, 0.3)",
       upperFill: true,
-      lowerFillColor: 'rgba(0, 0, 255, 0.3)',
+      lowerFillColor: "rgba(0, 0, 255, 0.3)",
       lowerFill: true,
     };
 
     primitive = new BandPrimitive(mockChart, defaultOptions);
   });
 
-  it('should process valid data correctly', () => {
+  it("should process valid data correctly", () => {
     const data: BandPrimitiveData[] = [
       { time: 1000, upper: 110, middle: 100, lower: 90 },
       { time: 2000, upper: 115, middle: 105, lower: 95 },
@@ -290,7 +292,7 @@ describe('BandPrimitive - Data Processing', () => {
     expect(processed[0].lower).toBe(90);
   });
 
-  it('should filter out null values', () => {
+  it("should filter out null values", () => {
     const data: BandPrimitiveData[] = [
       { time: 1000, upper: null, middle: 100, lower: 90 },
       { time: 2000, upper: 110, middle: null, lower: 90 },
@@ -305,7 +307,7 @@ describe('BandPrimitive - Data Processing', () => {
     expect(processed[0].time).toBe(4000);
   });
 
-  it('should filter out undefined values', () => {
+  it("should filter out undefined values", () => {
     const data: BandPrimitiveData[] = [
       { time: 1000, upper: undefined, middle: 100, lower: 90 },
       { time: 2000, upper: 110, middle: undefined, lower: 90 },
@@ -320,7 +322,7 @@ describe('BandPrimitive - Data Processing', () => {
     expect(processed[0].time).toBe(4000);
   });
 
-  it('should filter out NaN values', () => {
+  it("should filter out NaN values", () => {
     const data: BandPrimitiveData[] = [
       { time: 1000, upper: NaN, middle: 100, lower: 90 },
       { time: 2000, upper: 110, middle: NaN, lower: 90 },
@@ -335,7 +337,7 @@ describe('BandPrimitive - Data Processing', () => {
     expect(processed[0].time).toBe(4000);
   });
 
-  it('should require all three values to be valid', () => {
+  it("should require all three values to be valid", () => {
     const data: BandPrimitiveData[] = [
       { time: 1000, upper: 110, middle: 100 }, // missing lower
       { time: 2000, upper: 110, lower: 90 }, // missing middle
@@ -351,7 +353,7 @@ describe('BandPrimitive - Data Processing', () => {
   });
 });
 
-describe('BandPrimitive - Options Management', () => {
+describe("BandPrimitive - Options Management", () => {
   let mockChart: any;
   let defaultOptions: BandPrimitiveOptions;
   let primitive: BandPrimitive;
@@ -364,42 +366,42 @@ describe('BandPrimitive - Options Management', () => {
     };
 
     defaultOptions = {
-      upperLineColor: '#FF0000',
+      upperLineColor: "#FF0000",
       upperLineWidth: 2,
       upperLineStyle: 0,
       upperLineVisible: true,
-      middleLineColor: '#00FF00',
+      middleLineColor: "#00FF00",
       middleLineWidth: 2,
       middleLineStyle: 0,
       middleLineVisible: true,
-      lowerLineColor: '#0000FF',
+      lowerLineColor: "#0000FF",
       lowerLineWidth: 2,
       lowerLineStyle: 0,
       lowerLineVisible: true,
-      upperFillColor: 'rgba(255, 0, 0, 0.3)',
+      upperFillColor: "rgba(255, 0, 0, 0.3)",
       upperFill: true,
-      lowerFillColor: 'rgba(0, 0, 255, 0.3)',
+      lowerFillColor: "rgba(0, 0, 255, 0.3)",
       lowerFill: true,
     };
 
     primitive = new BandPrimitive(mockChart, defaultOptions);
   });
 
-  it('should update line colors', () => {
+  it("should update line colors", () => {
     // @ts-expect-error - updateOptions not implemented yet
     primitive.updateOptions({
-      upperLineColor: '#FFFF00',
-      middleLineColor: '#FF00FF',
-      lowerLineColor: '#00FFFF',
+      upperLineColor: "#FFFF00",
+      middleLineColor: "#FF00FF",
+      lowerLineColor: "#00FFFF",
     });
 
     const options = primitive.getOptions();
-    expect(options.upperLineColor).toBe('#FFFF00');
-    expect(options.middleLineColor).toBe('#FF00FF');
-    expect(options.lowerLineColor).toBe('#00FFFF');
+    expect(options.upperLineColor).toBe("#FFFF00");
+    expect(options.middleLineColor).toBe("#FF00FF");
+    expect(options.lowerLineColor).toBe("#00FFFF");
   });
 
-  it('should update line visibility', () => {
+  it("should update line visibility", () => {
     // @ts-expect-error - updateOptions not implemented yet
     primitive.updateOptions({
       upperLineVisible: false,
@@ -413,7 +415,7 @@ describe('BandPrimitive - Options Management', () => {
     expect(options.lowerLineVisible).toBe(false);
   });
 
-  it('should update fill visibility', () => {
+  it("should update fill visibility", () => {
     // @ts-expect-error - updateOptions not implemented yet
     primitive.updateOptions({
       upperFill: false,
@@ -425,20 +427,20 @@ describe('BandPrimitive - Options Management', () => {
     expect(options.lowerFill).toBe(false);
   });
 
-  it('should update fill colors', () => {
+  it("should update fill colors", () => {
     // @ts-expect-error - updateOptions not implemented yet
     primitive.updateOptions({
-      upperFillColor: 'rgba(100, 100, 100, 0.5)',
-      lowerFillColor: 'rgba(200, 200, 200, 0.5)',
+      upperFillColor: "rgba(100, 100, 100, 0.5)",
+      lowerFillColor: "rgba(200, 200, 200, 0.5)",
     });
 
     const options = primitive.getOptions();
-    expect(options.upperFillColor).toBe('rgba(100, 100, 100, 0.5)');
-    expect(options.lowerFillColor).toBe('rgba(200, 200, 200, 0.5)');
+    expect(options.upperFillColor).toBe("rgba(100, 100, 100, 0.5)");
+    expect(options.lowerFillColor).toBe("rgba(200, 200, 200, 0.5)");
   });
 });
 
-describe('BandPrimitive - Axis Views', () => {
+describe("BandPrimitive - Axis Views", () => {
   let mockChart: any;
   let defaultOptions: BandPrimitiveOptions;
   let primitive: BandPrimitive;
@@ -456,21 +458,21 @@ describe('BandPrimitive - Axis Views', () => {
     };
 
     defaultOptions = {
-      upperLineColor: '#FF0000',
+      upperLineColor: "#FF0000",
       upperLineWidth: 2,
       upperLineStyle: 0,
       upperLineVisible: true,
-      middleLineColor: '#00FF00',
+      middleLineColor: "#00FF00",
       middleLineWidth: 2,
       middleLineStyle: 0,
       middleLineVisible: true,
-      lowerLineColor: '#0000FF',
+      lowerLineColor: "#0000FF",
       lowerLineWidth: 2,
       lowerLineStyle: 0,
       lowerLineVisible: true,
-      upperFillColor: 'rgba(255, 0, 0, 0.3)',
+      upperFillColor: "rgba(255, 0, 0, 0.3)",
       upperFill: true,
-      lowerFillColor: 'rgba(0, 0, 255, 0.3)',
+      lowerFillColor: "rgba(0, 0, 255, 0.3)",
       lowerFill: true,
     };
 
@@ -479,12 +481,12 @@ describe('BandPrimitive - Axis Views', () => {
     primitive.attachToSeries(mockSeries);
   });
 
-  it('should have three price axis views', () => {
+  it("should have three price axis views", () => {
     const axisViews = primitive.priceAxisViews();
     expect(axisViews).toHaveLength(3);
   });
 
-  it('should provide upper line axis view', () => {
+  it("should provide upper line axis view", () => {
     const data: BandPrimitiveData[] = [
       { time: 1000, upper: 110, middle: 100, lower: 90 },
       { time: 2000, upper: 115, middle: 105, lower: 95 },
@@ -494,11 +496,11 @@ describe('BandPrimitive - Axis Views', () => {
     const axisViews = primitive.priceAxisViews();
     const upperView = axisViews[0];
 
-    expect(upperView.text()).toBe('115.00');
-    expect(upperView.textColor()).toBe('#FFFFFF');
+    expect(upperView.text()).toBe("115.00");
+    expect(upperView.textColor()).toBe("#FFFFFF");
   });
 
-  it('should provide middle line axis view', () => {
+  it("should provide middle line axis view", () => {
     const data: BandPrimitiveData[] = [
       { time: 1000, upper: 110, middle: 100, lower: 90 },
       { time: 2000, upper: 115, middle: 105, lower: 95 },
@@ -508,11 +510,11 @@ describe('BandPrimitive - Axis Views', () => {
     const axisViews = primitive.priceAxisViews();
     const middleView = axisViews[1];
 
-    expect(middleView.text()).toBe('105.00');
-    expect(middleView.textColor()).toBe('#FFFFFF');
+    expect(middleView.text()).toBe("105.00");
+    expect(middleView.textColor()).toBe("#FFFFFF");
   });
 
-  it('should provide lower line axis view', () => {
+  it("should provide lower line axis view", () => {
     const data: BandPrimitiveData[] = [
       { time: 1000, upper: 110, middle: 100, lower: 90 },
       { time: 2000, upper: 115, middle: 105, lower: 95 },
@@ -522,21 +524,21 @@ describe('BandPrimitive - Axis Views', () => {
     const axisViews = primitive.priceAxisViews();
     const lowerView = axisViews[2];
 
-    expect(lowerView.text()).toBe('95.00');
-    expect(lowerView.textColor()).toBe('#FFFFFF');
+    expect(lowerView.text()).toBe("95.00");
+    expect(lowerView.textColor()).toBe("#FFFFFF");
   });
 
-  it('should handle empty data in axis views', () => {
+  it("should handle empty data in axis views", () => {
     primitive.setData([]);
     const axisViews = primitive.priceAxisViews();
 
-    expect(axisViews[0].text()).toBe('');
-    expect(axisViews[1].text()).toBe('');
-    expect(axisViews[2].text()).toBe('');
+    expect(axisViews[0].text()).toBe("");
+    expect(axisViews[1].text()).toBe("");
+    expect(axisViews[2].text()).toBe("");
   });
 });
 
-describe('BandPrimitive - Edge Cases', () => {
+describe("BandPrimitive - Edge Cases", () => {
   let mockChart: any;
   let defaultOptions: BandPrimitiveOptions;
 
@@ -548,33 +550,33 @@ describe('BandPrimitive - Edge Cases', () => {
     };
 
     defaultOptions = {
-      upperLineColor: '#FF0000',
+      upperLineColor: "#FF0000",
       upperLineWidth: 2,
       upperLineStyle: 0,
       upperLineVisible: true,
-      middleLineColor: '#00FF00',
+      middleLineColor: "#00FF00",
       middleLineWidth: 2,
       middleLineStyle: 0,
       middleLineVisible: true,
-      lowerLineColor: '#0000FF',
+      lowerLineColor: "#0000FF",
       lowerLineWidth: 2,
       lowerLineStyle: 0,
       lowerLineVisible: true,
-      upperFillColor: 'rgba(255, 0, 0, 0.3)',
+      upperFillColor: "rgba(255, 0, 0, 0.3)",
       upperFill: true,
-      lowerFillColor: 'rgba(0, 0, 255, 0.3)',
+      lowerFillColor: "rgba(0, 0, 255, 0.3)",
       lowerFill: true,
     };
   });
 
-  it('should handle empty data array', () => {
+  it("should handle empty data array", () => {
     const primitive = new BandPrimitive(mockChart, defaultOptions);
     primitive.setData([]);
 
     expect(primitive.getProcessedData()).toHaveLength(0);
   });
 
-  it('should handle data with all invalid values', () => {
+  it("should handle data with all invalid values", () => {
     const primitive = new BandPrimitive(mockChart, defaultOptions);
     const data: BandPrimitiveData[] = [
       { time: 1000, upper: null, middle: null, lower: null },
@@ -586,7 +588,7 @@ describe('BandPrimitive - Edge Cases', () => {
     expect(primitive.getProcessedData()).toHaveLength(0);
   });
 
-  it('should handle crossing bands (middle not between upper and lower)', () => {
+  it("should handle crossing bands (middle not between upper and lower)", () => {
     const primitive = new BandPrimitive(mockChart, defaultOptions);
     const data: BandPrimitiveData[] = [
       { time: 1000, upper: 90, middle: 100, lower: 110 }, // Inverted order
@@ -601,9 +603,11 @@ describe('BandPrimitive - Edge Cases', () => {
     expect(processed[0].lower).toBe(110);
   });
 
-  it('should handle all three lines equal (zero band width)', () => {
+  it("should handle all three lines equal (zero band width)", () => {
     const primitive = new BandPrimitive(mockChart, defaultOptions);
-    const data: BandPrimitiveData[] = [{ time: 1000, upper: 100, middle: 100, lower: 100 }];
+    const data: BandPrimitiveData[] = [
+      { time: 1000, upper: 100, middle: 100, lower: 100 },
+    ];
 
     primitive.setData(data);
     const processed = primitive.getProcessedData();
@@ -615,7 +619,7 @@ describe('BandPrimitive - Edge Cases', () => {
   });
 });
 
-describe('BandPrimitive - Per-Point Color Overrides', () => {
+describe("BandPrimitive - Per-Point Color Overrides", () => {
   let mockChart: any;
   let defaultOptions: BandPrimitiveOptions;
 
@@ -627,26 +631,26 @@ describe('BandPrimitive - Per-Point Color Overrides', () => {
     };
 
     defaultOptions = {
-      upperLineColor: '#FF0000',
+      upperLineColor: "#FF0000",
       upperLineWidth: 2,
       upperLineStyle: 0,
       upperLineVisible: true,
-      middleLineColor: '#00FF00',
+      middleLineColor: "#00FF00",
       middleLineWidth: 2,
       middleLineStyle: 0,
       middleLineVisible: true,
-      lowerLineColor: '#0000FF',
+      lowerLineColor: "#0000FF",
       lowerLineWidth: 2,
       lowerLineStyle: 0,
       lowerLineVisible: true,
-      upperFillColor: 'rgba(255, 0, 0, 0.3)',
+      upperFillColor: "rgba(255, 0, 0, 0.3)",
       upperFill: true,
-      lowerFillColor: 'rgba(0, 0, 255, 0.3)',
+      lowerFillColor: "rgba(0, 0, 255, 0.3)",
       lowerFill: true,
     };
   });
 
-  it('should accept data with per-point color overrides', () => {
+  it("should accept data with per-point color overrides", () => {
     const primitive = new BandPrimitive(mockChart, defaultOptions);
     const data: BandPrimitiveData[] = [
       {
@@ -654,7 +658,7 @@ describe('BandPrimitive - Per-Point Color Overrides', () => {
         upper: 110,
         middle: 100,
         lower: 90,
-        upperLineColor: '#FFFF00',
+        upperLineColor: "#FFFF00",
       },
     ];
 
@@ -662,10 +666,10 @@ describe('BandPrimitive - Per-Point Color Overrides', () => {
     const processed = primitive.getProcessedData();
 
     expect(processed).toHaveLength(1);
-    expect(processed[0].upperLineColor).toBe('#FFFF00');
+    expect(processed[0].upperLineColor).toBe("#FFFF00");
   });
 
-  it('should handle mixed data (some with color overrides, some without)', () => {
+  it("should handle mixed data (some with color overrides, some without)", () => {
     const primitive = new BandPrimitive(mockChart, defaultOptions);
     const data: BandPrimitiveData[] = [
       { time: 1000, upper: 110, middle: 100, lower: 90 }, // No overrides
@@ -674,7 +678,7 @@ describe('BandPrimitive - Per-Point Color Overrides', () => {
         upper: 115,
         middle: 105,
         lower: 95,
-        upperLineColor: '#FF00FF',
+        upperLineColor: "#FF00FF",
       },
       { time: 3000, upper: 120, middle: 110, lower: 100 }, // No overrides
     ];
@@ -684,11 +688,11 @@ describe('BandPrimitive - Per-Point Color Overrides', () => {
 
     expect(processed).toHaveLength(3);
     expect(processed[0].upperLineColor).toBeUndefined();
-    expect(processed[1].upperLineColor).toBe('#FF00FF');
+    expect(processed[1].upperLineColor).toBe("#FF00FF");
     expect(processed[2].upperLineColor).toBeUndefined();
   });
 
-  it('should handle complete per-point color overrides', () => {
+  it("should handle complete per-point color overrides", () => {
     const primitive = new BandPrimitive(mockChart, defaultOptions);
     const data: BandPrimitiveData[] = [
       {
@@ -696,25 +700,25 @@ describe('BandPrimitive - Per-Point Color Overrides', () => {
         upper: 110,
         middle: 100,
         lower: 90,
-        upperLineColor: '#AA0000',
-        middleLineColor: '#00AA00',
-        lowerLineColor: '#0000AA',
-        upperFillColor: 'rgba(170, 0, 0, 0.4)',
-        lowerFillColor: 'rgba(0, 0, 170, 0.4)',
+        upperLineColor: "#AA0000",
+        middleLineColor: "#00AA00",
+        lowerLineColor: "#0000AA",
+        upperFillColor: "rgba(170, 0, 0, 0.4)",
+        lowerFillColor: "rgba(0, 0, 170, 0.4)",
       },
     ];
 
     primitive.setData(data);
     const processed = primitive.getProcessedData();
 
-    expect(processed[0].upperLineColor).toBe('#AA0000');
-    expect(processed[0].middleLineColor).toBe('#00AA00');
-    expect(processed[0].lowerLineColor).toBe('#0000AA');
-    expect(processed[0].upperFillColor).toBe('rgba(170, 0, 0, 0.4)');
-    expect(processed[0].lowerFillColor).toBe('rgba(0, 0, 170, 0.4)');
+    expect(processed[0].upperLineColor).toBe("#AA0000");
+    expect(processed[0].middleLineColor).toBe("#00AA00");
+    expect(processed[0].lowerLineColor).toBe("#0000AA");
+    expect(processed[0].upperFillColor).toBe("rgba(170, 0, 0, 0.4)");
+    expect(processed[0].lowerFillColor).toBe("rgba(0, 0, 170, 0.4)");
   });
 
-  it('should handle partial per-point color overrides', () => {
+  it("should handle partial per-point color overrides", () => {
     const primitive = new BandPrimitive(mockChart, defaultOptions);
     const data: BandPrimitiveData[] = [
       {
@@ -722,21 +726,21 @@ describe('BandPrimitive - Per-Point Color Overrides', () => {
         upper: 110,
         middle: 100,
         lower: 90,
-        upperLineColor: '#FFFF00', // Only upper line color
+        upperLineColor: "#FFFF00", // Only upper line color
       },
     ];
 
     primitive.setData(data);
     const processed = primitive.getProcessedData();
 
-    expect(processed[0].upperLineColor).toBe('#FFFF00');
+    expect(processed[0].upperLineColor).toBe("#FFFF00");
     expect(processed[0].middleLineColor).toBeUndefined();
     expect(processed[0].lowerLineColor).toBeUndefined();
     expect(processed[0].upperFillColor).toBeUndefined();
     expect(processed[0].lowerFillColor).toBeUndefined();
   });
 
-  it('should handle only fill color overrides', () => {
+  it("should handle only fill color overrides", () => {
     const primitive = new BandPrimitive(mockChart, defaultOptions);
     const data: BandPrimitiveData[] = [
       {
@@ -744,22 +748,22 @@ describe('BandPrimitive - Per-Point Color Overrides', () => {
         upper: 110,
         middle: 100,
         lower: 90,
-        upperFillColor: 'rgba(255, 255, 0, 0.5)',
-        lowerFillColor: 'rgba(0, 255, 255, 0.5)',
+        upperFillColor: "rgba(255, 255, 0, 0.5)",
+        lowerFillColor: "rgba(0, 255, 255, 0.5)",
       },
     ];
 
     primitive.setData(data);
     const processed = primitive.getProcessedData();
 
-    expect(processed[0].upperFillColor).toBe('rgba(255, 255, 0, 0.5)');
-    expect(processed[0].lowerFillColor).toBe('rgba(0, 255, 255, 0.5)');
+    expect(processed[0].upperFillColor).toBe("rgba(255, 255, 0, 0.5)");
+    expect(processed[0].lowerFillColor).toBe("rgba(0, 255, 255, 0.5)");
     expect(processed[0].upperLineColor).toBeUndefined();
     expect(processed[0].middleLineColor).toBeUndefined();
     expect(processed[0].lowerLineColor).toBeUndefined();
   });
 
-  it('should handle only line color overrides', () => {
+  it("should handle only line color overrides", () => {
     const primitive = new BandPrimitive(mockChart, defaultOptions);
     const data: BandPrimitiveData[] = [
       {
@@ -767,21 +771,21 @@ describe('BandPrimitive - Per-Point Color Overrides', () => {
         upper: 110,
         middle: 100,
         lower: 90,
-        upperLineColor: '#FFFF00',
-        lowerLineColor: '#00FFFF',
+        upperLineColor: "#FFFF00",
+        lowerLineColor: "#00FFFF",
       },
     ];
 
     primitive.setData(data);
     const processed = primitive.getProcessedData();
 
-    expect(processed[0].upperLineColor).toBe('#FFFF00');
-    expect(processed[0].lowerLineColor).toBe('#00FFFF');
+    expect(processed[0].upperLineColor).toBe("#FFFF00");
+    expect(processed[0].lowerLineColor).toBe("#00FFFF");
     expect(processed[0].upperFillColor).toBeUndefined();
     expect(processed[0].lowerFillColor).toBeUndefined();
   });
 
-  it('should preserve per-point colors through data updates', () => {
+  it("should preserve per-point colors through data updates", () => {
     const primitive = new BandPrimitive(mockChart, defaultOptions);
     const data1: BandPrimitiveData[] = [
       {
@@ -789,7 +793,7 @@ describe('BandPrimitive - Per-Point Color Overrides', () => {
         upper: 110,
         middle: 100,
         lower: 90,
-        upperLineColor: '#FF0000',
+        upperLineColor: "#FF0000",
       },
     ];
     const data2: BandPrimitiveData[] = [
@@ -798,20 +802,20 @@ describe('BandPrimitive - Per-Point Color Overrides', () => {
         upper: 110,
         middle: 100,
         lower: 90,
-        upperLineColor: '#00FF00',
+        upperLineColor: "#00FF00",
       },
     ];
 
     primitive.setData(data1);
     let processed = primitive.getProcessedData();
-    expect(processed[0].upperLineColor).toBe('#FF0000');
+    expect(processed[0].upperLineColor).toBe("#FF0000");
 
     primitive.setData(data2);
     processed = primitive.getProcessedData();
-    expect(processed[0].upperLineColor).toBe('#00FF00');
+    expect(processed[0].upperLineColor).toBe("#00FF00");
   });
 
-  it('should handle all three lines with different colors', () => {
+  it("should handle all three lines with different colors", () => {
     const primitive = new BandPrimitive(mockChart, defaultOptions);
     const data: BandPrimitiveData[] = [
       {
@@ -819,21 +823,21 @@ describe('BandPrimitive - Per-Point Color Overrides', () => {
         upper: 110,
         middle: 100,
         lower: 90,
-        upperLineColor: '#FF0000',
-        middleLineColor: '#00FF00',
-        lowerLineColor: '#0000FF',
+        upperLineColor: "#FF0000",
+        middleLineColor: "#00FF00",
+        lowerLineColor: "#0000FF",
       },
     ];
 
     primitive.setData(data);
     const processed = primitive.getProcessedData();
 
-    expect(processed[0].upperLineColor).toBe('#FF0000');
-    expect(processed[0].middleLineColor).toBe('#00FF00');
-    expect(processed[0].lowerLineColor).toBe('#0000FF');
+    expect(processed[0].upperLineColor).toBe("#FF0000");
+    expect(processed[0].middleLineColor).toBe("#00FF00");
+    expect(processed[0].lowerLineColor).toBe("#0000FF");
   });
 
-  it('should handle all color properties together', () => {
+  it("should handle all color properties together", () => {
     const primitive = new BandPrimitive(mockChart, defaultOptions);
     const data: BandPrimitiveData[] = [
       {
@@ -841,37 +845,37 @@ describe('BandPrimitive - Per-Point Color Overrides', () => {
         upper: 110,
         middle: 100,
         lower: 90,
-        upperLineColor: '#AA0000',
-        middleLineColor: '#00AA00',
-        lowerLineColor: '#0000AA',
-        upperFillColor: 'rgba(170, 170, 0, 0.4)',
-        lowerFillColor: 'rgba(0, 170, 170, 0.4)',
+        upperLineColor: "#AA0000",
+        middleLineColor: "#00AA00",
+        lowerLineColor: "#0000AA",
+        upperFillColor: "rgba(170, 170, 0, 0.4)",
+        lowerFillColor: "rgba(0, 170, 170, 0.4)",
       },
       {
         time: 2000,
         upper: 115,
         middle: 105,
         lower: 95,
-        upperLineColor: '#BB0000',
-        middleLineColor: '#00BB00',
-        lowerLineColor: '#0000BB',
-        upperFillColor: 'rgba(187, 187, 0, 0.4)',
-        lowerFillColor: 'rgba(0, 187, 187, 0.4)',
+        upperLineColor: "#BB0000",
+        middleLineColor: "#00BB00",
+        lowerLineColor: "#0000BB",
+        upperFillColor: "rgba(187, 187, 0, 0.4)",
+        lowerFillColor: "rgba(0, 187, 187, 0.4)",
       },
     ];
 
     primitive.setData(data);
     const processed = primitive.getProcessedData();
 
-    expect(processed[0].upperLineColor).toBe('#AA0000');
-    expect(processed[0].middleLineColor).toBe('#00AA00');
-    expect(processed[0].lowerLineColor).toBe('#0000AA');
-    expect(processed[0].upperFillColor).toBe('rgba(170, 170, 0, 0.4)');
-    expect(processed[0].lowerFillColor).toBe('rgba(0, 170, 170, 0.4)');
-    expect(processed[1].upperLineColor).toBe('#BB0000');
-    expect(processed[1].middleLineColor).toBe('#00BB00');
-    expect(processed[1].lowerLineColor).toBe('#0000BB');
-    expect(processed[1].upperFillColor).toBe('rgba(187, 187, 0, 0.4)');
-    expect(processed[1].lowerFillColor).toBe('rgba(0, 187, 187, 0.4)');
+    expect(processed[0].upperLineColor).toBe("#AA0000");
+    expect(processed[0].middleLineColor).toBe("#00AA00");
+    expect(processed[0].lowerLineColor).toBe("#0000AA");
+    expect(processed[0].upperFillColor).toBe("rgba(170, 170, 0, 0.4)");
+    expect(processed[0].lowerFillColor).toBe("rgba(0, 170, 170, 0.4)");
+    expect(processed[1].upperLineColor).toBe("#BB0000");
+    expect(processed[1].middleLineColor).toBe("#00BB00");
+    expect(processed[1].lowerLineColor).toBe("#0000BB");
+    expect(processed[1].upperFillColor).toBe("rgba(187, 187, 0, 0.4)");
+    expect(processed[1].lowerFillColor).toBe("rgba(0, 187, 187, 0.4)");
   });
 });

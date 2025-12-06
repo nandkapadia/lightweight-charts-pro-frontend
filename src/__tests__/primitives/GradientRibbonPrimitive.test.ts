@@ -6,13 +6,13 @@
  * with z-order control for background rendering.
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from "vitest";
 
 // Unmock the module under test
-vi.unmock('../../primitives/GradientRibbonPrimitive');
+vi.unmock("../../primitives/GradientRibbonPrimitive");
 
 // Mock BaseSeriesPrimitive
-vi.mock('../../primitives/BaseSeriesPrimitive', () => ({
+vi.mock("../../primitives/BaseSeriesPrimitive", () => ({
   BaseSeriesPrimitive: class {
     protected _options: any;
     protected _chart: any;
@@ -44,7 +44,7 @@ vi.mock('../../primitives/BaseSeriesPrimitive', () => ({
     }
 
     protected _getDefaultZOrder(): string {
-      return 'normal';
+      return "normal";
     }
 
     getChart(): any {
@@ -107,31 +107,33 @@ vi.mock('../../primitives/BaseSeriesPrimitive', () => ({
       return 0;
     }
     text(): string {
-      return '';
+      return "";
     }
     textColor(): string {
-      return '#FFFFFF';
+      return "#FFFFFF";
     }
     backColor(): string {
-      return '#000000';
+      return "#000000";
     }
   },
 }));
 
 // Mock color utils
-vi.mock('../../utils/colorUtils', () => ({
+vi.mock("../../utils/colorUtils", () => ({
   getSolidColorFromFill: vi.fn((color: string) => color),
 }));
 
 // Mock common rendering
-vi.mock('../../plugins/series/base/commonRendering', () => ({
-  convertToCoordinates: vi.fn((data: any[], chart: any, series: any, keys: string[]) => {
-    return data.map((item: any) => ({
-      x: item.time * 10,
-      upper: item.upper * 2,
-      lower: item.lower * 2,
-    }));
-  }),
+vi.mock("../../plugins/series/base/commonRendering", () => ({
+  convertToCoordinates: vi.fn(
+    (data: any[], chart: any, series: any, keys: string[]) => {
+      return data.map((item: any) => ({
+        x: item.time * 10,
+        upper: item.upper * 2,
+        lower: item.lower * 2,
+      }));
+    },
+  ),
   drawMultiLine: vi.fn(),
 }));
 
@@ -140,9 +142,9 @@ import {
   GradientRibbonPrimitive,
   GradientRibbonPrimitiveData,
   GradientRibbonPrimitiveOptions,
-} from '../../primitives/GradientRibbonPrimitive';
+} from "../../primitives/GradientRibbonPrimitive";
 
-describe('GradientRibbonPrimitive - Construction', () => {
+describe("GradientRibbonPrimitive - Construction", () => {
   let mockChart: any;
   let defaultOptions: GradientRibbonPrimitiveOptions;
 
@@ -154,28 +156,28 @@ describe('GradientRibbonPrimitive - Construction', () => {
     };
 
     defaultOptions = {
-      upperLineColor: '#FF0000',
+      upperLineColor: "#FF0000",
       upperLineWidth: 2,
       upperLineStyle: 0,
       upperLineVisible: true,
-      lowerLineColor: '#00FF00',
+      lowerLineColor: "#00FF00",
       lowerLineWidth: 2,
       lowerLineStyle: 0,
       lowerLineVisible: true,
       fillVisible: true,
-      gradientStartColor: '#FF0000',
-      gradientEndColor: '#0000FF',
+      gradientStartColor: "#FF0000",
+      gradientEndColor: "#0000FF",
       normalizeGradients: false,
     };
   });
 
-  it('should create primitive with default options', () => {
+  it("should create primitive with default options", () => {
     const primitive = new GradientRibbonPrimitive(mockChart, defaultOptions);
     expect(primitive).toBeDefined();
     expect(primitive.getOptions()).toBeDefined();
   });
 
-  it('should initialize pane and axis views', () => {
+  it("should initialize pane and axis views", () => {
     const primitive = new GradientRibbonPrimitive(mockChart, defaultOptions);
     const paneViews = primitive.paneViews();
     const axisViews = primitive.priceAxisViews();
@@ -184,13 +186,13 @@ describe('GradientRibbonPrimitive - Construction', () => {
     expect(axisViews.length).toBe(2); // Upper and lower axis views
   });
 
-  it('should store chart reference', () => {
+  it("should store chart reference", () => {
     const primitive = new GradientRibbonPrimitive(mockChart, defaultOptions);
     expect(primitive.getChart()).toBe(mockChart);
   });
 });
 
-describe('GradientRibbonPrimitive - Data Processing', () => {
+describe("GradientRibbonPrimitive - Data Processing", () => {
   let mockChart: any;
   let defaultOptions: GradientRibbonPrimitiveOptions;
   let primitive: GradientRibbonPrimitive;
@@ -203,24 +205,24 @@ describe('GradientRibbonPrimitive - Data Processing', () => {
     };
 
     defaultOptions = {
-      upperLineColor: '#FF0000',
+      upperLineColor: "#FF0000",
       upperLineWidth: 2,
       upperLineStyle: 0,
       upperLineVisible: true,
-      lowerLineColor: '#00FF00',
+      lowerLineColor: "#00FF00",
       lowerLineWidth: 2,
       lowerLineStyle: 0,
       lowerLineVisible: true,
       fillVisible: true,
-      gradientStartColor: '#FF0000',
-      gradientEndColor: '#0000FF',
+      gradientStartColor: "#FF0000",
+      gradientEndColor: "#0000FF",
       normalizeGradients: false,
     };
 
     primitive = new GradientRibbonPrimitive(mockChart, defaultOptions);
   });
 
-  it('should process valid data correctly', () => {
+  it("should process valid data correctly", () => {
     const data: GradientRibbonPrimitiveData[] = [
       { time: 1000, upper: 100, lower: 90 },
       { time: 2000, upper: 110, lower: 95 },
@@ -234,7 +236,7 @@ describe('GradientRibbonPrimitive - Data Processing', () => {
     expect(processed[0].lower).toBe(90);
   });
 
-  it('should filter out null upper values', () => {
+  it("should filter out null upper values", () => {
     const data: GradientRibbonPrimitiveData[] = [
       { time: 1000, upper: null, lower: 90 },
       { time: 2000, upper: 110, lower: 95 },
@@ -247,7 +249,7 @@ describe('GradientRibbonPrimitive - Data Processing', () => {
     expect(processed[0].time).toBe(2000);
   });
 
-  it('should filter out null lower values', () => {
+  it("should filter out null lower values", () => {
     const data: GradientRibbonPrimitiveData[] = [
       { time: 1000, upper: 100, lower: null },
       { time: 2000, upper: 110, lower: 95 },
@@ -260,7 +262,7 @@ describe('GradientRibbonPrimitive - Data Processing', () => {
     expect(processed[0].time).toBe(2000);
   });
 
-  it('should filter out undefined values', () => {
+  it("should filter out undefined values", () => {
     const data: GradientRibbonPrimitiveData[] = [
       { time: 1000, upper: undefined, lower: 90 },
       { time: 2000, upper: 110, lower: undefined },
@@ -274,7 +276,7 @@ describe('GradientRibbonPrimitive - Data Processing', () => {
     expect(processed[0].time).toBe(3000);
   });
 
-  it('should filter out NaN values', () => {
+  it("should filter out NaN values", () => {
     const data: GradientRibbonPrimitiveData[] = [
       { time: 1000, upper: NaN, lower: 90 },
       { time: 2000, upper: 110, lower: NaN },
@@ -288,8 +290,10 @@ describe('GradientRibbonPrimitive - Data Processing', () => {
     expect(processed[0].time).toBe(3000);
   });
 
-  it('should calculate gradient factor when not provided', () => {
-    const data: GradientRibbonPrimitiveData[] = [{ time: 1000, upper: 100, lower: 90 }];
+  it("should calculate gradient factor when not provided", () => {
+    const data: GradientRibbonPrimitiveData[] = [
+      { time: 1000, upper: 100, lower: 90 },
+    ];
 
     primitive.setData(data);
     const processed = primitive.getProcessedData();
@@ -299,24 +303,27 @@ describe('GradientRibbonPrimitive - Data Processing', () => {
     expect(processed[0].gradientFactor).toBeLessThanOrEqual(1);
   });
 
-  it('should use per-point fill override when provided', () => {
+  it("should use per-point fill override when provided", () => {
     const data: GradientRibbonPrimitiveData[] = [
-      { time: 1000, upper: 100, lower: 90, fill: 'rgba(255, 0, 0, 0.5)' },
+      { time: 1000, upper: 100, lower: 90, fill: "rgba(255, 0, 0, 0.5)" },
     ];
 
     primitive.setData(data);
     const processed = primitive.getProcessedData();
 
-    expect(processed[0].fillOverride).toBe('rgba(255, 0, 0, 0.5)');
+    expect(processed[0].fillOverride).toBe("rgba(255, 0, 0, 0.5)");
   });
 
-  it('should calculate gradient colors when normalizeGradients is true', () => {
+  it("should calculate gradient colors when normalizeGradients is true", () => {
     const optionsWithNormalize = {
       ...defaultOptions,
       normalizeGradients: true,
     };
 
-    const primitiveWithNormalize = new GradientRibbonPrimitive(mockChart, optionsWithNormalize);
+    const primitiveWithNormalize = new GradientRibbonPrimitive(
+      mockChart,
+      optionsWithNormalize,
+    );
 
     const data: GradientRibbonPrimitiveData[] = [
       { time: 1000, upper: 100, lower: 90 }, // spread: 10
@@ -337,12 +344,16 @@ describe('GradientRibbonPrimitive - Data Processing', () => {
     expect(processed[0].gradientFactor).toBeLessThanOrEqual(1);
 
     // Item with max spread should have highest gradient factor
-    expect(processed[1].gradientFactor).toBeGreaterThan(processed[0].gradientFactor);
-    expect(processed[1].gradientFactor).toBeGreaterThan(processed[2].gradientFactor);
+    expect(processed[1].gradientFactor).toBeGreaterThan(
+      processed[0].gradientFactor,
+    );
+    expect(processed[1].gradientFactor).toBeGreaterThan(
+      processed[2].gradientFactor,
+    );
   });
 });
 
-describe('GradientRibbonPrimitive - Options Management', () => {
+describe("GradientRibbonPrimitive - Options Management", () => {
   let mockChart: any;
   let defaultOptions: GradientRibbonPrimitiveOptions;
   let primitive: GradientRibbonPrimitive;
@@ -355,49 +366,49 @@ describe('GradientRibbonPrimitive - Options Management', () => {
     };
 
     defaultOptions = {
-      upperLineColor: '#FF0000',
+      upperLineColor: "#FF0000",
       upperLineWidth: 2,
       upperLineStyle: 0,
       upperLineVisible: true,
-      lowerLineColor: '#00FF00',
+      lowerLineColor: "#00FF00",
       lowerLineWidth: 2,
       lowerLineStyle: 0,
       lowerLineVisible: true,
       fillVisible: true,
-      gradientStartColor: '#FF0000',
-      gradientEndColor: '#0000FF',
+      gradientStartColor: "#FF0000",
+      gradientEndColor: "#0000FF",
       normalizeGradients: false,
     };
 
     primitive = new GradientRibbonPrimitive(mockChart, defaultOptions);
   });
 
-  it('should update upper line color', () => {
+  it("should update upper line color", () => {
     // @ts-expect-error - updateOptions not implemented yet
-    primitive.updateOptions({ upperLineColor: '#FFFF00' });
-    expect(primitive.getOptions().upperLineColor).toBe('#FFFF00');
+    primitive.updateOptions({ upperLineColor: "#FFFF00" });
+    expect(primitive.getOptions().upperLineColor).toBe("#FFFF00");
   });
 
-  it('should update lower line visibility', () => {
+  it("should update lower line visibility", () => {
     // @ts-expect-error - updateOptions not implemented yet
     primitive.updateOptions({ lowerLineVisible: false });
     expect(primitive.getOptions().lowerLineVisible).toBe(false);
   });
 
-  it('should update fill visibility', () => {
+  it("should update fill visibility", () => {
     // @ts-expect-error - updateOptions not implemented yet
     primitive.updateOptions({ fillVisible: false });
     expect(primitive.getOptions().fillVisible).toBe(false);
   });
 
-  it('should update gradient normalization', () => {
+  it("should update gradient normalization", () => {
     // @ts-expect-error - updateOptions not implemented yet
     primitive.updateOptions({ normalizeGradients: true });
     expect(primitive.getOptions().normalizeGradients).toBe(true);
   });
 });
 
-describe('GradientRibbonPrimitive - Axis Views', () => {
+describe("GradientRibbonPrimitive - Axis Views", () => {
   let mockChart: any;
   let defaultOptions: GradientRibbonPrimitiveOptions;
   let primitive: GradientRibbonPrimitive;
@@ -415,17 +426,17 @@ describe('GradientRibbonPrimitive - Axis Views', () => {
     };
 
     defaultOptions = {
-      upperLineColor: '#FF0000',
+      upperLineColor: "#FF0000",
       upperLineWidth: 2,
       upperLineStyle: 0,
       upperLineVisible: true,
-      lowerLineColor: '#00FF00',
+      lowerLineColor: "#00FF00",
       lowerLineWidth: 2,
       lowerLineStyle: 0,
       lowerLineVisible: true,
       fillVisible: true,
-      gradientStartColor: '#FF0000',
-      gradientEndColor: '#0000FF',
+      gradientStartColor: "#FF0000",
+      gradientEndColor: "#0000FF",
       normalizeGradients: false,
     };
 
@@ -434,12 +445,12 @@ describe('GradientRibbonPrimitive - Axis Views', () => {
     primitive.attachToSeries(mockSeries);
   });
 
-  it('should have two price axis views', () => {
+  it("should have two price axis views", () => {
     const axisViews = primitive.priceAxisViews();
     expect(axisViews).toHaveLength(2);
   });
 
-  it('should provide upper line axis view', () => {
+  it("should provide upper line axis view", () => {
     const data: GradientRibbonPrimitiveData[] = [
       { time: 1000, upper: 100, lower: 90 },
       { time: 2000, upper: 110, lower: 95 },
@@ -449,11 +460,11 @@ describe('GradientRibbonPrimitive - Axis Views', () => {
     const axisViews = primitive.priceAxisViews();
     const upperView = axisViews[0];
 
-    expect(upperView.text()).toBe('110.00');
-    expect(upperView.textColor()).toBe('#FFFFFF');
+    expect(upperView.text()).toBe("110.00");
+    expect(upperView.textColor()).toBe("#FFFFFF");
   });
 
-  it('should provide lower line axis view', () => {
+  it("should provide lower line axis view", () => {
     const data: GradientRibbonPrimitiveData[] = [
       { time: 1000, upper: 100, lower: 90 },
       { time: 2000, upper: 110, lower: 95 },
@@ -463,20 +474,20 @@ describe('GradientRibbonPrimitive - Axis Views', () => {
     const axisViews = primitive.priceAxisViews();
     const lowerView = axisViews[1];
 
-    expect(lowerView.text()).toBe('95.00');
-    expect(lowerView.textColor()).toBe('#FFFFFF');
+    expect(lowerView.text()).toBe("95.00");
+    expect(lowerView.textColor()).toBe("#FFFFFF");
   });
 
-  it('should handle empty data in axis views', () => {
+  it("should handle empty data in axis views", () => {
     primitive.setData([]);
     const axisViews = primitive.priceAxisViews();
 
-    expect(axisViews[0].text()).toBe('');
-    expect(axisViews[1].text()).toBe('');
+    expect(axisViews[0].text()).toBe("");
+    expect(axisViews[1].text()).toBe("");
   });
 });
 
-describe('GradientRibbonPrimitive - Edge Cases', () => {
+describe("GradientRibbonPrimitive - Edge Cases", () => {
   let mockChart: any;
   let defaultOptions: GradientRibbonPrimitiveOptions;
 
@@ -488,29 +499,29 @@ describe('GradientRibbonPrimitive - Edge Cases', () => {
     };
 
     defaultOptions = {
-      upperLineColor: '#FF0000',
+      upperLineColor: "#FF0000",
       upperLineWidth: 2,
       upperLineStyle: 0,
       upperLineVisible: true,
-      lowerLineColor: '#00FF00',
+      lowerLineColor: "#00FF00",
       lowerLineWidth: 2,
       lowerLineStyle: 0,
       lowerLineVisible: true,
       fillVisible: true,
-      gradientStartColor: '#FF0000',
-      gradientEndColor: '#0000FF',
+      gradientStartColor: "#FF0000",
+      gradientEndColor: "#0000FF",
       normalizeGradients: false,
     };
   });
 
-  it('should handle empty data array', () => {
+  it("should handle empty data array", () => {
     const primitive = new GradientRibbonPrimitive(mockChart, defaultOptions);
     primitive.setData([]);
 
     expect(primitive.getProcessedData()).toHaveLength(0);
   });
 
-  it('should handle data with all invalid values', () => {
+  it("should handle data with all invalid values", () => {
     const primitive = new GradientRibbonPrimitive(mockChart, defaultOptions);
     const data: GradientRibbonPrimitiveData[] = [
       { time: 1000, upper: null, lower: null },
@@ -522,7 +533,7 @@ describe('GradientRibbonPrimitive - Edge Cases', () => {
     expect(primitive.getProcessedData()).toHaveLength(0);
   });
 
-  it('should handle upper less than lower (crossing lines)', () => {
+  it("should handle upper less than lower (crossing lines)", () => {
     const primitive = new GradientRibbonPrimitive(mockChart, defaultOptions);
     const data: GradientRibbonPrimitiveData[] = [
       { time: 1000, upper: 90, lower: 100 }, // Inverted
@@ -536,7 +547,7 @@ describe('GradientRibbonPrimitive - Edge Cases', () => {
     expect(processed[0].lower).toBe(100);
   });
 
-  it('should handle zero spread (upper equals lower)', () => {
+  it("should handle zero spread (upper equals lower)", () => {
     const primitive = new GradientRibbonPrimitive(mockChart, {
       ...defaultOptions,
       normalizeGradients: true,

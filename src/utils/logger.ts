@@ -71,11 +71,16 @@ class Logger {
   private formatMessage(entry: LogEntry): string {
     const timestamp = entry.timestamp.toISOString();
     const levelName = LogLevel[entry.level];
-    const context = entry.context ? `[${entry.context}] ` : '';
+    const context = entry.context ? `[${entry.context}] ` : "";
     return `${timestamp} ${levelName} ${context}${entry.message}`;
   }
 
-  private log(level: LogLevel, message: string, context?: string, data?: unknown): void {
+  private log(
+    level: LogLevel,
+    message: string,
+    context?: string,
+    data?: unknown,
+  ): void {
     if (!this.shouldLog(level)) return;
 
     const entry: LogEntry = {
@@ -122,7 +127,7 @@ class Logger {
 
   // Specialized methods for common contexts
   chartError(message: string, error?: Error): void {
-    this.error(message, 'Chart', error);
+    this.error(message, "Chart", error);
   }
 
   primitiveError(message: string, primitiveId: string, error?: Error): void {
@@ -130,7 +135,7 @@ class Logger {
   }
 
   performanceWarn(message: string, data?: unknown): void {
-    this.warn(message, 'Performance', data);
+    this.warn(message, "Performance", data);
   }
 
   renderDebug(message: string, componentName: string, data?: unknown): void {
@@ -143,9 +148,12 @@ export const logger = new Logger();
 
 // Export convenience methods for common patterns
 export const chartLog = {
-  debug: (message: string, data?: unknown) => logger.debug(message, 'Chart', data),
-  info: (message: string, data?: unknown) => logger.info(message, 'Chart', data),
-  warn: (message: string, data?: unknown) => logger.warn(message, 'Chart', data),
+  debug: (message: string, data?: unknown) =>
+    logger.debug(message, "Chart", data),
+  info: (message: string, data?: unknown) =>
+    logger.info(message, "Chart", data),
+  warn: (message: string, data?: unknown) =>
+    logger.warn(message, "Chart", data),
   error: (message: string, error?: Error) => logger.chartError(message, error),
 };
 
@@ -157,8 +165,10 @@ export const primitiveLog = {
 };
 
 export const perfLog = {
-  warn: (message: string, data?: unknown) => logger.performanceWarn(message, data),
-  debug: (message: string, data?: unknown) => logger.debug(message, 'Performance', data),
+  warn: (message: string, data?: unknown) =>
+    logger.performanceWarn(message, data),
+  debug: (message: string, data?: unknown) =>
+    logger.debug(message, "Performance", data),
 };
 
 export default logger;

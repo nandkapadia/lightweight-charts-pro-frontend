@@ -2,12 +2,12 @@
  * @vitest-environment jsdom
  */
 
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import {
   TrendFillPrimitive,
   TrendFillPrimitiveData,
   TrendFillPrimitiveOptions,
-} from '../../primitives/TrendFillPrimitive';
+} from "../../primitives/TrendFillPrimitive";
 
 // Mock lightweight-charts
 const mockTimeScale = {
@@ -18,21 +18,21 @@ const mockTimeScale = {
 const mockAttachedSeries = {
   priceToCoordinate: vi.fn((price: number) => 500 - price * 10),
   options: vi.fn(() => ({
-    uptrendLineColor: '#4CAF50',
+    uptrendLineColor: "#4CAF50",
     uptrendLineWidth: 2,
     uptrendLineStyle: 0,
     uptrendLineVisible: true,
-    downtrendLineColor: '#F44336',
+    downtrendLineColor: "#F44336",
     downtrendLineWidth: 2,
     downtrendLineStyle: 0,
     downtrendLineVisible: true,
-    baseLineColor: '#666666',
+    baseLineColor: "#666666",
     baseLineWidth: 1,
     baseLineStyle: 1,
     baseLineVisible: false,
     fillVisible: true,
-    uptrendFillColor: 'rgba(76, 175, 80, 0.3)',
-    downtrendFillColor: 'rgba(244, 67, 54, 0.3)',
+    uptrendFillColor: "rgba(76, 175, 80, 0.3)",
+    downtrendFillColor: "rgba(244, 67, 54, 0.3)",
     useHalfBarWidth: true,
   })),
 };
@@ -52,7 +52,7 @@ const mockChart = {
   },
 } as any;
 
-describe('TrendFillPrimitive', () => {
+describe("TrendFillPrimitive", () => {
   let primitive: TrendFillPrimitive;
   let defaultOptions: TrendFillPrimitiveOptions;
 
@@ -61,23 +61,23 @@ describe('TrendFillPrimitive', () => {
     vi.clearAllMocks();
 
     defaultOptions = {
-      uptrendFillColor: 'rgba(76, 175, 80, 0.3)',
-      downtrendFillColor: 'rgba(244, 67, 54, 0.3)',
-      uptrendLineColor: '#4CAF50',
+      uptrendFillColor: "rgba(76, 175, 80, 0.3)",
+      downtrendFillColor: "rgba(244, 67, 54, 0.3)",
+      uptrendLineColor: "#4CAF50",
       uptrendLineWidth: 2,
       uptrendLineStyle: 0,
       uptrendLineVisible: true,
-      downtrendLineColor: '#F44336',
+      downtrendLineColor: "#F44336",
       downtrendLineWidth: 2,
       downtrendLineStyle: 0,
       downtrendLineVisible: true,
-      baseLineColor: '#666666',
+      baseLineColor: "#666666",
       baseLineWidth: 1,
       baseLineStyle: 1,
       baseLineVisible: false,
       fillVisible: true,
       visible: true,
-      priceScaleId: 'right',
+      priceScaleId: "right",
       useHalfBarWidth: true,
       zIndex: 0,
     };
@@ -93,18 +93,18 @@ describe('TrendFillPrimitive', () => {
   // Constructor & Initialization Tests
   // ============================================================================
 
-  describe('Constructor & Initialization', () => {
-    it('should create instance with default options', () => {
+  describe("Constructor & Initialization", () => {
+    it("should create instance with default options", () => {
       expect(primitive).toBeDefined();
       expect(primitive.getOptions()).toEqual(defaultOptions);
     });
 
-    it('should create instance with minimal options', () => {
+    it("should create instance with minimal options", () => {
       const minimalPrimitive = new TrendFillPrimitive(mockChart);
       const options = minimalPrimitive.getOptions();
 
-      expect(options.uptrendFillColor).toBe('rgba(76, 175, 80, 0.3)');
-      expect(options.downtrendFillColor).toBe('rgba(244, 67, 54, 0.3)');
+      expect(options.uptrendFillColor).toBe("rgba(76, 175, 80, 0.3)");
+      expect(options.downtrendFillColor).toBe("rgba(244, 67, 54, 0.3)");
       expect(options.uptrendLineVisible).toBe(true);
       expect(options.downtrendLineVisible).toBe(true);
       expect(options.useHalfBarWidth).toBe(true);
@@ -113,15 +113,15 @@ describe('TrendFillPrimitive', () => {
       minimalPrimitive.destroy();
     });
 
-    it('should initialize with empty data', () => {
+    it("should initialize with empty data", () => {
       expect(primitive.getProcessedData()).toEqual([]);
     });
 
-    it('should store chart reference', () => {
+    it("should store chart reference", () => {
       expect(primitive.getChart()).toBe(mockChart);
     });
 
-    it('should have no attached series initially', () => {
+    it("should have no attached series initially", () => {
       expect(primitive.getAttachedSeries()).toBeNull();
     });
   });
@@ -130,8 +130,8 @@ describe('TrendFillPrimitive', () => {
   // Data Setting & Processing Tests
   // ============================================================================
 
-  describe('Data Setting & Processing', () => {
-    it('should set and process camelCase data', () => {
+  describe("Data Setting & Processing", () => {
+    it("should set and process camelCase data", () => {
       const data: TrendFillPrimitiveData[] = [
         { time: 1000, baseLine: 10, trendLine: 20, trendDirection: 1 },
         { time: 2000, baseLine: 15, trendLine: 25, trendDirection: 1 },
@@ -146,7 +146,7 @@ describe('TrendFillPrimitive', () => {
       expect(processed[0].trendDirection).toBe(1);
     });
 
-    it('should set and process snake_case data', () => {
+    it("should set and process snake_case data", () => {
       const data: TrendFillPrimitiveData[] = [
         { time: 1000, base_line: 10, trend_line: 20, trend_direction: 1 },
         { time: 2000, base_line: 15, trend_line: 25, trend_direction: 1 },
@@ -161,7 +161,7 @@ describe('TrendFillPrimitive', () => {
       expect(processed[0].trendDirection).toBe(1);
     });
 
-    it('should sort data by time', () => {
+    it("should sort data by time", () => {
       const data: TrendFillPrimitiveData[] = [
         { time: 3000, baseLine: 30, trendLine: 40, trendDirection: 1 },
         { time: 1000, baseLine: 10, trendLine: 20, trendDirection: 1 },
@@ -176,7 +176,7 @@ describe('TrendFillPrimitive', () => {
       expect(processed[2].time).toBe(3000);
     });
 
-    it('should skip items with null baseLine', () => {
+    it("should skip items with null baseLine", () => {
       const data: TrendFillPrimitiveData[] = [
         { time: 1000, baseLine: null, trendLine: 20, trendDirection: 1 },
         { time: 2000, baseLine: 15, trendLine: 25, trendDirection: 1 },
@@ -189,7 +189,7 @@ describe('TrendFillPrimitive', () => {
       expect(processed[0].time).toBe(2000);
     });
 
-    it('should skip items with null trendLine', () => {
+    it("should skip items with null trendLine", () => {
       const data: TrendFillPrimitiveData[] = [
         { time: 1000, baseLine: 10, trendLine: null, trendDirection: 1 },
         { time: 2000, baseLine: 15, trendLine: 25, trendDirection: 1 },
@@ -202,7 +202,7 @@ describe('TrendFillPrimitive', () => {
       expect(processed[0].time).toBe(2000);
     });
 
-    it('should skip items with null trendDirection', () => {
+    it("should skip items with null trendDirection", () => {
       const data: TrendFillPrimitiveData[] = [
         { time: 1000, baseLine: 10, trendLine: 20, trendDirection: null },
         { time: 2000, baseLine: 15, trendLine: 25, trendDirection: 1 },
@@ -215,7 +215,7 @@ describe('TrendFillPrimitive', () => {
       expect(processed[0].time).toBe(2000);
     });
 
-    it('should skip items with zero trendDirection', () => {
+    it("should skip items with zero trendDirection", () => {
       const data: TrendFillPrimitiveData[] = [
         { time: 1000, baseLine: 10, trendLine: 20, trendDirection: 0 },
         { time: 2000, baseLine: 15, trendLine: 25, trendDirection: 1 },
@@ -228,7 +228,7 @@ describe('TrendFillPrimitive', () => {
       expect(processed[0].time).toBe(2000);
     });
 
-    it('should skip items with undefined values', () => {
+    it("should skip items with undefined values", () => {
       const data: TrendFillPrimitiveData[] = [
         { time: 1000, baseLine: undefined, trendLine: 20, trendDirection: 1 },
         { time: 2000, baseLine: 15, trendLine: undefined, trendDirection: 1 },
@@ -248,8 +248,8 @@ describe('TrendFillPrimitive', () => {
   // Time Parsing Tests
   // ============================================================================
 
-  describe('Time Parsing', () => {
-    it('should parse numeric timestamps in seconds', () => {
+  describe("Time Parsing", () => {
+    it("should parse numeric timestamps in seconds", () => {
       const data: TrendFillPrimitiveData[] = [
         { time: 1609459200, baseLine: 10, trendLine: 20, trendDirection: 1 },
       ];
@@ -260,7 +260,7 @@ describe('TrendFillPrimitive', () => {
       expect(processed[0].time).toBe(1609459200);
     });
 
-    it('should convert milliseconds to seconds', () => {
+    it("should convert milliseconds to seconds", () => {
       const data: TrendFillPrimitiveData[] = [
         { time: 1609459200000, baseLine: 10, trendLine: 20, trendDirection: 1 },
       ];
@@ -271,9 +271,9 @@ describe('TrendFillPrimitive', () => {
       expect(processed[0].time).toBe(1609459200);
     });
 
-    it('should parse string timestamps', () => {
+    it("should parse string timestamps", () => {
       const data: TrendFillPrimitiveData[] = [
-        { time: '1609459200', baseLine: 10, trendLine: 20, trendDirection: 1 },
+        { time: "1609459200", baseLine: 10, trendLine: 20, trendDirection: 1 },
       ];
 
       primitive.setData(data);
@@ -282,10 +282,10 @@ describe('TrendFillPrimitive', () => {
       expect(processed[0].time).toBe(1609459200);
     });
 
-    it('should parse ISO date strings', () => {
+    it("should parse ISO date strings", () => {
       // Note: parseTime first tries parseInt, so '2021-...' returns 2021
       // This is expected behavior - use numeric timestamps for reliable parsing
-      const isoDate = '2021-01-01T00:00:00.000Z';
+      const isoDate = "2021-01-01T00:00:00.000Z";
       const data: TrendFillPrimitiveData[] = [
         { time: isoDate, baseLine: 10, trendLine: 20, trendDirection: 1 },
       ];
@@ -297,9 +297,9 @@ describe('TrendFillPrimitive', () => {
       expect(processed[0].time).toBe(2021);
     });
 
-    it('should handle invalid time strings', () => {
+    it("should handle invalid time strings", () => {
       const data: TrendFillPrimitiveData[] = [
-        { time: 'invalid', baseLine: 10, trendLine: 20, trendDirection: 1 },
+        { time: "invalid", baseLine: 10, trendLine: 20, trendDirection: 1 },
       ];
 
       primitive.setData(data);
@@ -313,8 +313,8 @@ describe('TrendFillPrimitive', () => {
   // Fill Color Assignment Tests
   // ============================================================================
 
-  describe('Fill Color Assignment', () => {
-    it('should assign uptrend fill color for positive direction', () => {
+  describe("Fill Color Assignment", () => {
+    it("should assign uptrend fill color for positive direction", () => {
       const data: TrendFillPrimitiveData[] = [
         { time: 1000, baseLine: 10, trendLine: 20, trendDirection: 1 },
       ];
@@ -322,11 +322,11 @@ describe('TrendFillPrimitive', () => {
       primitive.setData(data);
       const processed = primitive.getProcessedData();
 
-      expect(processed[0].fillColor).toBe('rgba(76, 175, 80, 0.3)');
-      expect(processed[0].lineColor).toBe('#4CAF50'); // Uses uptrend line color
+      expect(processed[0].fillColor).toBe("rgba(76, 175, 80, 0.3)");
+      expect(processed[0].lineColor).toBe("#4CAF50"); // Uses uptrend line color
     });
 
-    it('should assign downtrend fill color for negative direction', () => {
+    it("should assign downtrend fill color for negative direction", () => {
       const data: TrendFillPrimitiveData[] = [
         { time: 1000, baseLine: 10, trendLine: 20, trendDirection: -1 },
       ];
@@ -334,11 +334,11 @@ describe('TrendFillPrimitive', () => {
       primitive.setData(data);
       const processed = primitive.getProcessedData();
 
-      expect(processed[0].fillColor).toBe('rgba(244, 67, 54, 0.3)');
-      expect(processed[0].lineColor).toBe('#F44336'); // Uses downtrend line color
+      expect(processed[0].fillColor).toBe("rgba(244, 67, 54, 0.3)");
+      expect(processed[0].lineColor).toBe("#F44336"); // Uses downtrend line color
     });
 
-    it('should handle direction value > 1', () => {
+    it("should handle direction value > 1", () => {
       const data: TrendFillPrimitiveData[] = [
         { time: 1000, baseLine: 10, trendLine: 20, trendDirection: 5 },
       ];
@@ -346,10 +346,10 @@ describe('TrendFillPrimitive', () => {
       primitive.setData(data);
       const processed = primitive.getProcessedData();
 
-      expect(processed[0].fillColor).toBe('rgba(76, 175, 80, 0.3)');
+      expect(processed[0].fillColor).toBe("rgba(76, 175, 80, 0.3)");
     });
 
-    it('should handle direction value < -1', () => {
+    it("should handle direction value < -1", () => {
       const data: TrendFillPrimitiveData[] = [
         { time: 1000, baseLine: 10, trendLine: 20, trendDirection: -5 },
       ];
@@ -357,7 +357,7 @@ describe('TrendFillPrimitive', () => {
       primitive.setData(data);
       const processed = primitive.getProcessedData();
 
-      expect(processed[0].fillColor).toBe('rgba(244, 67, 54, 0.3)');
+      expect(processed[0].fillColor).toBe("rgba(244, 67, 54, 0.3)");
     });
   });
 
@@ -365,18 +365,18 @@ describe('TrendFillPrimitive', () => {
   // Options Tests
   // ============================================================================
 
-  describe('Options Management', () => {
-    it('should apply partial options update', () => {
+  describe("Options Management", () => {
+    it("should apply partial options update", () => {
       primitive.applyOptions({
-        uptrendFillColor: 'rgba(0, 255, 0, 0.5)',
+        uptrendFillColor: "rgba(0, 255, 0, 0.5)",
       });
 
       const options = primitive.getOptions();
-      expect(options.uptrendFillColor).toBe('rgba(0, 255, 0, 0.5)');
-      expect(options.downtrendFillColor).toBe('rgba(244, 67, 54, 0.3)'); // unchanged
+      expect(options.uptrendFillColor).toBe("rgba(0, 255, 0, 0.5)");
+      expect(options.downtrendFillColor).toBe("rgba(244, 67, 54, 0.3)"); // unchanged
     });
 
-    it('should reprocess data when options change', () => {
+    it("should reprocess data when options change", () => {
       const data: TrendFillPrimitiveData[] = [
         { time: 1000, baseLine: 10, trendLine: 20, trendDirection: 1 },
       ];
@@ -384,76 +384,76 @@ describe('TrendFillPrimitive', () => {
       primitive.setData(data);
 
       primitive.applyOptions({
-        uptrendFillColor: 'rgba(0, 255, 0, 0.5)',
+        uptrendFillColor: "rgba(0, 255, 0, 0.5)",
       });
 
       const processed = primitive.getProcessedData();
-      expect(processed[0].fillColor).toBe('rgba(0, 255, 0, 0.5)');
+      expect(processed[0].fillColor).toBe("rgba(0, 255, 0, 0.5)");
     });
 
-    it('should update uptrend line options', () => {
+    it("should update uptrend line options", () => {
       primitive.applyOptions({
-        uptrendLineColor: '#FF0000',
+        uptrendLineColor: "#FF0000",
         uptrendLineWidth: 3,
         uptrendLineStyle: 1,
         uptrendLineVisible: false,
       });
 
       const options = primitive.getOptions();
-      expect(options.uptrendLineColor).toBe('#FF0000');
+      expect(options.uptrendLineColor).toBe("#FF0000");
       expect(options.uptrendLineWidth).toBe(3);
       expect(options.uptrendLineStyle).toBe(1);
       expect(options.uptrendLineVisible).toBe(false);
     });
 
-    it('should update downtrend line options', () => {
+    it("should update downtrend line options", () => {
       primitive.applyOptions({
-        downtrendLineColor: '#0000FF',
+        downtrendLineColor: "#0000FF",
         downtrendLineWidth: 4,
         downtrendLineStyle: 2,
         downtrendLineVisible: false,
       });
 
       const options = primitive.getOptions();
-      expect(options.downtrendLineColor).toBe('#0000FF');
+      expect(options.downtrendLineColor).toBe("#0000FF");
       expect(options.downtrendLineWidth).toBe(4);
       expect(options.downtrendLineStyle).toBe(2);
       expect(options.downtrendLineVisible).toBe(false);
     });
 
-    it('should update base line options', () => {
+    it("should update base line options", () => {
       primitive.applyOptions({
-        baseLineColor: '#0000FF',
+        baseLineColor: "#0000FF",
         baseLineWidth: 2,
         baseLineStyle: 2,
         baseLineVisible: true,
       });
 
       const options = primitive.getOptions();
-      expect(options.baseLineColor).toBe('#0000FF');
+      expect(options.baseLineColor).toBe("#0000FF");
       expect(options.baseLineWidth).toBe(2);
       expect(options.baseLineStyle).toBe(2);
       expect(options.baseLineVisible).toBe(true);
     });
 
-    it('should update useHalfBarWidth option', () => {
+    it("should update useHalfBarWidth option", () => {
       primitive.applyOptions({ useHalfBarWidth: false });
       expect(primitive.getOptions().useHalfBarWidth).toBe(false);
     });
 
-    it('should update zIndex option', () => {
+    it("should update zIndex option", () => {
       primitive.applyOptions({ zIndex: -100 });
       expect(primitive.getOptions().zIndex).toBe(-100);
     });
 
-    it('should update visible option', () => {
+    it("should update visible option", () => {
       primitive.applyOptions({ visible: false });
       expect(primitive.getOptions().visible).toBe(false);
     });
 
-    it('should update priceScaleId option', () => {
-      primitive.applyOptions({ priceScaleId: 'left' });
-      expect(primitive.getOptions().priceScaleId).toBe('left');
+    it("should update priceScaleId option", () => {
+      primitive.applyOptions({ priceScaleId: "left" });
+      expect(primitive.getOptions().priceScaleId).toBe("left");
     });
   });
 
@@ -461,13 +461,13 @@ describe('TrendFillPrimitive', () => {
   // Coordinate Conversion Tests
   // ============================================================================
 
-  describe('Coordinate Conversion', () => {
+  describe("Coordinate Conversion", () => {
     beforeEach(() => {
       // Set up primitive with attached series
       (primitive as any)._series = mockAttachedSeries;
     });
 
-    it('should convert time to x coordinate', () => {
+    it("should convert time to x coordinate", () => {
       const data: TrendFillPrimitiveData[] = [
         { time: 100, baseLine: 10, trendLine: 20, trendDirection: 1 },
       ];
@@ -481,7 +481,7 @@ describe('TrendFillPrimitive', () => {
       expect(mockTimeScale.timeToCoordinate).toHaveBeenCalledWith(100);
     });
 
-    it('should convert baseLine price to y coordinate', () => {
+    it("should convert baseLine price to y coordinate", () => {
       const data: TrendFillPrimitiveData[] = [
         { time: 100, baseLine: 10, trendLine: 20, trendDirection: 1 },
       ];
@@ -494,7 +494,7 @@ describe('TrendFillPrimitive', () => {
       expect(mockAttachedSeries.priceToCoordinate).toHaveBeenCalledWith(10);
     });
 
-    it('should convert trendLine price to y coordinate', () => {
+    it("should convert trendLine price to y coordinate", () => {
       const data: TrendFillPrimitiveData[] = [
         { time: 100, baseLine: 10, trendLine: 20, trendDirection: 1 },
       ];
@@ -507,7 +507,7 @@ describe('TrendFillPrimitive', () => {
       expect(mockAttachedSeries.priceToCoordinate).toHaveBeenCalledWith(20);
     });
 
-    it('should skip items with null coordinates', () => {
+    it("should skip items with null coordinates", () => {
       // Mock to return null for time coordinate
       const originalTimeToCoordinate = mockTimeScale.timeToCoordinate;
       mockTimeScale.timeToCoordinate = vi.fn(() => null) as any;
@@ -534,12 +534,12 @@ describe('TrendFillPrimitive', () => {
   // Price Axis View Tests
   // ============================================================================
 
-  describe('Price Axis View', () => {
+  describe("Price Axis View", () => {
     beforeEach(() => {
       (primitive as any)._series = mockAttachedSeries;
     });
 
-    it('should return coordinate for last visible item', () => {
+    it("should return coordinate for last visible item", () => {
       const data: TrendFillPrimitiveData[] = [
         { time: 1000, baseLine: 10, trendLine: 20, trendDirection: 1 },
         { time: 1500, baseLine: 15, trendLine: 25, trendDirection: 1 },
@@ -556,7 +556,7 @@ describe('TrendFillPrimitive', () => {
       expect(mockAttachedSeries.priceToCoordinate).toHaveBeenCalledWith(30);
     });
 
-    it('should return formatted text for last visible item', () => {
+    it("should return formatted text for last visible item", () => {
       const data: TrendFillPrimitiveData[] = [
         { time: 1500, baseLine: 15, trendLine: 25.456, trendDirection: 1 },
       ];
@@ -564,10 +564,10 @@ describe('TrendFillPrimitive', () => {
       primitive.setData(data);
 
       const priceAxisView = (primitive as any)._priceAxisViews[0];
-      expect(priceAxisView.text()).toBe('25.46');
+      expect(priceAxisView.text()).toBe("25.46");
     });
 
-    it('should return white text color', () => {
+    it("should return white text color", () => {
       const data: TrendFillPrimitiveData[] = [
         { time: 1500, baseLine: 15, trendLine: 25, trendDirection: 1 },
       ];
@@ -575,10 +575,10 @@ describe('TrendFillPrimitive', () => {
       primitive.setData(data);
 
       const priceAxisView = (primitive as any)._priceAxisViews[0];
-      expect(priceAxisView.textColor()).toBe('#FFFFFF');
+      expect(priceAxisView.textColor()).toBe("#FFFFFF");
     });
 
-    it('should return solid uptrend color for uptrend', () => {
+    it("should return solid uptrend color for uptrend", () => {
       const data: TrendFillPrimitiveData[] = [
         { time: 1500, baseLine: 15, trendLine: 25, trendDirection: 1 },
       ];
@@ -589,10 +589,10 @@ describe('TrendFillPrimitive', () => {
       const backColor = priceAxisView.backColor();
 
       // getSolidColorFromFill converts rgba with transparency to solid rgba (alpha=1)
-      expect(backColor).toBe('rgba(76, 175, 80, 1)');
+      expect(backColor).toBe("rgba(76, 175, 80, 1)");
     });
 
-    it('should return solid downtrend color for downtrend', () => {
+    it("should return solid downtrend color for downtrend", () => {
       const data: TrendFillPrimitiveData[] = [
         { time: 1500, baseLine: 15, trendLine: 25, trendDirection: -1 },
       ];
@@ -603,10 +603,10 @@ describe('TrendFillPrimitive', () => {
       const backColor = priceAxisView.backColor();
 
       // getSolidColorFromFill converts rgba with transparency to solid rgba (alpha=1)
-      expect(backColor).toBe('rgba(244, 67, 54, 1)');
+      expect(backColor).toBe("rgba(244, 67, 54, 1)");
     });
 
-    it('should be visible when primitive is visible and has data', () => {
+    it("should be visible when primitive is visible and has data", () => {
       const data: TrendFillPrimitiveData[] = [
         { time: 1500, baseLine: 15, trendLine: 25, trendDirection: 1 },
       ];
@@ -617,7 +617,7 @@ describe('TrendFillPrimitive', () => {
       expect(priceAxisView.visible()).toBe(true);
     });
 
-    it('should not be visible when primitive is not visible', () => {
+    it("should not be visible when primitive is not visible", () => {
       const data: TrendFillPrimitiveData[] = [
         { time: 1500, baseLine: 15, trendLine: 25, trendDirection: 1 },
       ];
@@ -629,14 +629,14 @@ describe('TrendFillPrimitive', () => {
       expect(priceAxisView.visible()).toBe(false);
     });
 
-    it('should not be visible when no data', () => {
+    it("should not be visible when no data", () => {
       primitive.setData([]);
 
       const priceAxisView = (primitive as any)._priceAxisViews[0];
       expect(priceAxisView.visible()).toBe(false);
     });
 
-    it('should show tick visible', () => {
+    it("should show tick visible", () => {
       const data: TrendFillPrimitiveData[] = [
         { time: 1500, baseLine: 15, trendLine: 25, trendDirection: 1 },
       ];
@@ -647,7 +647,7 @@ describe('TrendFillPrimitive', () => {
       expect(priceAxisView.tickVisible()).toBe(true);
     });
 
-    it('should detect last visible item within visible range', () => {
+    it("should detect last visible item within visible range", () => {
       const data: TrendFillPrimitiveData[] = [
         { time: 500, baseLine: 5, trendLine: 10, trendDirection: 1 },
         { time: 1500, baseLine: 15, trendLine: 25, trendDirection: 1 },
@@ -660,24 +660,24 @@ describe('TrendFillPrimitive', () => {
       const text = priceAxisView.text();
 
       // Should show item at time 1500 (within visible range 1000-2000)
-      expect(text).toBe('25.00');
+      expect(text).toBe("25.00");
     });
 
-    it('should return empty string when no visible items', () => {
+    it("should return empty string when no visible items", () => {
       primitive.setData([]);
 
       const priceAxisView = (primitive as any)._priceAxisViews[0];
-      expect(priceAxisView.text()).toBe('');
+      expect(priceAxisView.text()).toBe("");
     });
 
-    it('should return transparent background when no data', () => {
+    it("should return transparent background when no data", () => {
       primitive.setData([]);
 
       const priceAxisView = (primitive as any)._priceAxisViews[0];
-      expect(priceAxisView.backColor()).toBe('transparent');
+      expect(priceAxisView.backColor()).toBe("transparent");
     });
 
-    it('should return 0 coordinate when no data', () => {
+    it("should return 0 coordinate when no data", () => {
       primitive.setData([]);
 
       const priceAxisView = (primitive as any)._priceAxisViews[0];
@@ -689,23 +689,23 @@ describe('TrendFillPrimitive', () => {
   // View Management Tests
   // ============================================================================
 
-  describe('View Management', () => {
-    it('should have pane view initialized', () => {
+  describe("View Management", () => {
+    it("should have pane view initialized", () => {
       const paneViews = (primitive as any)._paneViews;
       expect(paneViews).toHaveLength(1);
     });
 
-    it('should have price axis view initialized', () => {
+    it("should have price axis view initialized", () => {
       const priceAxisViews = (primitive as any)._priceAxisViews;
       expect(priceAxisViews).toHaveLength(1);
     });
 
-    it('should have no time axis views', () => {
+    it("should have no time axis views", () => {
       expect(primitive.timeAxisViews()).toEqual([]);
     });
 
-    it('should update all views when data changes', () => {
-      const updateSpy = vi.spyOn((primitive as any)._paneViews[0], 'update');
+    it("should update all views when data changes", () => {
+      const updateSpy = vi.spyOn((primitive as any)._paneViews[0], "update");
 
       const data: TrendFillPrimitiveData[] = [
         { time: 1000, baseLine: 10, trendLine: 20, trendDirection: 1 },
@@ -716,8 +716,8 @@ describe('TrendFillPrimitive', () => {
       expect(updateSpy).toHaveBeenCalled();
     });
 
-    it('should update all views when options change', () => {
-      const updateSpy = vi.spyOn((primitive as any)._paneViews[0], 'update');
+    it("should update all views when options change", () => {
+      const updateSpy = vi.spyOn((primitive as any)._paneViews[0], "update");
 
       primitive.applyOptions({ visible: false });
 
@@ -729,8 +729,8 @@ describe('TrendFillPrimitive', () => {
   // Z-Index Tests
   // ============================================================================
 
-  describe('Z-Index', () => {
-    it('should return correct zIndex from options', () => {
+  describe("Z-Index", () => {
+    it("should return correct zIndex from options", () => {
       (primitive as any)._series = mockAttachedSeries;
 
       primitive.applyOptions({ zIndex: 50 });
@@ -739,7 +739,7 @@ describe('TrendFillPrimitive', () => {
       expect(view.zIndex()).toBe(50);
     });
 
-    it('should return 0 for negative zIndex', () => {
+    it("should return 0 for negative zIndex", () => {
       (primitive as any)._series = mockAttachedSeries;
 
       primitive.applyOptions({ zIndex: -100 });
@@ -748,7 +748,7 @@ describe('TrendFillPrimitive', () => {
       expect(view.zIndex()).toBe(0);
     });
 
-    it('should return 0 for default zIndex', () => {
+    it("should return 0 for default zIndex", () => {
       (primitive as any)._series = mockAttachedSeries;
 
       const view = (primitive as any)._paneViews[0];
@@ -760,8 +760,8 @@ describe('TrendFillPrimitive', () => {
   // Renderer Tests
   // ============================================================================
 
-  describe('Renderer', () => {
-    it('should return renderer from view', () => {
+  describe("Renderer", () => {
+    it("should return renderer from view", () => {
       const view = (primitive as any)._paneViews[0];
       const renderer = view.renderer();
 
@@ -770,18 +770,18 @@ describe('TrendFillPrimitive', () => {
       expect(renderer.drawBackground).toBeDefined();
     });
 
-    it('should have draw method for lines', () => {
+    it("should have draw method for lines", () => {
       const view = (primitive as any)._paneViews[0];
       const renderer = view.renderer();
 
-      expect(typeof renderer.draw).toBe('function');
+      expect(typeof renderer.draw).toBe("function");
     });
 
-    it('should have drawBackground method for fills', () => {
+    it("should have drawBackground method for fills", () => {
       const view = (primitive as any)._paneViews[0];
       const renderer = view.renderer();
 
-      expect(typeof renderer.drawBackground).toBe('function');
+      expect(typeof renderer.drawBackground).toBe("function");
     });
   });
 
@@ -789,13 +789,13 @@ describe('TrendFillPrimitive', () => {
   // Edge Cases Tests
   // ============================================================================
 
-  describe('Edge Cases', () => {
-    it('should handle empty data array', () => {
+  describe("Edge Cases", () => {
+    it("should handle empty data array", () => {
       primitive.setData([]);
       expect(primitive.getProcessedData()).toEqual([]);
     });
 
-    it('should handle single data point', () => {
+    it("should handle single data point", () => {
       const data: TrendFillPrimitiveData[] = [
         { time: 1000, baseLine: 10, trendLine: 20, trendDirection: 1 },
       ];
@@ -804,19 +804,22 @@ describe('TrendFillPrimitive', () => {
       expect(primitive.getProcessedData()).toHaveLength(1);
     });
 
-    it('should handle very large datasets', () => {
-      const data: TrendFillPrimitiveData[] = Array.from({ length: 10000 }, (_, i) => ({
-        time: 1000 + i,
-        baseLine: 10 + i * 0.1,
-        trendLine: 20 + i * 0.1,
-        trendDirection: i % 2 === 0 ? 1 : -1,
-      }));
+    it("should handle very large datasets", () => {
+      const data: TrendFillPrimitiveData[] = Array.from(
+        { length: 10000 },
+        (_, i) => ({
+          time: 1000 + i,
+          baseLine: 10 + i * 0.1,
+          trendLine: 20 + i * 0.1,
+          trendDirection: i % 2 === 0 ? 1 : -1,
+        }),
+      );
 
       primitive.setData(data);
       expect(primitive.getProcessedData()).toHaveLength(10000);
     });
 
-    it('should handle alternating trend directions', () => {
+    it("should handle alternating trend directions", () => {
       const data: TrendFillPrimitiveData[] = [
         { time: 1000, baseLine: 10, trendLine: 20, trendDirection: 1 },
         { time: 2000, baseLine: 15, trendLine: 25, trendDirection: -1 },
@@ -826,12 +829,12 @@ describe('TrendFillPrimitive', () => {
       primitive.setData(data);
       const processed = primitive.getProcessedData();
 
-      expect(processed[0].fillColor).toBe('rgba(76, 175, 80, 0.3)');
-      expect(processed[1].fillColor).toBe('rgba(244, 67, 54, 0.3)');
-      expect(processed[2].fillColor).toBe('rgba(76, 175, 80, 0.3)');
+      expect(processed[0].fillColor).toBe("rgba(76, 175, 80, 0.3)");
+      expect(processed[1].fillColor).toBe("rgba(244, 67, 54, 0.3)");
+      expect(processed[2].fillColor).toBe("rgba(76, 175, 80, 0.3)");
     });
 
-    it('should handle mixed valid and invalid data', () => {
+    it("should handle mixed valid and invalid data", () => {
       const data: TrendFillPrimitiveData[] = [
         { time: 1000, baseLine: null, trendLine: 20, trendDirection: 1 },
         { time: 2000, baseLine: 15, trendLine: 25, trendDirection: 1 },
@@ -848,7 +851,7 @@ describe('TrendFillPrimitive', () => {
       expect(processed[1].time).toBe(5000);
     });
 
-    it('should handle extreme time values', () => {
+    it("should handle extreme time values", () => {
       const data: TrendFillPrimitiveData[] = [
         { time: 0, baseLine: 10, trendLine: 20, trendDirection: 1 },
         { time: 2147483647, baseLine: 15, trendLine: 25, trendDirection: 1 },
@@ -858,16 +861,21 @@ describe('TrendFillPrimitive', () => {
       expect(primitive.getProcessedData()).toHaveLength(2);
     });
 
-    it('should handle extreme price values', () => {
+    it("should handle extreme price values", () => {
       const data: TrendFillPrimitiveData[] = [
-        { time: 1000, baseLine: -1000000, trendLine: 1000000, trendDirection: 1 },
+        {
+          time: 1000,
+          baseLine: -1000000,
+          trendLine: 1000000,
+          trendDirection: 1,
+        },
       ];
 
       primitive.setData(data);
       expect(primitive.getProcessedData()).toHaveLength(1);
     });
 
-    it('should handle duplicate timestamps', () => {
+    it("should handle duplicate timestamps", () => {
       const data: TrendFillPrimitiveData[] = [
         { time: 1000, baseLine: 10, trendLine: 20, trendDirection: 1 },
         { time: 1000, baseLine: 15, trendLine: 25, trendDirection: 1 },
@@ -878,7 +886,7 @@ describe('TrendFillPrimitive', () => {
       expect(primitive.getProcessedData()).toHaveLength(2);
     });
 
-    it('should handle no attached series gracefully', () => {
+    it("should handle no attached series gracefully", () => {
       const data: TrendFillPrimitiveData[] = [
         { time: 1000, baseLine: 10, trendLine: 20, trendDirection: 1 },
       ];
@@ -897,17 +905,17 @@ describe('TrendFillPrimitive', () => {
   // Cleanup Tests
   // ============================================================================
 
-  describe('Cleanup', () => {
-    it('should destroy without errors', () => {
+  describe("Cleanup", () => {
+    it("should destroy without errors", () => {
       expect(() => primitive.destroy()).not.toThrow();
     });
 
-    it('should be callable multiple times', () => {
+    it("should be callable multiple times", () => {
       primitive.destroy();
       expect(() => primitive.destroy()).not.toThrow();
     });
 
-    it('should work after setting data', () => {
+    it("should work after setting data", () => {
       const data: TrendFillPrimitiveData[] = [
         { time: 1000, baseLine: 10, trendLine: 20, trendDirection: 1 },
       ];
@@ -921,8 +929,8 @@ describe('TrendFillPrimitive', () => {
   // Bar Spacing Tests
   // ============================================================================
 
-  describe('Bar Spacing', () => {
-    it('should get bar spacing from chart model', () => {
+  describe("Bar Spacing", () => {
+    it("should get bar spacing from chart model", () => {
       (primitive as any)._series = mockAttachedSeries;
 
       const view = (primitive as any)._paneViews[0];
@@ -932,7 +940,7 @@ describe('TrendFillPrimitive', () => {
       expect(viewData.data.barSpacing).toBe(6);
     });
 
-    it('should use default bar spacing if chart model fails', () => {
+    it("should use default bar spacing if chart model fails", () => {
       (primitive as any)._series = mockAttachedSeries;
 
       const invalidChart = {
@@ -941,7 +949,10 @@ describe('TrendFillPrimitive', () => {
         _model: null, // Invalid model
       } as any;
 
-      const testPrimitive = new TrendFillPrimitive(invalidChart, defaultOptions);
+      const testPrimitive = new TrendFillPrimitive(
+        invalidChart,
+        defaultOptions,
+      );
       (testPrimitive as any)._series = mockAttachedSeries;
 
       const view = (testPrimitive as any)._paneViews[0];
@@ -958,8 +969,8 @@ describe('TrendFillPrimitive', () => {
   // Line Style & Width Tests
   // ============================================================================
 
-  describe('Line Style & Width', () => {
-    it('should store line width from options', () => {
+  describe("Line Style & Width", () => {
+    it("should store line width from options", () => {
       const data: TrendFillPrimitiveData[] = [
         { time: 1000, baseLine: 10, trendLine: 20, trendDirection: 1 },
       ];
@@ -970,7 +981,7 @@ describe('TrendFillPrimitive', () => {
       expect(processed[0].lineWidth).toBe(2);
     });
 
-    it('should store line style from options', () => {
+    it("should store line style from options", () => {
       const data: TrendFillPrimitiveData[] = [
         { time: 1000, baseLine: 10, trendLine: 20, trendDirection: 1 },
       ];
@@ -981,7 +992,7 @@ describe('TrendFillPrimitive', () => {
       expect(processed[0].lineStyle).toBe(0);
     });
 
-    it('should update line width when options change', () => {
+    it("should update line width when options change", () => {
       const data: TrendFillPrimitiveData[] = [
         { time: 1000, baseLine: 10, trendLine: 20, trendDirection: 1 },
       ];
@@ -996,7 +1007,7 @@ describe('TrendFillPrimitive', () => {
       expect(processed[0].lineWidth).toBe(4);
     });
 
-    it('should update line style when options change', () => {
+    it("should update line style when options change", () => {
       const data: TrendFillPrimitiveData[] = [
         { time: 1000, baseLine: 10, trendLine: 20, trendDirection: 1 },
       ];

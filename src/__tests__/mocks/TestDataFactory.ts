@@ -14,9 +14,9 @@ import {
   AreaData,
   BaselineData,
   Time,
-} from 'lightweight-charts';
-import { ChartConfig } from '../../types';
-import { SeriesType as AppSeriesType } from '../../types/SeriesTypes';
+} from "lightweight-charts";
+import { ChartConfig } from "../../types";
+import { SeriesType as AppSeriesType } from "../../types/SeriesTypes";
 
 // Define missing types for testing
 export interface SeriesConfiguration {
@@ -42,7 +42,7 @@ export interface TestDataConfig {
   timeInterval?: number;
   basePrice?: number;
   volatility?: number;
-  trend?: 'up' | 'down' | 'sideways';
+  trend?: "up" | "down" | "sideways";
   includeGaps?: boolean;
   customBehavior?: Record<string, unknown>;
 }
@@ -93,7 +93,7 @@ export class TimeSeriesGenerator {
       count = 100,
       basePrice = 100,
       volatility = 0.02,
-      trend = 'sideways',
+      trend = "sideways",
       seed = 12345,
     } = config;
 
@@ -101,7 +101,8 @@ export class TimeSeriesGenerator {
     const prices: number[] = [];
     let currentPrice = basePrice;
 
-    const trendMultiplier = trend === 'up' ? 0.0005 : trend === 'down' ? -0.0005 : 0;
+    const trendMultiplier =
+      trend === "up" ? 0.0005 : trend === "down" ? -0.0005 : 0;
 
     for (let i = 0; i < count; i++) {
       // Add trend
@@ -126,7 +127,7 @@ export class TimeSeriesGenerator {
   static generateOHLCData(
     basePrice: number,
     volatility: number = 0.01,
-    seed: number = 12345
+    seed: number = 12345,
   ): { open: number; high: number; low: number; close: number } {
     const random = this.seededRandom(seed + Math.floor(Math.random() * 1000));
 
@@ -154,7 +155,7 @@ export class TestDataFactory {
     timeInterval: 24 * 60 * 60 * 1000, // 1 day
     basePrice: 100,
     volatility: 0.02,
-    trend: 'sideways',
+    trend: "sideways",
     includeGaps: false,
     customBehavior: {},
   };
@@ -193,7 +194,7 @@ export class TestDataFactory {
       const ohlc = TimeSeriesGenerator.generateOHLCData(
         basePrice,
         finalConfig.volatility,
-        finalConfig.seed! + index
+        finalConfig.seed! + index,
       );
 
       return {
@@ -217,7 +218,7 @@ export class TestDataFactory {
     return timestamps.map((time, index) => ({
       time: Math.floor(time / 1000) as Time,
       value: prices[index],
-      color: prices[index] > finalConfig.basePrice! ? '#4CAF50' : '#F44336',
+      color: prices[index] > finalConfig.basePrice! ? "#4CAF50" : "#F44336",
     }));
   }
 
@@ -265,40 +266,40 @@ export class TestDataFactory {
       width: 800,
       height: 600,
       layout: {
-        background: { color: '#ffffff' } as any, // Use any to bypass strict color type checking
-        textColor: '#333',
+        background: { color: "#ffffff" } as any, // Use any to bypass strict color type checking
+        textColor: "#333",
         fontSize: 12,
-        fontFamily: 'Arial, sans-serif',
+        fontFamily: "Arial, sans-serif",
         panes: {
           enableResize: true,
-          separatorColor: '#E0E0E0',
-          separatorHoverColor: '#BDBDBD',
+          separatorColor: "#E0E0E0",
+          separatorHoverColor: "#BDBDBD",
         } as any,
         attributionLogo: false,
-        colorSpace: 'srgb',
+        colorSpace: "srgb",
         colorParsers: {} as any,
       },
       grid: {
-        vertLines: { color: '#f0f0f0', style: 0, visible: true },
-        horzLines: { color: '#f0f0f0', style: 0, visible: true },
+        vertLines: { color: "#f0f0f0", style: 0, visible: true },
+        horzLines: { color: "#f0f0f0", style: 0, visible: true },
       },
       crosshair: {
         mode: 0, // Normal
         vertLine: {
-          color: '#758696',
+          color: "#758696",
           width: 1,
           style: 0,
           visible: true,
           labelVisible: true,
-          labelBackgroundColor: '#ffffff',
+          labelBackgroundColor: "#ffffff",
         },
         horzLine: {
-          color: '#758696',
+          color: "#758696",
           width: 1,
           style: 0,
           visible: true,
           labelVisible: true,
-          labelBackgroundColor: '#ffffff',
+          labelBackgroundColor: "#ffffff",
         },
       },
       rightPriceScale: {
@@ -308,7 +309,7 @@ export class TestDataFactory {
         alignLabels: true,
         scaleMargins: { top: 0.1, bottom: 0.1 },
         borderVisible: true,
-        borderColor: '#cccccc',
+        borderColor: "#cccccc",
         visible: true,
         entireTextOnly: false,
         ticksVisible: true,
@@ -325,7 +326,7 @@ export class TestDataFactory {
         lockVisibleTimeRangeOnResize: false,
         rightBarStaysOnScroll: false,
         borderVisible: true,
-        borderColor: '#cccccc',
+        borderColor: "#cccccc",
         visible: true,
         timeVisible: true,
         secondsVisible: false,
@@ -350,18 +351,18 @@ export class TestDataFactory {
         width: 800,
         height: 600,
         layout: {
-          backgroundColor: '#ffffff',
-          textColor: '#333333',
+          backgroundColor: "#ffffff",
+          textColor: "#333333",
         },
         grid: {
-          vertLines: { color: '#f0f0f0', style: 0, visible: true },
-          horzLines: { color: '#f0f0f0', style: 0, visible: true },
+          vertLines: { color: "#f0f0f0", style: 0, visible: true },
+          horzLines: { color: "#f0f0f0", style: 0, visible: true },
         },
         crosshair: {
           mode: 0,
         },
         rightPriceScale: {
-          borderColor: '#cccccc',
+          borderColor: "#cccccc",
           autoScale: true,
         },
         timeScale: {
@@ -378,15 +379,15 @@ export class TestDataFactory {
    * Generate SeriesConfiguration for testing
    */
   static createSeriesConfiguration(
-    seriesType: AppSeriesType = 'line',
-    config: Partial<SeriesConfiguration> = {}
+    seriesType: AppSeriesType = "line",
+    config: Partial<SeriesConfiguration> = {},
   ): SeriesConfiguration {
     const baseConfigs = {
       line: {
-        type: 'line' as AppSeriesType,
-        name: 'Test Line Series',
+        type: "line" as AppSeriesType,
+        name: "Test Line Series",
         options: {
-          color: '#2196F3',
+          color: "#2196F3",
           lineWidth: 2,
           lineType: 0, // Simple
           lineStyle: 0, // Solid
@@ -395,12 +396,12 @@ export class TestDataFactory {
         },
       },
       area: {
-        type: 'area' as AppSeriesType,
-        name: 'Test Area Series',
+        type: "area" as AppSeriesType,
+        name: "Test Area Series",
         options: {
-          topColor: 'rgba(33, 150, 243, 0.56)',
-          bottomColor: 'rgba(33, 150, 243, 0.04)',
-          lineColor: '#2196F3',
+          topColor: "rgba(33, 150, 243, 0.56)",
+          bottomColor: "rgba(33, 150, 243, 0.04)",
+          lineColor: "#2196F3",
           lineWidth: 2,
           lineType: 0,
           lineStyle: 0,
@@ -409,51 +410,51 @@ export class TestDataFactory {
         },
       },
       candlestick: {
-        type: 'candlestick' as AppSeriesType,
-        name: 'Test Candlestick Series',
+        type: "candlestick" as AppSeriesType,
+        name: "Test Candlestick Series",
         options: {
-          upColor: '#4CAF50',
-          downColor: '#F44336',
-          borderUpColor: '#4CAF50',
-          borderDownColor: '#F44336',
-          wickUpColor: '#4CAF50',
-          wickDownColor: '#F44336',
+          upColor: "#4CAF50",
+          downColor: "#F44336",
+          borderUpColor: "#4CAF50",
+          borderDownColor: "#F44336",
+          wickUpColor: "#4CAF50",
+          wickDownColor: "#F44336",
         },
       },
       histogram: {
-        type: 'histogram' as AppSeriesType,
-        name: 'Test Histogram Series',
+        type: "histogram" as AppSeriesType,
+        name: "Test Histogram Series",
         options: {
-          color: '#2196F3',
+          color: "#2196F3",
           base: 0,
         },
       },
       baseline: {
-        type: 'baseline' as AppSeriesType,
-        name: 'Test Baseline Series',
+        type: "baseline" as AppSeriesType,
+        name: "Test Baseline Series",
         options: {
-          baseValue: { type: 'price', price: 100 },
-          topLineColor: '#4CAF50',
-          bottomLineColor: '#F44336',
-          topFillColor1: 'rgba(76, 175, 80, 0.28)',
-          topFillColor2: 'rgba(76, 175, 80, 0.05)',
-          bottomFillColor1: 'rgba(244, 67, 54, 0.28)',
-          bottomFillColor2: 'rgba(244, 67, 54, 0.05)',
+          baseValue: { type: "price", price: 100 },
+          topLineColor: "#4CAF50",
+          bottomLineColor: "#F44336",
+          topFillColor1: "rgba(76, 175, 80, 0.28)",
+          topFillColor2: "rgba(76, 175, 80, 0.05)",
+          bottomFillColor1: "rgba(244, 67, 54, 0.28)",
+          bottomFillColor2: "rgba(244, 67, 54, 0.05)",
         },
       },
       bar: {
-        type: 'histogram' as AppSeriesType, // Bar is essentially histogram in lightweight-charts
-        name: 'Test Bar Series',
+        type: "histogram" as AppSeriesType, // Bar is essentially histogram in lightweight-charts
+        name: "Test Bar Series",
         options: {
-          color: '#FF9800',
+          color: "#FF9800",
           base: 0,
         },
       },
       supertrend: {
-        type: 'line' as AppSeriesType, // Supertrend is typically rendered as line
-        name: 'Test Supertrend Series',
+        type: "line" as AppSeriesType, // Supertrend is typically rendered as line
+        name: "Test Supertrend Series",
         options: {
-          color: '#9C27B0',
+          color: "#9C27B0",
           lineWidth: 2,
           lineType: 0,
           lineStyle: 0,
@@ -462,10 +463,10 @@ export class TestDataFactory {
         },
       },
       bollinger_bands: {
-        type: 'line' as AppSeriesType, // Bollinger bands are typically rendered as lines
-        name: 'Test Bollinger Bands Series',
+        type: "line" as AppSeriesType, // Bollinger bands are typically rendered as lines
+        name: "Test Bollinger Bands Series",
         options: {
-          color: '#FF5722',
+          color: "#FF5722",
           lineWidth: 1,
           lineType: 0,
           lineStyle: 2, // Dashed style for bands
@@ -474,10 +475,10 @@ export class TestDataFactory {
         },
       },
       sma: {
-        type: 'line' as AppSeriesType, // SMA is a line indicator
-        name: 'Test SMA Series',
+        type: "line" as AppSeriesType, // SMA is a line indicator
+        name: "Test SMA Series",
         options: {
-          color: '#795548',
+          color: "#795548",
           lineWidth: 1,
           lineType: 0,
           lineStyle: 0,
@@ -486,10 +487,10 @@ export class TestDataFactory {
         },
       },
       ema: {
-        type: 'line' as AppSeriesType, // EMA is a line indicator
-        name: 'Test EMA Series',
+        type: "line" as AppSeriesType, // EMA is a line indicator
+        name: "Test EMA Series",
         options: {
-          color: '#607D8B',
+          color: "#607D8B",
           lineWidth: 1,
           lineType: 0,
           lineStyle: 1, // Dotted style to distinguish from SMA
@@ -498,10 +499,10 @@ export class TestDataFactory {
         },
       },
       ribbon: {
-        type: 'line' as AppSeriesType, // Ribbon is typically rendered as line
-        name: 'Test Ribbon Series',
+        type: "line" as AppSeriesType, // Ribbon is typically rendered as line
+        name: "Test Ribbon Series",
         options: {
-          color: '#E91E63',
+          color: "#E91E63",
           lineWidth: 3,
           lineType: 0,
           lineStyle: 0,
@@ -510,10 +511,10 @@ export class TestDataFactory {
         },
       },
       signal: {
-        type: 'line' as AppSeriesType, // Signal is a custom series type
-        name: 'Test Signal Series',
+        type: "line" as AppSeriesType, // Signal is a custom series type
+        name: "Test Signal Series",
         options: {
-          color: '#3F51B5',
+          color: "#3F51B5",
           lineWidth: 1,
           lineType: 0,
           lineStyle: 0,
@@ -522,12 +523,12 @@ export class TestDataFactory {
         },
       },
       trend_fill: {
-        type: 'area' as AppSeriesType, // Trend fill is typically rendered as area
-        name: 'Test Trend Fill Series',
+        type: "area" as AppSeriesType, // Trend fill is typically rendered as area
+        name: "Test Trend Fill Series",
         options: {
-          topColor: 'rgba(76, 175, 80, 0.4)',
-          bottomColor: 'rgba(244, 67, 54, 0.4)',
-          lineColor: '#4CAF50',
+          topColor: "rgba(76, 175, 80, 0.4)",
+          bottomColor: "rgba(244, 67, 54, 0.4)",
+          lineColor: "#4CAF50",
           lineWidth: 1,
           lineType: 0,
           lineStyle: 0,
@@ -536,10 +537,10 @@ export class TestDataFactory {
         },
       },
       gradient_ribbon: {
-        type: 'line' as AppSeriesType, // Gradient ribbon is a custom series type
-        name: 'Test Gradient Ribbon Series',
+        type: "line" as AppSeriesType, // Gradient ribbon is a custom series type
+        name: "Test Gradient Ribbon Series",
         options: {
-          color: '#00BCD4',
+          color: "#00BCD4",
           lineWidth: 2,
           lineType: 0,
           lineStyle: 0,
@@ -548,10 +549,10 @@ export class TestDataFactory {
         },
       },
       band: {
-        type: 'line' as AppSeriesType, // Band is a custom series type
-        name: 'Test Band Series',
+        type: "line" as AppSeriesType, // Band is a custom series type
+        name: "Test Band Series",
         options: {
-          color: '#9C27B0',
+          color: "#9C27B0",
           lineWidth: 1,
           lineType: 0,
           lineStyle: 0,
@@ -577,8 +578,8 @@ export class TestDataFactory {
    * Generate SeriesInfo for testing
    */
   static createSeriesInfo(
-    seriesType: AppSeriesType = 'line',
-    config: Partial<SeriesInfo> = {}
+    seriesType: AppSeriesType = "line",
+    config: Partial<SeriesInfo> = {},
   ): SeriesInfo {
     return {
       id: `test-series-${Math.random().toString(36).substr(2, 9)}`,
@@ -586,7 +587,7 @@ export class TestDataFactory {
       name: `Test ${seriesType.charAt(0).toUpperCase() + seriesType.slice(1)} Series`,
       visible: true,
       options: {},
-      priceScaleId: 'right',
+      priceScaleId: "right",
       ...config,
     };
   }
@@ -594,17 +595,20 @@ export class TestDataFactory {
   /**
    * Generate test data for specific series types
    */
-  static createSeriesData(seriesType: SeriesType, config: TestDataConfig = {}): unknown[] {
+  static createSeriesData(
+    seriesType: SeriesType,
+    config: TestDataConfig = {},
+  ): unknown[] {
     switch (seriesType) {
-      case 'Line':
+      case "Line":
         return this.createLineData(config);
-      case 'Area':
+      case "Area":
         return this.createAreaData(config);
-      case 'Candlestick':
+      case "Candlestick":
         return this.createCandlestickData(config);
-      case 'Histogram':
+      case "Histogram":
         return this.createHistogramData(config);
-      case 'Baseline':
+      case "Baseline":
         return this.createBaselineData(config);
       default:
         return this.createLineData(config);
@@ -619,9 +623,13 @@ export class TestDataFactory {
       seriesType?: SeriesType;
       dataPointCount?: number;
       seriesCount?: number;
-    } = {}
+    } = {},
   ): { seriesData: unknown[][]; chartOptions: ChartOptions } {
-    const { seriesType = 'Line', dataPointCount = 1000, seriesCount = 5 } = config;
+    const {
+      seriesType = "Line",
+      dataPointCount = 1000,
+      seriesCount = 5,
+    } = config;
 
     const seriesData: unknown[][] = [];
 
@@ -652,9 +660,13 @@ export class TestDataFactory {
       chartCount?: number;
       seriesPerChart?: number;
       dataPointsPerSeries?: number;
-    } = {}
+    } = {},
   ) {
-    const { chartCount = 10, seriesPerChart = 3, dataPointsPerSeries = 500 } = config;
+    const {
+      chartCount = 10,
+      seriesPerChart = 3,
+      dataPointsPerSeries = 500,
+    } = config;
 
     const testScenarios = [];
 
@@ -673,7 +685,13 @@ export class TestDataFactory {
       };
 
       for (let seriesIndex = 0; seriesIndex < seriesPerChart; seriesIndex++) {
-        const seriesTypes: SeriesType[] = ['Line', 'Area', 'Candlestick', 'Histogram', 'Baseline'];
+        const seriesTypes: SeriesType[] = [
+          "Line",
+          "Area",
+          "Candlestick",
+          "Histogram",
+          "Baseline",
+        ];
         const seriesType = seriesTypes[seriesIndex % seriesTypes.length];
 
         chartData.series.push({
@@ -683,9 +701,12 @@ export class TestDataFactory {
             seed: chartIndex * 1000 + seriesIndex,
             basePrice: 100 + seriesIndex * 20,
           }),
-          configuration: this.createSeriesConfiguration(seriesType.toLowerCase() as AppSeriesType, {
-            name: `Series ${seriesIndex + 1}`,
-          }),
+          configuration: this.createSeriesConfiguration(
+            seriesType.toLowerCase() as AppSeriesType,
+            {
+              name: `Series ${seriesIndex + 1}`,
+            },
+          ),
         });
       }
 
@@ -702,8 +723,8 @@ export class TestDataFactory {
     return {
       // Invalid data formats
       invalidLineData: [
-        { time: 'invalid', value: 100 },
-        { time: 1234567890, value: 'invalid' },
+        { time: "invalid", value: 100 },
+        { time: 1234567890, value: "invalid" },
         { time: null, value: null },
       ],
 
@@ -750,7 +771,7 @@ export const TestDataPresets = {
     timeInterval: 60 * 1000, // 1 minute
     basePrice: 100,
     volatility: 0.01,
-    trend: 'sideways',
+    trend: "sideways",
     includeGaps: false,
   }),
 
@@ -760,7 +781,7 @@ export const TestDataPresets = {
     timeInterval: 60 * 60 * 1000, // 1 hour
     basePrice: 150,
     volatility: 0.02,
-    trend: 'up',
+    trend: "up",
     includeGaps: false,
   }),
 
@@ -770,7 +791,7 @@ export const TestDataPresets = {
     timeInterval: 24 * 60 * 60 * 1000, // 1 day
     basePrice: 200,
     volatility: 0.03,
-    trend: 'sideways',
+    trend: "sideways",
     includeGaps: true,
   }),
 
@@ -780,7 +801,7 @@ export const TestDataPresets = {
     timeInterval: 1000, // 1 second
     basePrice: 50,
     volatility: 0.05,
-    trend: 'down',
+    trend: "down",
     includeGaps: true,
   }),
 
@@ -790,7 +811,7 @@ export const TestDataPresets = {
     timeInterval: 5 * 60 * 1000, // 5 minutes
     basePrice: 100,
     volatility: 0.1,
-    trend: 'sideways',
+    trend: "sideways",
     includeGaps: false,
   }),
 
@@ -800,7 +821,7 @@ export const TestDataPresets = {
     timeInterval: 24 * 60 * 60 * 1000, // 1 day
     basePrice: 100,
     volatility: 0.015,
-    trend: 'up',
+    trend: "up",
     includeGaps: false,
   }),
 
@@ -810,7 +831,7 @@ export const TestDataPresets = {
     timeInterval: 24 * 60 * 60 * 1000, // 1 day
     basePrice: 200,
     volatility: 0.025,
-    trend: 'down',
+    trend: "down",
     includeGaps: false,
   }),
 };
@@ -818,6 +839,8 @@ export const TestDataPresets = {
 /**
  * Global test data setup utility
  */
-export function setupTestDataDefaults(preset: TestDataConfig = TestDataPresets.unit()) {
+export function setupTestDataDefaults(
+  preset: TestDataConfig = TestDataPresets.unit(),
+) {
   TestDataFactory.configure(preset);
 }

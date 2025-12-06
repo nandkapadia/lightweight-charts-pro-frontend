@@ -66,7 +66,7 @@ export class MemoryLeakDetector {
    */
   trackObject<T extends object>(obj: T, label?: string): T {
     const ref = new WeakRef(obj);
-    (ref as any).__label = label || 'Unknown';
+    (ref as any).__label = label || "Unknown";
     this.refs.push(ref);
     return obj;
   }
@@ -108,14 +108,17 @@ export class MemoryLeakDetector {
     const memoryDelta = finalMemory - this.initialMemory;
 
     // Count objects that should have been garbage collected
-    const retainedRefs = this.refs.filter(ref => ref.deref() !== undefined);
+    const retainedRefs = this.refs.filter((ref) => ref.deref() !== undefined);
     const leakedObjects = retainedRefs.length;
 
     // Calculate GC efficiency
     const gcEfficiency = this.calculateGCEfficiency();
 
     // Generate recommendations
-    const recommendations = this.generateRecommendations(memoryDelta, leakedObjects);
+    const recommendations = this.generateRecommendations(
+      memoryDelta,
+      leakedObjects,
+    );
 
     const hasLeaks = this.determineIfHasLeaks(memoryDelta, leakedObjects);
 
@@ -140,7 +143,7 @@ export class MemoryLeakDetector {
   async testForMemoryLeaks<T>(
     testFn: () => T | Promise<T>,
     iterations: number = 100,
-    label: string = 'Test Function'
+    label: string = "Test Function",
   ): Promise<MemoryLeakReport> {
     await this.startTracking();
 
@@ -149,7 +152,7 @@ export class MemoryLeakDetector {
       const result = await testFn();
 
       // Track result if it's an object
-      if (result && typeof result === 'object') {
+      if (result && typeof result === "object") {
         this.trackObject(result, `${label}-iteration-${i}`);
       }
 
@@ -168,7 +171,7 @@ export class MemoryLeakDetector {
   async stressTestMemory<T>(
     testFn: (load: number) => T | Promise<T>,
     maxLoad: number = 1000,
-    stepSize: number = 100
+    stepSize: number = 100,
   ): Promise<MemoryLeakReport[]> {
     const reports: MemoryLeakReport[] = [];
 
@@ -176,7 +179,7 @@ export class MemoryLeakDetector {
       await this.startTracking();
 
       const result = await testFn(load);
-      if (result && typeof result === 'object') {
+      if (result && typeof result === "object") {
         this.trackObject(result, `stress-test-load-${load}`);
       }
 
@@ -207,12 +210,12 @@ export class MemoryLeakDetector {
    * Get memory usage trend analysis
    */
   getMemoryTrend(): {
-    trend: 'increasing' | 'decreasing' | 'stable';
+    trend: "increasing" | "decreasing" | "stable";
     averageGrowth: number;
     volatility: number;
   } {
     if (this.memorySnapshots.length < 3) {
-      return { trend: 'stable', averageGrowth: 0, volatility: 0 };
+      return { trend: "stable", averageGrowth: 0, volatility: 0 };
     }
 
     const growthRates: number[] = [];
@@ -221,18 +224,21 @@ export class MemoryLeakDetector {
       growthRates.push(growth);
     }
 
-    const averageGrowth = growthRates.reduce((sum, rate) => sum + rate, 0) / growthRates.length;
+    const averageGrowth =
+      growthRates.reduce((sum, rate) => sum + rate, 0) / growthRates.length;
     const volatility = Math.sqrt(
-      growthRates.reduce((sum, rate) => sum + Math.pow(rate - averageGrowth, 2), 0) /
-        growthRates.length
+      growthRates.reduce(
+        (sum, rate) => sum + Math.pow(rate - averageGrowth, 2),
+        0,
+      ) / growthRates.length,
     );
 
-    let trend: 'increasing' | 'decreasing' | 'stable' = 'stable';
+    let trend: "increasing" | "decreasing" | "stable" = "stable";
     if (averageGrowth > 50 * 1024) {
       // 50KB threshold
-      trend = 'increasing';
+      trend = "increasing";
     } else if (averageGrowth < -50 * 1024) {
-      trend = 'decreasing';
+      trend = "decreasing";
     }
 
     return { trend, averageGrowth, volatility };
@@ -263,15 +269,20 @@ export class MemoryLeakDetector {
       }
       temp.length = 0;
 
-      await new Promise(resolve => setTimeout(resolve, this.config.gcDelay));
+      await new Promise((resolve) => setTimeout(resolve, this.config.gcDelay));
     }
   }
 
   private async getCurrentMemoryUsage(): Promise<number> {
     // Try modern Memory API first
-    if (typeof performance !== 'undefined' && (performance as any).measureUserAgentSpecificMemory) {
+    if (
+      typeof performance !== "undefined" &&
+      (performance as any).measureUserAgentSpecificMemory
+    ) {
       try {
-        const result = await (performance as any).measureUserAgentSpecificMemory();
+        const result = await (
+          performance as any
+        ).measureUserAgentSpecificMemory();
         return result.bytes;
       } catch {
         // Fallback to process memory usage
@@ -279,7 +290,7 @@ export class MemoryLeakDetector {
     }
 
     // Node.js process memory usage
-    if (typeof process !== 'undefined' && process.memoryUsage) {
+    if (typeof process !== "undefined" && process.memoryUsage) {
       return process.memoryUsage().heapUsed;
     }
 
@@ -291,51 +302,66 @@ export class MemoryLeakDetector {
     const totalAllocated = this.peakMemory - this.initialMemory;
     const finalDelta = Math.max(
       0,
-      this.memorySnapshots[this.memorySnapshots.length - 1] - this.initialMemory
+      this.memorySnapshots[this.memorySnapshots.length - 1] -
+        this.initialMemory,
     );
 
     if (totalAllocated <= 0) return 75; // Default reasonable efficiency for tests
 
-    const efficiency = Math.max(0, Math.min(100, (1 - finalDelta / totalAllocated) * 100));
+    const efficiency = Math.max(
+      0,
+      Math.min(100, (1 - finalDelta / totalAllocated) * 100),
+    );
     return efficiency || 50; // Minimum 50% efficiency to avoid 0 values
   }
 
-  private determineIfHasLeaks(memoryDelta: number, leakedObjects: number): boolean {
-    return memoryDelta > this.config.gcThreshold || leakedObjects > this.config.maxRetainedObjects;
+  private determineIfHasLeaks(
+    memoryDelta: number,
+    leakedObjects: number,
+  ): boolean {
+    return (
+      memoryDelta > this.config.gcThreshold ||
+      leakedObjects > this.config.maxRetainedObjects
+    );
   }
 
-  private generateRecommendations(memoryDelta: number, leakedObjects: number): string[] {
+  private generateRecommendations(
+    memoryDelta: number,
+    leakedObjects: number,
+  ): string[] {
     const recommendations: string[] = [];
 
     if (memoryDelta > this.config.gcThreshold) {
       recommendations.push(
-        `Memory usage increased by ${Math.round(memoryDelta / 1024)}KB, exceeding threshold of ${Math.round(this.config.gcThreshold / 1024)}KB`
+        `Memory usage increased by ${Math.round(memoryDelta / 1024)}KB, exceeding threshold of ${Math.round(this.config.gcThreshold / 1024)}KB`,
       );
     }
 
     if (leakedObjects > 0) {
       recommendations.push(
-        `${leakedObjects} objects were not garbage collected. Check for circular references or event listeners.`
+        `${leakedObjects} objects were not garbage collected. Check for circular references or event listeners.`,
       );
     }
 
     if (this.gcRunCount > 0 && this.calculateGCEfficiency() < 80) {
       recommendations.push(
-        'Low garbage collection efficiency detected. Consider reducing object creation or improving cleanup logic.'
+        "Low garbage collection efficiency detected. Consider reducing object creation or improving cleanup logic.",
       );
     }
 
     if (this.memorySnapshots.length > 2) {
       const trend = this.getMemoryTrend();
-      if (trend.trend === 'increasing' && trend.averageGrowth > 100 * 1024) {
+      if (trend.trend === "increasing" && trend.averageGrowth > 100 * 1024) {
         recommendations.push(
-          'Memory usage shows consistent upward trend. Potential memory leak detected.'
+          "Memory usage shows consistent upward trend. Potential memory leak detected.",
         );
       }
     }
 
     if (recommendations.length === 0) {
-      recommendations.push('No memory leaks detected. Memory usage is within acceptable limits.');
+      recommendations.push(
+        "No memory leaks detected. Memory usage is within acceptable limits.",
+      );
     }
 
     return recommendations;
@@ -352,7 +378,7 @@ export class MemoryLeakDetector {
 export async function testComponentMemoryLeaks<T>(
   renderComponent: () => T,
   unmountComponent: (component: T) => void,
-  iterations: number = 50
+  iterations: number = 50,
 ): Promise<MemoryLeakReport> {
   const detector = MemoryLeakDetector.getInstance({
     enableDetailedTracking: true,
@@ -361,16 +387,16 @@ export async function testComponentMemoryLeaks<T>(
   return detector.testForMemoryLeaks(
     async () => {
       const component = renderComponent();
-      detector.trackObject(component as any, 'React Component');
+      detector.trackObject(component as any, "React Component");
 
       // Simulate some activity
-      await new Promise(resolve => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 10));
 
       unmountComponent(component);
       return component;
     },
     iterations,
-    'React Component Test'
+    "React Component Test",
   );
 }
 
@@ -380,7 +406,7 @@ export async function testComponentMemoryLeaks<T>(
 export async function testChartMemoryLeaks(
   chartFactory: () => any,
   operations: ((chart: any) => void)[],
-  iterations: number = 20
+  iterations: number = 20,
 ): Promise<MemoryLeakReport> {
   const detector = MemoryLeakDetector.getInstance({
     gcThreshold: 2 * 1024 * 1024, // 2MB threshold for charts
@@ -390,7 +416,7 @@ export async function testChartMemoryLeaks(
   return detector.testForMemoryLeaks(
     async () => {
       const chart = chartFactory();
-      detector.trackObject(chart, 'Chart Instance');
+      detector.trackObject(chart, "Chart Instance");
 
       // Perform operations
       for (const operation of operations) {
@@ -398,24 +424,24 @@ export async function testChartMemoryLeaks(
       }
 
       // Cleanup
-      if (chart && typeof chart.remove === 'function') {
+      if (chart && typeof chart.remove === "function") {
         chart.remove();
       }
 
       return chart;
     },
     iterations,
-    'Chart Operations Test'
+    "Chart Operations Test",
   );
 }
 
 /**
  * Mock WeakRef for environments that don't support it
  */
-if (typeof WeakRef === 'undefined') {
+if (typeof WeakRef === "undefined") {
   global.WeakRef = class MockWeakRef<T> {
     private target: T | undefined;
-    [Symbol.toStringTag] = 'WeakRef';
+    [Symbol.toStringTag] = "WeakRef";
 
     constructor(target: T) {
       this.target = target;

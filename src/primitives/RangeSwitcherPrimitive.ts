@@ -58,6 +58,7 @@ import {
   PrimitiveStylingUtils,
   BaseStyleConfig,
 } from "./PrimitiveStylingUtils";
+import { getLastTimestamp } from "../utils/timeNormalization";
 
 /**
  * Predefined time range values for easy configuration
@@ -537,7 +538,7 @@ export class RangeSwitcherPrimitive extends BasePanePrimitive<RangeSwitcherPrimi
         // "All" range - fit all content
         timeScale.fitContent();
       } else {
-        // Specific time range - use current visible range or current time
+        // Specific time range - use current visible range or last bar time
         const currentRange = timeScale.getVisibleRange();
         let endTime: number;
 
@@ -545,8 +546,8 @@ export class RangeSwitcherPrimitive extends BasePanePrimitive<RangeSwitcherPrimi
           // Use the current visible end time as reference
           endTime = currentRange.to as number;
         } else {
-          // Fallback to current time
-          endTime = Date.now() / 1000;
+          // Fallback to last bar time from series data
+          endTime = this.getLastBarTime() ?? Date.now() / 1000;
         }
 
         const fromTime = endTime - seconds;
@@ -558,6 +559,48 @@ export class RangeSwitcherPrimitive extends BasePanePrimitive<RangeSwitcherPrimi
       }
     } catch {
       // Silently handle chart range application errors
+    }
+  }
+
+  /**
+   * Get the last bar time from all series in the chart
+   * @returns Last bar timestamp in seconds, or null if no data
+   */
+  private getLastBarTime(): number | null {
+    if (!this.chart) return null;
+
+    try {
+      // Get all series from the chart
+      const seriesList = (this.chart as any)._private__seriesMap;
+      if (!seriesList) return null;
+
+      let latestTime: number | null = null;
+
+      // Iterate through all series to find the latest time
+      for (const series of seriesList.values()) {
+        try {
+          const data = series.data();
+          if (data && data.length > 0) {
+            const lastPoint = data[data.length - 1];
+            if (lastPoint && lastPoint.time !== undefined) {
+              const timestamp = getLastTimestamp([lastPoint.time]);
+              if (
+                timestamp !== undefined &&
+                (latestTime === null || timestamp > latestTime)
+              ) {
+                latestTime = timestamp;
+              }
+            }
+          }
+        } catch {
+          // Skip series that don't support data() method
+          continue;
+        }
+      }
+
+      return latestTime;
+    } catch {
+      return null;
     }
   }
 
@@ -683,6 +726,9 @@ export class RangeSwitcherPrimitive extends BasePanePrimitive<RangeSwitcherPrimi
       this.invalidateDataTimespan();
       // Update button visibility without full re-render
       this.updateRangeButtonVisibility();
+
+      // Mark initial setup as complete to stop further updates
+      this.completeInitialSetup();
     }
   }
 
@@ -735,12 +781,27 @@ export class RangeSwitcherPrimitive extends BasePanePrimitive<RangeSwitcherPrimi
         const currentTimespan = this.getDataTimespan();
         if (currentTimespan !== this.dataTimespan) {
           this.updateRangeButtonVisibility();
+          // Mark initial setup as complete after first successful update
+          this.completeInitialSetup();
         }
       }
     };
 
     // Check every 1 second for data changes (only during initial setup)
     this.dataChangeIntervalId = setInterval(checkDataChanges, 1000);
+  }
+
+  /**
+   * Mark initial visibility setup as complete and stop the interval
+   */
+  private completeInitialSetup(): void {
+    this.initialVisibilitySetupComplete = true;
+
+    // Stop the interval once initial setup is complete
+    if (this.dataChangeIntervalId) {
+      clearInterval(this.dataChangeIntervalId);
+      this.dataChangeIntervalId = null;
+    }
   }
 
   // ===== Public API =====
