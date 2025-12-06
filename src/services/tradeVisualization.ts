@@ -95,12 +95,9 @@ function parseTime(time: string | number | Time): UTCTimestamp | null {
  * @param {any[]} chartData - Array of chart data with time property
  * @returns {UTCTimestamp | null} Nearest timestamp, or null if no data
  */
-function findNearestTime(
-  targetTime: UTCTimestamp,
-  chartData: any[],
-): UTCTimestamp | null {
+function extractSortedTimes(chartData: any[]): number[] {
   if (!chartData || chartData.length === 0) {
-    return null;
+    return [];
   }
 
   // Extract and normalize times from chart data
@@ -114,15 +111,8 @@ function findNearestTime(
     }
   }
 
-  if (times.length === 0) {
-    return null;
-  }
-
-  // Sort times once (O(n log n)) - enables binary search
-  times.sort((a, b) => a - b);
-
-  // Binary search for nearest (O(log n))
-  return findNearestTimestamp(targetTime, times) as UTCTimestamp;
+  // Sort times once (O(n log n))
+  return times.sort((a, b) => a - b);
 }
 
 // Trade rectangle data interface (for data creation only)
@@ -176,6 +166,9 @@ function createTradeRectangles(
     );
   }
 
+  // Pre-sort chart times ONCE to avoid repeated sorting (O(n log n) once vs O(n log n) per trade)
+  const sortedChartTimes = chartData ? extractSortedTimes(chartData) : [];
+
   // Process only valid trades
   validationResult.valid.forEach((trade, _index) => {
     // Parse entry time
@@ -210,12 +203,15 @@ function createTradeRectangles(
     let adjustedTime1 = time1;
     let adjustedTime2 = time2;
 
-    if (chartData && chartData.length > 0) {
-      const nearestTime1 = findNearestTime(time1, chartData);
-      const nearestTime2 = findNearestTime(time2, chartData);
-
-      if (nearestTime1) adjustedTime1 = nearestTime1;
-      if (nearestTime2) adjustedTime2 = nearestTime2;
+    if (sortedChartTimes.length > 0) {
+      adjustedTime1 = findNearestTimestamp(
+        time1,
+        sortedChartTimes,
+      ) as UTCTimestamp;
+      adjustedTime2 = findNearestTimestamp(
+        time2,
+        sortedChartTimes,
+      ) as UTCTimestamp;
     }
 
     // Validate prices
@@ -288,6 +284,9 @@ function createTradeMarkers(
     );
   }
 
+  // Pre-sort chart times ONCE to avoid repeated sorting (O(n log n) once vs O(n log n) per trade)
+  const sortedChartTimes = chartData ? extractSortedTimes(chartData) : [];
+
   // Process only valid trades
   validationResult.valid.forEach((trade, _index) => {
     // Parse entry time
@@ -309,13 +308,17 @@ function createTradeMarkers(
     let adjustedEntryTime = entryTime;
     let adjustedExitTime = exitTime;
 
-    if (chartData && chartData.length > 0) {
-      const nearestEntryTime = findNearestTime(entryTime, chartData);
-      if (nearestEntryTime) adjustedEntryTime = nearestEntryTime;
+    if (sortedChartTimes.length > 0) {
+      adjustedEntryTime = findNearestTimestamp(
+        entryTime,
+        sortedChartTimes,
+      ) as UTCTimestamp;
 
       if (exitTime) {
-        const nearestExitTime = findNearestTime(exitTime, chartData);
-        if (nearestExitTime) adjustedExitTime = nearestExitTime;
+        adjustedExitTime = findNearestTimestamp(
+          exitTime,
+          sortedChartTimes,
+        ) as UTCTimestamp;
       }
     }
 
