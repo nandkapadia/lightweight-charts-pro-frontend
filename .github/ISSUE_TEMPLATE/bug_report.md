@@ -31,7 +31,7 @@ What actually happened.
 ```typescript
 // Minimal reproduction code
 import { createChart } from 'lightweight-charts';
-import { createBandSeries } from '@lightweight-charts-pro/core/plugins';
+import { createBandSeries } from '@nandkapadia/lightweight-charts-pro-core/plugins';
 
 // Your code here
 ```

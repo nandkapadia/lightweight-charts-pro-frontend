@@ -11,7 +11,7 @@ We release patches for security vulnerabilities for the following versions:
 
 ## Reporting a Vulnerability
 
-We take the security of @lightweight-charts-pro/core seriously. If you believe you have found a security vulnerability, please report it to us as described below.
+We take the security of @nandkapadia/lightweight-charts-pro-core seriously. If you believe you have found a security vulnerability, please report it to us as described below.
 
 ### Please DO NOT:
 
@@ -53,7 +53,7 @@ When we receive a security report:
 
 ```bash
 # Always install from npm
-npm install @lightweight-charts-pro/core
+npm install @nandkapadia/lightweight-charts-pro-core
 
 # Verify package integrity
 npm audit
@@ -63,7 +63,7 @@ npm audit
 
 1. **Keep Dependencies Updated**
    ```bash
-   npm update @lightweight-charts-pro/core
+   npm update @nandkapadia/lightweight-charts-pro-core
    npm audit fix
    ```
 

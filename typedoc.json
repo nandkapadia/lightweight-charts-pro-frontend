@@ -10,7 +10,7 @@
   ],
   "entryPointStrategy": "expand",
   "out": "docs",
-  "name": "@lightweight-charts-pro/core",
+  "name": "@nandkapadia/lightweight-charts-pro-core",
   "includeVersion": true,
   "readme": "README.md",
   "exclude": [

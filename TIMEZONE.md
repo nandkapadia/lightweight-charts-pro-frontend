@@ -2,7 +2,7 @@
 
 ## Core Philosophy
 
-**@lightweight-charts-pro/core does NOT perform any timezone conversions.**
+**@nandkapadia/lightweight-charts-pro-core does NOT perform any timezone conversions.**
 
 This is an intentional design decision that gives you full control over how times are handled in your application.
 
@@ -43,7 +43,7 @@ Timezone handling is better left to specialized libraries and your backend.
 The library **normalizes** different time formats to Unix timestamps (seconds):
 
 ```typescript
-import { normalizeTime } from '@lightweight-charts-pro/core/utils';
+import { normalizeTime } from '@nandkapadia/lightweight-charts-pro-core/utils';
 
 // All of these are normalized WITHOUT conversion:
 
@@ -70,7 +70,7 @@ normalizeTime({ year: 2024, month: 1, day: 15 })
 By default, times are formatted as **ISO 8601 UTC strings**:
 
 ```typescript
-import { formatTime } from '@lightweight-charts-pro/core/utils';
+import { formatTime } from '@nandkapadia/lightweight-charts-pro-core/utils';
 
 formatTime(1705312800);
 // Returns: "2024-01-15T10:00:00.000Z"
@@ -79,7 +79,7 @@ formatTime(1705312800);
 You can provide **custom formatters** for display:
 
 ```typescript
-import { TemplateEngine } from '@lightweight-charts-pro/core/services';
+import { TemplateEngine } from '@nandkapadia/lightweight-charts-pro-core/services';
 
 const engine = TemplateEngine.getInstance();
 
@@ -319,7 +319,7 @@ const legend = new LegendPrimitive({
 The library uses **O(log n) binary search** for time operations:
 
 ```typescript
-import { createSortedTimeArray, findNearestTimestamp } from '@lightweight-charts-pro/core/utils';
+import { createSortedTimeArray, findNearestTimestamp } from '@nandkapadia/lightweight-charts-pro-core/utils';
 
 // Pre-sort times once
 const chartTimes = data.map(d => d.time);

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is `@lightweight-charts-pro/core` - a framework-agnostic TypeScript library that extends TradingView's Lightweight Charts with custom series plugins, primitives, and utilities for financial trading applications. It serves as the core foundation for framework-specific wrappers (React, Vue, Streamlit, etc.).
+This is `@nandkapadia/lightweight-charts-pro-core` - a framework-agnostic TypeScript library that extends TradingView's Lightweight Charts with custom series plugins, primitives, and utilities for financial trading applications. It serves as the core foundation for framework-specific wrappers (React, Vue, Streamlit, etc.).
 
 ## Development Commands
 

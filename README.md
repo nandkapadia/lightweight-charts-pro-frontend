@@ -1,6 +1,6 @@
-# @lightweight-charts-pro/core
+# @nandkapadia/lightweight-charts-pro-core
 
-[![npm version](https://img.shields.io/npm/v/@lightweight-charts-pro/core.svg)](https://www.npmjs.com/package/@lightweight-charts-pro/core)
+[![npm version](https://img.shields.io/npm/v/@nandkapadia/lightweight-charts-pro-core.svg)](https://www.npmjs.com/package/@nandkapadia/lightweight-charts-pro-core)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue.svg)](https://www.typescriptlang.org/)
 [![CI/CD](https://github.com/nandkapadia/lightweight-charts-pro-frontend/workflows/CI%2FCD/badge.svg)](https://github.com/nandkapadia/lightweight-charts-pro-frontend/actions)
@@ -20,15 +20,15 @@
 ## 📦 Installation
 
 ```bash
-npm install @lightweight-charts-pro/core lightweight-charts
+npm install @nandkapadia/lightweight-charts-pro-core lightweight-charts
 ```
 
 ```bash
-yarn add @lightweight-charts-pro/core lightweight-charts
+yarn add @nandkapadia/lightweight-charts-pro-core lightweight-charts
 ```
 
 ```bash
-pnpm add @lightweight-charts-pro/core lightweight-charts
+pnpm add @nandkapadia/lightweight-charts-pro-core lightweight-charts
 ```
 
 ## 🎯 Quick Start
@@ -37,7 +37,7 @@ pnpm add @lightweight-charts-pro/core lightweight-charts
 
 ```typescript
 import { createChart } from 'lightweight-charts';
-import { createBandSeries } from '@lightweight-charts-pro/core/plugins';
+import { createBandSeries } from '@nandkapadia/lightweight-charts-pro-core/plugins';
 
 const chart = createChart(document.getElementById('chart'));
 const bandSeries = createBandSeries(chart, {
@@ -56,7 +56,7 @@ bandSeries.setData([
 ### Using Primitives
 
 ```typescript
-import { LegendPrimitive } from '@lightweight-charts-pro/core/primitives';
+import { LegendPrimitive } from '@nandkapadia/lightweight-charts-pro-core/primitives';
 
 const legend = new LegendPrimitive({
   text: 'My Series',
@@ -69,7 +69,7 @@ series.attachPrimitive(legend);
 ### Using Services
 
 ```typescript
-import { ChartCoordinateService } from '@lightweight-charts-pro/core/services';
+import { ChartCoordinateService } from '@nandkapadia/lightweight-charts-pro-core/services';
 
 const coordService = ChartCoordinateService.getInstance();
 const dimensions = await coordService.getValidatedChartDimensions(chart, container);
@@ -141,7 +141,7 @@ timestamp = int(user_dt.timestamp())  # Already in user's timezone
 If you need to display times in a specific timezone, use custom formatters:
 
 ```typescript
-import { TemplateEngine } from '@lightweight-charts-pro/core/services';
+import { TemplateEngine } from '@nandkapadia/lightweight-charts-pro-core/services';
 
 const engine = TemplateEngine.getInstance();
 
@@ -220,7 +220,7 @@ import {
   formatTime,
   findNearestTimestamp,
   createSortedTimeArray
-} from '@lightweight-charts-pro/core/utils';
+} from '@nandkapadia/lightweight-charts-pro-core/utils';
 
 // Normalize any time format (no conversion)
 const timestamp = normalizeTime('2024-01-15T10:00:00.000Z');
@@ -244,7 +244,7 @@ const nearest = findNearestTimestamp(2400, sorted);
 Display data with upper and lower bounds (e.g., Bollinger Bands).
 
 ```typescript
-import { createBandSeries, BandData } from '@lightweight-charts-pro/core/plugins';
+import { createBandSeries, BandData } from '@nandkapadia/lightweight-charts-pro-core/plugins';
 
 const data: BandData[] = [
   { time: '2024-01-01', upper: 105, lower: 95 },
@@ -264,7 +264,7 @@ bandSeries.setData(data);
 Multiple moving averages displayed as a ribbon.
 
 ```typescript
-import { createRibbonSeries } from '@lightweight-charts-pro/core/plugins';
+import { createRibbonSeries } from '@nandkapadia/lightweight-charts-pro-core/plugins';
 
 const ribbonSeries = createRibbonSeries(chart, {
   fillColor: '#2196F3',
@@ -276,7 +276,7 @@ const ribbonSeries = createRibbonSeries(chart, {
 Binary or numeric signals displayed as colored backgrounds.
 
 ```typescript
-import { createSignalSeries } from '@lightweight-charts-pro/core/plugins';
+import { createSignalSeries } from '@nandkapadia/lightweight-charts-pro-core/plugins';
 
 const signalSeries = createSignalSeries(chart, {
   signalColor: '#4CAF50',
@@ -296,7 +296,7 @@ signalSeries.setData([
 Descriptor-based series creation with consistent API:
 
 ```typescript
-import { SeriesFactory } from '@lightweight-charts-pro/core/series';
+import { SeriesFactory } from '@nandkapadia/lightweight-charts-pro-core/series';
 
 const factory = new SeriesFactory();
 
@@ -324,7 +324,7 @@ const isCustom = factory.isCustomSeries('band'); // true
 Customizable chart legend with template support:
 
 ```typescript
-import { createLegendPrimitive, DefaultLegendConfigs } from '@lightweight-charts-pro/core/primitives';
+import { createLegendPrimitive, DefaultLegendConfigs } from '@nandkapadia/lightweight-charts-pro-core/primitives';
 
 const legend = createLegendPrimitive({
   ...DefaultLegendConfigs.default,
@@ -339,7 +339,7 @@ series.attachPrimitive(legend);
 Time range selector buttons:
 
 ```typescript
-import { createRangeSwitcherPrimitive } from '@lightweight-charts-pro/core/primitives';
+import { createRangeSwitcherPrimitive } from '@nandkapadia/lightweight-charts-pro-core/primitives';
 
 const rangeSwitcher = createRangeSwitcherPrimitive({
   ranges: [
@@ -359,7 +359,7 @@ chart.attachPrimitive(rangeSwitcher);
 Singleton service for chart coordinate management:
 
 ```typescript
-import { ChartCoordinateService } from '@lightweight-charts-pro/core/services';
+import { ChartCoordinateService } from '@nandkapadia/lightweight-charts-pro-core/services';
 
 const service = ChartCoordinateService.getInstance();
 
@@ -377,7 +377,7 @@ const paneCoords = service.getPaneCoordinates(chart, 0);
 String template interpolation for dynamic content:
 
 ```typescript
-import { TemplateEngine } from '@lightweight-charts-pro/core/services';
+import { TemplateEngine } from '@nandkapadia/lightweight-charts-pro-core/services';
 
 const engine = new TemplateEngine();
 const result = engine.process('Price: {{price}}', { price: 123.45 });
@@ -488,14 +488,14 @@ Separate entry points for tree-shaking:
 
 ```typescript
 // Main entry point
-import { ... } from '@lightweight-charts-pro/core';
+import { ... } from '@nandkapadia/lightweight-charts-pro-core';
 
 // Module-specific imports (tree-shakeable)
-import { createBandSeries } from '@lightweight-charts-pro/core/plugins';
-import { LegendPrimitive } from '@lightweight-charts-pro/core/primitives';
-import { SeriesFactory } from '@lightweight-charts-pro/core/series';
-import { ChartCoordinateService } from '@lightweight-charts-pro/core/services';
-import { logger } from '@lightweight-charts-pro/core/utils';
+import { createBandSeries } from '@nandkapadia/lightweight-charts-pro-core/plugins';
+import { LegendPrimitive } from '@nandkapadia/lightweight-charts-pro-core/primitives';
+import { SeriesFactory } from '@nandkapadia/lightweight-charts-pro-core/series';
+import { ChartCoordinateService } from '@nandkapadia/lightweight-charts-pro-core/services';
+import { logger } from '@nandkapadia/lightweight-charts-pro-core/utils';
 ```
 
 ### Type Definitions
@@ -510,7 +510,7 @@ import type {
   SignalData,
   ExtendedChartApi,
   ExtendedSeriesApi,
-} from '@lightweight-charts-pro/core';
+} from '@nandkapadia/lightweight-charts-pro-core';
 ```
 
 ## 🤝 Contributing

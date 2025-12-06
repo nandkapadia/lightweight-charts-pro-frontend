@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🎉 Initial Release - Production Ready
 
-This is the initial production-ready release of @lightweight-charts-pro/core with comprehensive documentation, stability improvements, and critical timezone/performance fixes.
+This is the initial production-ready release of @nandkapadia/lightweight-charts-pro-core with comprehensive documentation, stability improvements, and critical timezone/performance fixes.
 
 ### 🔧 Fixed
 
@@ -95,7 +95,7 @@ This is the initial production-ready release of @lightweight-charts-pro/core wit
 
 ### Changed
 
-- **Package Name**: Published as `@lightweight-charts-pro/core` (scoped package)
+- **Package Name**: Published as `@nandkapadia/lightweight-charts-pro-core` (scoped package)
 - **Default Marker Visibility**: Set to false for cleaner charts
   - `pointMarkersVisible: false`
   - `crosshairMarkerVisible: false`
@@ -190,20 +190,20 @@ If upgrading from 0.2.x:
 1. **Import Paths**: Use module-specific imports for tree-shaking
    ```typescript
    // Before
-   import { createBandSeries } from '@lightweight-charts-pro/core';
+   import { createBandSeries } from '@nandkapadia/lightweight-charts-pro-core';
 
    // After (recommended)
-   import { createBandSeries } from '@lightweight-charts-pro/core/plugins';
+   import { createBandSeries } from '@nandkapadia/lightweight-charts-pro-core/plugins';
    ```
 
 2. **Type Imports**: Use type-only imports
    ```typescript
-   import type { BandData } from '@lightweight-charts-pro/core';
+   import type { BandData } from '@nandkapadia/lightweight-charts-pro-core';
    ```
 
 3. **Series Factory**: Consider using UnifiedSeriesFactory for new code
    ```typescript
-   import { SeriesFactory } from '@lightweight-charts-pro/core/series';
+   import { SeriesFactory } from '@nandkapadia/lightweight-charts-pro-core/series';
    const factory = new SeriesFactory();
    const series = factory.createSeries(chart, config);
    ```
@@ -216,7 +216,7 @@ If upgrading from 0.2.x:
 - Line, Area, and Baseline series with comprehensive default options
 
 ### Changed
-- Package published as `@lightweight-charts-pro/core`
+- Package published as `@nandkapadia/lightweight-charts-pro-core`
 - Default marker visibility set to false for cleaner charts
 
 ### Fixed

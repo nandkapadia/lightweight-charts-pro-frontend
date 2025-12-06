@@ -25,7 +25,7 @@ A clear description of what you want to happen.
 ```typescript
 // Example of how the API might look
 import { createChart } from 'lightweight-charts';
-import { yourFeature } from '@lightweight-charts-pro/core/plugins';
+import { yourFeature } from '@nandkapadia/lightweight-charts-pro-core/plugins';
 
 // Your proposed API usage here
 ```
