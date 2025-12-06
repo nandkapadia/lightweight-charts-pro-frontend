@@ -6,11 +6,15 @@
  * the existing template infrastructure used by legends and other primitives.
  */
 
-import { TemplateEngine, TemplateOptions, TemplateResult } from './TemplateEngine';
-import { TemplateContext } from '../types/ChartInterfaces';
+import {
+  TemplateEngine,
+  TemplateOptions,
+  TemplateResult,
+} from "./TemplateEngine";
+import { TemplateContext } from "../types/ChartInterfaces";
 
 export interface TradeTemplateData {
-  tradeType: 'long' | 'short';
+  tradeType: "long" | "short";
   entryPrice: number;
   exitPrice: number;
   pnl: number;
@@ -83,7 +87,7 @@ export class TradeTemplateProcessor {
   static processTemplate(
     template: string,
     data: TradeTemplateData | Record<string, any>,
-    options: TemplateOptions = {}
+    options: TemplateOptions = {},
   ): TemplateResult {
     // Step 1: Get singleton TemplateEngine instance
     const templateEngine = TemplateEngine.getInstance();
@@ -104,7 +108,7 @@ export class TradeTemplateProcessor {
    * Now supports flexible data structure with additional_data fields
    */
   private static convertTradeDataToContext(
-    data: TradeTemplateData | Record<string, any>
+    data: TradeTemplateData | Record<string, any>,
   ): Record<string, unknown> {
     // Start with all data fields (supports additional_data pattern)
     const context: Record<string, unknown> = { ...data };
@@ -113,14 +117,15 @@ export class TradeTemplateProcessor {
     const flexData = data as any;
 
     // Add derived values based on isProfitable flag from backend
-    const isProfitable = flexData.isProfitable ?? flexData.is_profitable ?? false;
+    const isProfitable =
+      flexData.isProfitable ?? flexData.is_profitable ?? false;
     const pnl = flexData.pnl ?? 0;
     const exitPrice = flexData.exitPrice ?? flexData.exit_price ?? 0;
     const entryPrice = flexData.entryPrice ?? flexData.entry_price ?? 0;
     const priceDifference = exitPrice - entryPrice;
 
     // Get trade type from various possible fields
-    const tradeType = (flexData.tradeType || flexData.trade_type || 'long')
+    const tradeType = (flexData.tradeType || flexData.trade_type || "long")
       .toString()
       .toLowerCase();
 
@@ -130,13 +135,14 @@ export class TradeTemplateProcessor {
     context.entry_price = entryPrice;
     context.exit_price = exitPrice;
     context.pnl = pnl;
-    context.pnl_percentage = flexData.pnlPercentage ?? flexData.pnl_percentage ?? 0;
+    context.pnl_percentage =
+      flexData.pnlPercentage ?? flexData.pnl_percentage ?? 0;
     context.is_profitable = isProfitable;
-    context.profit_loss = isProfitable ? 'PROFIT' : 'LOSS';
-    context.profit_loss_lower = isProfitable ? 'profit' : 'loss';
-    context.pnl_sign = pnl >= 0 ? '+' : '';
+    context.profit_loss = isProfitable ? "PROFIT" : "LOSS";
+    context.profit_loss_lower = isProfitable ? "profit" : "loss";
+    context.pnl_sign = pnl >= 0 ? "+" : "";
     context.price_difference = priceDifference;
-    context.price_diff_sign = priceDifference >= 0 ? '+' : '';
+    context.price_diff_sign = priceDifference >= 0 ? "+" : "";
 
     // Add ID fields with fallbacks
     context.trade_id = flexData.tradeId ?? flexData.trade_id ?? flexData.id;
@@ -170,7 +176,7 @@ export class TradeTemplateProcessor {
    * Get default marker template
    */
   static getDefaultMarkerTemplate(): string {
-    return 'E: $$entry_price$$';
+    return "E: $$entry_price$$";
   }
 
   /**
@@ -178,22 +184,23 @@ export class TradeTemplateProcessor {
    */
   static getPlaceholdersDocumentation(): Record<string, string> {
     return {
-      $$trade_type$$: 'Trade type in uppercase (LONG or SHORT)',
-      $$trade_type_lower$$: 'Trade type in lowercase (long or short)',
-      $$entry_price$$: 'Entry price formatted to 2 decimal places',
-      $$exit_price$$: 'Exit price formatted to 2 decimal places',
-      $$pnl$$: 'Profit/Loss amount with sign (+/-)',
-      $$pnl_percentage$$: 'Profit/Loss percentage formatted to 1 decimal place',
-      $$quantity$$: 'Trade quantity',
-      $$notes$$: 'Trade notes or comments',
-      $$trade_id$$: 'Trade ID',
-      $$entry_time$$: 'Entry time as string',
-      $$exit_time$$: 'Exit time as string',
-      $$is_profitable$$: 'Boolean indicating if trade is profitable (true/false)',
-      $$profit_loss$$: 'Profit/Loss status in uppercase (PROFIT or LOSS)',
-      $$profit_loss_lower$$: 'Profit/Loss status in lowercase (profit or loss)',
-      $$price_difference$$: 'Price difference with sign (+/-)',
-      $$pnl_sign$$: 'P&L sign only (+ or -)',
+      $$trade_type$$: "Trade type in uppercase (LONG or SHORT)",
+      $$trade_type_lower$$: "Trade type in lowercase (long or short)",
+      $$entry_price$$: "Entry price formatted to 2 decimal places",
+      $$exit_price$$: "Exit price formatted to 2 decimal places",
+      $$pnl$$: "Profit/Loss amount with sign (+/-)",
+      $$pnl_percentage$$: "Profit/Loss percentage formatted to 1 decimal place",
+      $$quantity$$: "Trade quantity",
+      $$notes$$: "Trade notes or comments",
+      $$trade_id$$: "Trade ID",
+      $$entry_time$$: "Entry time as string",
+      $$exit_time$$: "Exit time as string",
+      $$is_profitable$$:
+        "Boolean indicating if trade is profitable (true/false)",
+      $$profit_loss$$: "Profit/Loss status in uppercase (PROFIT or LOSS)",
+      $$profit_loss_lower$$: "Profit/Loss status in lowercase (profit or loss)",
+      $$price_difference$$: "Price difference with sign (+/-)",
+      $$pnl_sign$$: "P&L sign only (+ or -)",
     };
   }
 }

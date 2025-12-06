@@ -49,7 +49,12 @@
  * ```
  */
 
-import { IChartApi, ISeriesApi, Time, PriceToCoordinateConverter } from 'lightweight-charts';
+import {
+  IChartApi,
+  ISeriesApi,
+  Time,
+  PriceToCoordinateConverter,
+} from "lightweight-charts";
 import {
   ChartCoordinates,
   PaneCoordinates,
@@ -61,24 +66,30 @@ import {
   ScaleDimensions,
   ContainerDimensions,
   Margins,
-} from '../types/coordinates';
+} from "../types/coordinates";
 import {
   PaneSize,
   PaneBounds,
   ChartLayoutDimensions,
   WidgetPosition,
   LayoutWidget,
-} from '../types';
+} from "../types";
 import {
   validateChartCoordinates,
   sanitizeCoordinates,
   createBoundingBox,
   areCoordinatesStale,
   logValidationResult,
-} from '../utils/coordinateValidation';
-import { DIMENSIONS, TIMING, Z_INDEX, getFallback, getMargins } from '../config/positioningConfig';
-import { UniversalSpacing } from '../primitives/PrimitiveDefaults';
-import { logger } from '../utils/logger';
+} from "../utils/coordinateValidation";
+import {
+  DIMENSIONS,
+  TIMING,
+  Z_INDEX,
+  getFallback,
+  getMargins,
+} from "../config/positioningConfig";
+import { UniversalSpacing } from "../primitives/PrimitiveDefaults";
+import { logger } from "../utils/logger";
 
 /**
  * Configuration for chart dimensions validation
@@ -106,7 +117,7 @@ export interface PositioningConfig {
   margins?: Partial<Margins>;
   dimensions?: { width?: number; height?: number };
   zIndex?: number;
-  alignment?: 'start' | 'center' | 'end';
+  alignment?: "start" | "center" | "end";
   offset?: { x?: number; y?: number };
 }
 
@@ -116,7 +127,7 @@ export interface PositioningConfig {
 export interface TooltipPosition {
   x: number;
   y: number;
-  anchor: 'top' | 'bottom' | 'left' | 'right';
+  anchor: "top" | "bottom" | "left" | "right";
   offset: { x: number; y: number };
 }
 
@@ -268,7 +279,7 @@ export class ChartCoordinateService {
   async getCoordinates(
     chart: IChartApi,
     container: HTMLElement,
-    options: CoordinateOptions = {}
+    options: CoordinateOptions = {},
   ): Promise<ChartCoordinates> {
     const {
       includeMargins = true,
@@ -290,12 +301,16 @@ export class ChartCoordinateService {
 
     try {
       // Calculate coordinates
-      const coordinates = await this.calculateCoordinates(chart, container, includeMargins);
+      const coordinates = await this.calculateCoordinates(
+        chart,
+        container,
+        includeMargins,
+      );
 
       // Validate if requested
       if (validateResult) {
         const validation = validateChartCoordinates(coordinates);
-        logValidationResult(validation, 'ChartCoordinateService');
+        logValidationResult(validation, "ChartCoordinateService");
 
         if (!validation.isValid && fallbackOnError) {
           return sanitizeCoordinates(coordinates);
@@ -329,7 +344,7 @@ export class ChartCoordinateService {
   getFullPaneBounds(chart: IChartApi, paneId: number): PaneBounds | null {
     try {
       // Validate inputs
-      if (!chart || typeof paneId !== 'number' || paneId < 0) {
+      if (!chart || typeof paneId !== "number" || paneId < 0) {
         return null;
       }
 
@@ -341,7 +356,11 @@ export class ChartCoordinateService {
         return null;
       }
 
-      if (!paneSize || typeof paneSize.height !== 'number' || typeof paneSize.width !== 'number') {
+      if (
+        !paneSize ||
+        typeof paneSize.height !== "number" ||
+        typeof paneSize.width !== "number"
+      ) {
         return null;
       }
 
@@ -350,7 +369,7 @@ export class ChartCoordinateService {
       for (let i = 0; i < paneId; i++) {
         try {
           const size = chart.paneSize(i);
-          if (size && typeof size.height === 'number') {
+          if (size && typeof size.height === "number") {
             offsetY += size.height;
           }
         } catch {
@@ -359,12 +378,12 @@ export class ChartCoordinateService {
       }
 
       // Return full pane bounds including all price scale areas
-      const paneWidth = paneSize.width || getFallback('paneWidth');
+      const paneWidth = paneSize.width || getFallback("paneWidth");
       return createBoundingBox(
         0, // Full pane starts at 0
         offsetY,
         paneWidth, // Full pane width including price scales
-        paneSize.height
+        paneSize.height,
       );
     } catch {
       return null;
@@ -377,7 +396,7 @@ export class ChartCoordinateService {
   getPaneCoordinates(chart: IChartApi, paneId: number): PaneCoordinates | null {
     try {
       // Validate inputs
-      if (!chart || typeof paneId !== 'number' || paneId < 0) {
+      if (!chart || typeof paneId !== "number" || paneId < 0) {
         return null;
       }
 
@@ -389,7 +408,11 @@ export class ChartCoordinateService {
         return null;
       }
 
-      if (!paneSize || typeof paneSize.height !== 'number' || typeof paneSize.width !== 'number') {
+      if (
+        !paneSize ||
+        typeof paneSize.height !== "number" ||
+        typeof paneSize.width !== "number"
+      ) {
         return null;
       }
 
@@ -398,7 +421,7 @@ export class ChartCoordinateService {
       for (let i = 0; i < paneId; i++) {
         try {
           const size = chart.paneSize(i);
-          if (size && typeof size.height === 'number') {
+          if (size && typeof size.height === "number") {
             offsetY += size.height;
           }
         } catch {
@@ -420,13 +443,13 @@ export class ChartCoordinateService {
 
       // Calculate bounds relative to chart element (for pane primitive positioning)
       // Pane primitives should get the full pane area without price scale adjustments
-      const paneWidth = paneSize.width || getFallback('paneWidth');
+      const paneWidth = paneSize.width || getFallback("paneWidth");
 
       const bounds = createBoundingBox(
         legendOffsetX,
         legendOffsetY,
         paneWidth, // Use full pane width - no price scale adjustment
-        paneSize.height
+        paneSize.height,
       );
 
       // Calculate content area (excluding scales) relative to chart element
@@ -435,12 +458,14 @@ export class ChartCoordinateService {
       const contentArea = createBoundingBox(
         axisDimensions.leftPriceScaleWidth, // Start after the left Y-axis (price scale)
         legendOffsetY,
-        paneWidth - axisDimensions.leftPriceScaleWidth - axisDimensions.rightPriceScaleWidth, // Width excluding both price scales
-        paneSize.height - (paneId === 0 ? 0 : timeScaleHeight)
+        paneWidth -
+          axisDimensions.leftPriceScaleWidth -
+          axisDimensions.rightPriceScaleWidth, // Width excluding both price scales
+        paneSize.height - (paneId === 0 ? 0 : timeScaleHeight),
       );
 
       // Get margins
-      const margins = getMargins('pane');
+      const margins = getMargins("pane");
 
       // Debug logging for legend positioning
       if (paneId === 0) {
@@ -477,7 +502,7 @@ export class ChartCoordinateService {
     chart: IChartApi,
     paneId: number,
     container: HTMLElement,
-    options: PaneDimensionsOptions & ChartDimensionsOptions = {}
+    options: PaneDimensionsOptions & ChartDimensionsOptions = {},
   ): Promise<PaneCoordinates | null> {
     const { ...paneOptions } = options;
 
@@ -494,7 +519,12 @@ export class ChartCoordinateService {
     }
 
     // Method 3: DOM fallback
-    return this.getPaneCoordinatesFromDOM(chart, container, paneId, paneOptions);
+    return this.getPaneCoordinatesFromDOM(
+      chart,
+      container,
+      paneId,
+      paneOptions,
+    );
   }
 
   /**
@@ -504,7 +534,7 @@ export class ChartCoordinateService {
     chart: IChartApi,
     container: HTMLElement,
     paneId: number,
-    options: PaneDimensionsOptions = {}
+    options: PaneDimensionsOptions = {},
   ): PaneCoordinates | null {
     try {
       // Find pane elements in DOM
@@ -513,7 +543,9 @@ export class ChartCoordinateService {
         return null;
       }
 
-      const paneElements = chartElement.querySelectorAll('.tv-lightweight-charts-pane');
+      const paneElements = chartElement.querySelectorAll(
+        ".tv-lightweight-charts-pane",
+      );
       if (paneElements.length <= paneId) {
         return null;
       }
@@ -538,7 +570,12 @@ export class ChartCoordinateService {
       const legendOffsetY = offsetY;
 
       // Calculate bounds relative to chart element (for legend positioning)
-      const bounds = createBoundingBox(legendOffsetX, legendOffsetY, width, height);
+      const bounds = createBoundingBox(
+        legendOffsetX,
+        legendOffsetY,
+        width,
+        height,
+      );
 
       // Calculate content area (excluding scales) relative to chart element
       const priceScaleWidth = this.getPriceScaleWidth(chart);
@@ -548,11 +585,11 @@ export class ChartCoordinateService {
         priceScaleWidth, // Start after the left Y-axis (price scale)
         legendOffsetY,
         width - priceScaleWidth, // Width is the remaining area after price scale
-        height - (paneId === 0 ? 0 : timeScaleHeight)
+        height - (paneId === 0 ? 0 : timeScaleHeight),
       );
 
       // Get margins
-      const margins = getMargins('pane');
+      const margins = getMargins("pane");
 
       return {
         paneId,
@@ -580,7 +617,10 @@ export class ChartCoordinateService {
   /**
    * Check if a point is within a pane
    */
-  isPointInPane(point: { x: number; y: number }, paneCoords: PaneCoordinates): boolean {
+  isPointInPane(
+    point: { x: number; y: number },
+    paneCoords: PaneCoordinates,
+  ): boolean {
     return (
       point.x >= paneCoords.x &&
       point.x <= paneCoords.x + paneCoords.width &&
@@ -595,7 +635,7 @@ export class ChartCoordinateService {
   areChartDimensionsValid(
     dimensions: ChartCoordinates,
     minWidth: number = 200,
-    minHeight: number = 200
+    minHeight: number = 200,
   ): boolean {
     try {
       const { container } = dimensions;
@@ -611,7 +651,7 @@ export class ChartCoordinateService {
   areChartDimensionsObjectValid(
     dimensions: { container: { width: number; height: number } },
     minWidth: number = 200,
-    minHeight: number = 200
+    minHeight: number = 200,
   ): boolean {
     try {
       const { container } = dimensions;
@@ -627,14 +667,20 @@ export class ChartCoordinateService {
   async getValidatedCoordinates(
     chart: IChartApi,
     container: HTMLElement,
-    options: ChartDimensionsOptions = {}
+    options: ChartDimensionsOptions = {},
   ): Promise<ChartCoordinates | null> {
     try {
       const coordinates = await this.getCoordinates(chart, container, {
         validateResult: true,
       });
 
-      if (this.areChartDimensionsValid(coordinates, options.minWidth, options.minHeight)) {
+      if (
+        this.areChartDimensionsValid(
+          coordinates,
+          options.minWidth,
+          options.minHeight,
+        )
+      ) {
         return coordinates;
       } else {
         return null;
@@ -650,7 +696,7 @@ export class ChartCoordinateService {
   async getChartDimensionsWithFallback(
     chart: IChartApi,
     container: HTMLElement,
-    options: ChartDimensionsOptions = {}
+    options: ChartDimensionsOptions = {},
   ): Promise<{
     container: { width: number; height: number };
     timeScale: { x: number; y: number; width: number; height: number };
@@ -677,7 +723,10 @@ export class ChartCoordinateService {
     // Method 2: DOM fallback
     try {
       const result = this.getChartDimensionsFromDOM(chart, container);
-      if (result.container.width >= minWidth && result.container.height >= minHeight) {
+      if (
+        result.container.width >= minWidth &&
+        result.container.height >= minHeight
+      ) {
         return result;
       }
     } catch {
@@ -693,7 +742,7 @@ export class ChartCoordinateService {
    */
   private getChartDimensionsFromAPI(
     chart: IChartApi,
-    chartSize: { width: number; height: number }
+    chartSize: { width: number; height: number },
   ): {
     container: { width: number; height: number };
     timeScale: { x: number; y: number; width: number; height: number };
@@ -715,7 +764,7 @@ export class ChartCoordinateService {
     let priceScaleWidth = 70;
 
     try {
-      const priceScale = chart.priceScale('left');
+      const priceScale = chart.priceScale("left");
       priceScaleWidth = priceScale.width() || 70;
     } catch {
       // Price scale API failed, using defaults
@@ -743,7 +792,7 @@ export class ChartCoordinateService {
    */
   private getChartDimensionsFromDOM(
     chart: IChartApi,
-    container: HTMLElement
+    container: HTMLElement,
   ): {
     container: { width: number; height: number };
     timeScale: { x: number; y: number; width: number; height: number };
@@ -759,7 +808,11 @@ export class ChartCoordinateService {
       width = rect.width;
       height = rect.height;
     } catch (error) {
-      logger.error('Chart coordinate operation failed', 'ChartCoordinateService', error);
+      logger.error(
+        "Chart coordinate operation failed",
+        "ChartCoordinateService",
+        error,
+      );
     }
 
     // Method 2: offset dimensions
@@ -793,17 +846,25 @@ export class ChartCoordinateService {
       timeScaleHeight = timeScale.height() || 35;
       timeScaleWidth = timeScale.width() || width;
     } catch (error) {
-      logger.error('Chart coordinate operation failed', 'ChartCoordinateService', error);
+      logger.error(
+        "Chart coordinate operation failed",
+        "ChartCoordinateService",
+        error,
+      );
     }
 
     // Get price scale width
     let priceScaleWidth = 70;
 
     try {
-      const priceScale = chart.priceScale('left');
+      const priceScale = chart.priceScale("left");
       priceScaleWidth = priceScale.width() || 70;
     } catch (error) {
-      logger.error('Chart coordinate operation failed', 'ChartCoordinateService', error);
+      logger.error(
+        "Chart coordinate operation failed",
+        "ChartCoordinateService",
+        error,
+      );
     }
 
     return {
@@ -857,16 +918,26 @@ export class ChartCoordinateService {
   async getValidatedChartDimensions(
     chart: IChartApi,
     container: HTMLElement,
-    options: ChartDimensionsOptions = {}
+    options: ChartDimensionsOptions = {},
   ): Promise<{
     container: { width: number; height: number };
     timeScale: { x: number; y: number; width: number; height: number };
     priceScale: { x: number; y: number; width: number; height: number };
   } | null> {
     try {
-      const dimensions = await this.getChartDimensionsWithFallback(chart, container, options);
+      const dimensions = await this.getChartDimensionsWithFallback(
+        chart,
+        container,
+        options,
+      );
 
-      if (this.areChartDimensionsObjectValid(dimensions, options.minWidth, options.minHeight)) {
+      if (
+        this.areChartDimensionsObjectValid(
+          dimensions,
+          options.minWidth,
+          options.minHeight,
+        )
+      ) {
         return dimensions;
       } else {
         return null;
@@ -882,7 +953,7 @@ export class ChartCoordinateService {
   getRangeSwitcherPosition(
     chart: IChartApi,
     position: ElementPosition,
-    containerDimensions?: { width: number; height: number }
+    containerDimensions?: { width: number; height: number },
   ): LegendCoordinates | null {
     try {
       // Get main pane coordinates (pane 0) for reference
@@ -898,7 +969,10 @@ export class ChartCoordinateService {
 
       // Get chart layout to account for price scale and time scale dimensions
       try {
-        chart.chartElement().querySelector('.tv-lightweight-charts')?.getBoundingClientRect();
+        chart
+          .chartElement()
+          .querySelector(".tv-lightweight-charts")
+          ?.getBoundingClientRect();
       } catch {
         // Layout check failed
       }
@@ -912,11 +986,11 @@ export class ChartCoordinateService {
         actualTimeScaleHeight = chart.timeScale().height();
 
         // Get actual price scale width - try right scale first, then left scale
-        const rightPriceScale = chart.priceScale('right');
+        const rightPriceScale = chart.priceScale("right");
         if (rightPriceScale) {
           actualPriceScaleWidth = rightPriceScale.width();
         } else {
-          const leftPriceScale = chart.priceScale('left');
+          const leftPriceScale = chart.priceScale("left");
           if (leftPriceScale) {
             actualPriceScaleWidth = leftPriceScale.width();
           }
@@ -934,7 +1008,7 @@ export class ChartCoordinateService {
           // Keep trying to get pane sizes until we find a non-existent pane
           while (true) {
             const paneSize = chart.paneSize(paneCount);
-            if (!paneSize || typeof paneSize.height !== 'number') {
+            if (!paneSize || typeof paneSize.height !== "number") {
               break;
             }
             paneCount++;
@@ -961,7 +1035,7 @@ export class ChartCoordinateService {
         // 1. It's a bottom position AND
         // 2. There's only one pane (single-pane chart where X-axis is at bottom of pane 0)
         // In multi-pane charts, the X-axis is only at the very bottom of the last pane, not pane 0
-        if (pos.includes('bottom') && totalPanes === 1) {
+        if (pos.includes("bottom") && totalPanes === 1) {
           margins.bottom += actualTimeScaleHeight; // X-axis height only for single-pane charts
         }
 
@@ -981,31 +1055,39 @@ export class ChartCoordinateService {
       // For bottom positions, position relative to pane 0 (main price chart)
       // For top positions, position relative to entire chart container
       switch (position) {
-        case 'top-left':
+        case "top-left":
           top = margins.top;
           left = margins.left;
           right = undefined;
           break;
 
-        case 'top-right':
+        case "top-right":
           top = margins.top;
           left = undefined;
           right = margins.right;
           break;
 
-        case 'bottom-left':
+        case "bottom-left":
           // Position at bottom of pane 0, not entire chart
           // This ensures range switcher is positioned at the bottom of the main price chart pane
-          top = paneCoords.y + paneCoords.height - margins.bottom - rangeSwitcherDimensions.height;
+          top =
+            paneCoords.y +
+            paneCoords.height -
+            margins.bottom -
+            rangeSwitcherDimensions.height;
           left = margins.left;
           right = undefined;
           bottom = undefined;
           break;
 
-        case 'bottom-right':
+        case "bottom-right":
           // Position at bottom of pane 0, not entire chart
           // This ensures range switcher is positioned at the bottom of the main price chart pane
-          top = paneCoords.y + paneCoords.height - margins.bottom - rangeSwitcherDimensions.height;
+          top =
+            paneCoords.y +
+            paneCoords.height -
+            margins.bottom -
+            rangeSwitcherDimensions.height;
           left = undefined;
           right = margins.right;
           bottom = undefined;
@@ -1013,7 +1095,11 @@ export class ChartCoordinateService {
 
         default:
           // Default to bottom-right for range switcher
-          top = paneCoords.y + paneCoords.height - margins.bottom - rangeSwitcherDimensions.height;
+          top =
+            paneCoords.y +
+            paneCoords.height -
+            margins.bottom -
+            rangeSwitcherDimensions.height;
           left = undefined;
           right = margins.right;
           break;
@@ -1045,12 +1131,12 @@ export class ChartCoordinateService {
   getLegendPosition(
     chart: IChartApi,
     paneId: number,
-    position: ElementPosition
+    position: ElementPosition,
   ): LegendCoordinates | null {
     const paneCoords = this.getPaneCoordinates(chart, paneId);
     if (!paneCoords) return null;
 
-    const margins = getMargins('legend');
+    const margins = getMargins("legend");
     const legendDimensions = DIMENSIONS.legend;
 
     let top = 0;
@@ -1060,41 +1146,41 @@ export class ChartCoordinateService {
 
     // Calculate position based on alignment
     switch (position) {
-      case 'top-left':
+      case "top-left":
         top = paneCoords.contentArea.top + margins.top;
         left = paneCoords.contentArea.left + margins.left;
         break;
 
-      case 'top-right':
+      case "top-right":
         top = paneCoords.contentArea.top + margins.top;
         right = margins.right;
         break;
 
-      case 'top-center':
+      case "top-center":
         top = paneCoords.contentArea.top + margins.top;
         left =
           paneCoords.contentArea.left +
           (paneCoords.contentArea.width - legendDimensions.defaultWidth) / 2;
         break;
 
-      case 'bottom-left':
+      case "bottom-left":
         bottom = margins.bottom;
         left = paneCoords.contentArea.left + margins.left;
         break;
 
-      case 'bottom-right':
+      case "bottom-right":
         bottom = margins.bottom;
         right = margins.right;
         break;
 
-      case 'bottom-center':
+      case "bottom-center":
         bottom = margins.bottom;
         left =
           paneCoords.contentArea.left +
           (paneCoords.contentArea.width - legendDimensions.defaultWidth) / 2;
         break;
 
-      case 'center':
+      case "center":
         top =
           paneCoords.contentArea.top +
           (paneCoords.contentArea.height - legendDimensions.defaultHeight) / 2;
@@ -1155,7 +1241,7 @@ export class ChartCoordinateService {
           keysToDelete.push(key);
         }
       });
-      keysToDelete.forEach(key => this.coordinateCache.delete(key));
+      keysToDelete.forEach((key) => this.coordinateCache.delete(key));
     } else {
       // Clear all cache
       this.coordinateCache.clear();
@@ -1168,9 +1254,9 @@ export class ChartCoordinateService {
   private async calculateCoordinates(
     chart: IChartApi,
     container: HTMLElement,
-    includeMargins: boolean
+    includeMargins: boolean,
   ): Promise<ChartCoordinates> {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       // Use requestAnimationFrame for better performance
       requestAnimationFrame(() => {
         try {
@@ -1178,9 +1264,20 @@ export class ChartCoordinateService {
           const containerDimensions = this.getContainerDimensions(container);
 
           // Get scale dimensions
-          const timeScale = this.getTimeScaleDimensions(chart, containerDimensions);
-          const priceScaleLeft = this.getPriceScaleDimensions(chart, 'left', containerDimensions);
-          const priceScaleRight = this.getPriceScaleDimensions(chart, 'right', containerDimensions);
+          const timeScale = this.getTimeScaleDimensions(
+            chart,
+            containerDimensions,
+          );
+          const priceScaleLeft = this.getPriceScaleDimensions(
+            chart,
+            "left",
+            containerDimensions,
+          );
+          const priceScaleRight = this.getPriceScaleDimensions(
+            chart,
+            "right",
+            containerDimensions,
+          );
 
           // Get all panes
           const panes = this.getAllPaneCoordinates(chart);
@@ -1190,7 +1287,7 @@ export class ChartCoordinateService {
             containerDimensions,
             timeScale,
             priceScaleLeft,
-            includeMargins
+            includeMargins,
           );
 
           const coordinates: ChartCoordinates = {
@@ -1218,8 +1315,10 @@ export class ChartCoordinateService {
   private getContainerDimensions(container: HTMLElement): ContainerDimensions {
     const rect = container.getBoundingClientRect();
     return {
-      width: rect.width || container.offsetWidth || getFallback('containerWidth'),
-      height: rect.height || container.offsetHeight || getFallback('containerHeight'),
+      width:
+        rect.width || container.offsetWidth || getFallback("containerWidth"),
+      height:
+        rect.height || container.offsetHeight || getFallback("containerHeight"),
       offsetTop: container.offsetTop || 0,
       offsetLeft: container.offsetLeft || 0,
     };
@@ -1230,11 +1329,11 @@ export class ChartCoordinateService {
    */
   private getTimeScaleDimensions(
     chart: IChartApi,
-    container: ContainerDimensions
+    container: ContainerDimensions,
   ): ScaleDimensions {
     try {
       const timeScale = chart.timeScale();
-      const height = timeScale.height() || getFallback('timeScaleHeight');
+      const height = timeScale.height() || getFallback("timeScaleHeight");
       const width = timeScale.width() || container.width;
 
       return {
@@ -1246,9 +1345,9 @@ export class ChartCoordinateService {
     } catch {
       return {
         x: 0,
-        y: container.height - getFallback('timeScaleHeight'),
+        y: container.height - getFallback("timeScaleHeight"),
         width: container.width,
-        height: getFallback('timeScaleHeight'),
+        height: getFallback("timeScaleHeight"),
       };
     }
   }
@@ -1258,26 +1357,28 @@ export class ChartCoordinateService {
    */
   private getPriceScaleDimensions(
     chart: IChartApi,
-    side: 'left' | 'right',
-    container: ContainerDimensions
+    side: "left" | "right",
+    container: ContainerDimensions,
   ): ScaleDimensions {
     try {
       const priceScale = chart.priceScale(side);
-      const width = priceScale.width() || (side === 'left' ? getFallback('priceScaleWidth') : 0);
+      const width =
+        priceScale.width() ||
+        (side === "left" ? getFallback("priceScaleWidth") : 0);
 
       return {
-        x: side === 'left' ? 0 : container.width - width,
+        x: side === "left" ? 0 : container.width - width,
         y: 0,
         width,
-        height: container.height - getFallback('timeScaleHeight'),
+        height: container.height - getFallback("timeScaleHeight"),
       };
     } catch {
-      const defaultWidth = side === 'left' ? getFallback('priceScaleWidth') : 0;
+      const defaultWidth = side === "left" ? getFallback("priceScaleWidth") : 0;
       return {
-        x: side === 'left' ? 0 : container.width - defaultWidth,
+        x: side === "left" ? 0 : container.width - defaultWidth,
         y: 0,
         width: defaultWidth,
-        height: container.height - getFallback('timeScaleHeight'),
+        height: container.height - getFallback("timeScaleHeight"),
       };
     }
   }
@@ -1311,10 +1412,10 @@ export class ChartCoordinateService {
 
     // Ensure we have at least one pane
     if (panes.length === 0) {
-      const fallbackWidth = getFallback('paneWidth');
-      const fallbackHeight = getFallback('paneHeight');
-      const priceScaleWidth = getFallback('priceScaleWidth');
-      const timeScaleHeight = getFallback('timeScaleHeight');
+      const fallbackWidth = getFallback("paneWidth");
+      const fallbackHeight = getFallback("paneHeight");
+      const priceScaleWidth = getFallback("priceScaleWidth");
+      const timeScaleHeight = getFallback("timeScaleHeight");
 
       panes.push({
         paneId: 0,
@@ -1330,7 +1431,7 @@ export class ChartCoordinateService {
           width: fallbackWidth - priceScaleWidth,
           height: fallbackHeight - timeScaleHeight,
         },
-        margins: getMargins('pane'),
+        margins: getMargins("pane"),
         isMainPane: true,
         isLastPane: true,
       });
@@ -1346,16 +1447,18 @@ export class ChartCoordinateService {
     container: ContainerDimensions,
     timeScale: ScaleDimensions,
     priceScaleLeft: ScaleDimensions,
-    includeMargins: boolean
+    includeMargins: boolean,
   ): BoundingBox {
     const margins = includeMargins
-      ? getMargins('content')
+      ? getMargins("content")
       : { top: 0, right: 0, bottom: 0, left: 0 };
 
     const x = priceScaleLeft.width + margins.left;
     const y = margins.top;
-    const width = container.width - priceScaleLeft.width - margins.left - margins.right;
-    const height = container.height - timeScale.height - margins.top - margins.bottom;
+    const width =
+      container.width - priceScaleLeft.width - margins.left - margins.right;
+    const height =
+      container.height - timeScale.height - margins.top - margins.bottom;
 
     return createBoundingBox(x, y, width, height);
   }
@@ -1363,7 +1466,10 @@ export class ChartCoordinateService {
   /**
    * Get price scale width helper
    */
-  private getPriceScaleWidth(chart: IChartApi, side: 'left' | 'right' = 'left'): number {
+  private getPriceScaleWidth(
+    chart: IChartApi,
+    side: "left" | "right" = "left",
+  ): number {
     try {
       const priceScale = chart.priceScale(side);
       const width = priceScale.width();
@@ -1386,9 +1492,9 @@ export class ChartCoordinateService {
   private getTimeScaleHeight(chart: IChartApi): number {
     try {
       const timeScale = chart.timeScale();
-      return timeScale.height() || getFallback('timeScaleHeight');
+      return timeScale.height() || getFallback("timeScaleHeight");
     } catch {
-      return getFallback('timeScaleHeight');
+      return getFallback("timeScaleHeight");
     }
   }
 
@@ -1396,8 +1502,8 @@ export class ChartCoordinateService {
    * Generate cache key
    */
   private generateCacheKey(chart: IChartApi, container: HTMLElement): string {
-    const chartId = chart?.chartElement?.()?.id || 'unknown';
-    const containerId = container?.id || 'unknown';
+    const chartId = chart?.chartElement?.()?.id || "unknown";
+    const containerId = container?.id || "unknown";
     return `${chartId}-${containerId}`;
   }
 
@@ -1405,15 +1511,19 @@ export class ChartCoordinateService {
    * Notify update callbacks
    */
   private notifyUpdateCallbacks(cacheKey: string): void {
-    const chartId = cacheKey.split('-')[0];
+    const chartId = cacheKey.split("-")[0];
     const callbacks = this.updateCallbacks.get(chartId);
 
     if (callbacks) {
-      callbacks.forEach(callback => {
+      callbacks.forEach((callback) => {
         try {
           callback();
         } catch (error) {
-          logger.error('Callback execution failed', 'ChartCoordinateService', error);
+          logger.error(
+            "Callback execution failed",
+            "ChartCoordinateService",
+            error,
+          );
         }
       });
     }
@@ -1436,7 +1546,7 @@ export class ChartCoordinateService {
           keysToDelete.push(key);
         }
       });
-      keysToDelete.forEach(key => this.coordinateCache.delete(key));
+      keysToDelete.forEach((key) => this.coordinateCache.delete(key));
     }, TIMING.cacheExpiration);
   }
 
@@ -1474,7 +1584,8 @@ export class ChartCoordinateService {
   getCurrentPaneDimensions(chart: IChartApi): {
     [paneId: number]: { width: number; height: number };
   } {
-    const dimensions: { [paneId: number]: { width: number; height: number } } = {};
+    const dimensions: { [paneId: number]: { width: number; height: number } } =
+      {};
     let paneIndex = 0;
 
     while (paneIndex < 10) {
@@ -1517,7 +1628,10 @@ export class ChartCoordinateService {
     }
 
     // Compare with cached dimensions
-    const hasChanges = this.hasPaneSizeChanges(cachedPaneDimensions.dimensions, currentDimensions);
+    const hasChanges = this.hasPaneSizeChanges(
+      cachedPaneDimensions.dimensions,
+      currentDimensions,
+    );
 
     if (hasChanges) {
       // Update cached dimensions
@@ -1553,7 +1667,10 @@ export class ChartCoordinateService {
     }
 
     // Check if dimensions have changed
-    const hasChanges = this.hasPaneSizeChanges(cachedPaneDimensions.dimensions, currentDimensions);
+    const hasChanges = this.hasPaneSizeChanges(
+      cachedPaneDimensions.dimensions,
+      currentDimensions,
+    );
 
     if (hasChanges) {
       // Update cached pane dimensions
@@ -1584,7 +1701,7 @@ export class ChartCoordinateService {
         keysToDelete.push(key);
       }
     });
-    keysToDelete.forEach(key => this.coordinateCache.delete(key));
+    keysToDelete.forEach((key) => this.coordinateCache.delete(key));
 
     // Also clear pane dimensions cache
     const paneKeysToDelete: string[] = [];
@@ -1593,16 +1710,20 @@ export class ChartCoordinateService {
         paneKeysToDelete.push(key);
       }
     });
-    paneKeysToDelete.forEach(key => this.paneDimensionsCache.delete(key));
+    paneKeysToDelete.forEach((key) => this.paneDimensionsCache.delete(key));
 
     // Notify all listeners for this chart
     this.updateCallbacks.forEach((callbacks, key) => {
       if (key.includes(chartId)) {
-        callbacks.forEach(callback => {
+        callbacks.forEach((callback) => {
           try {
             callback();
           } catch (error) {
-            logger.error('Cache cleanup callback failed', 'ChartCoordinateService', error);
+            logger.error(
+              "Cache cleanup callback failed",
+              "ChartCoordinateService",
+              error,
+            );
           }
         });
       }
@@ -1614,7 +1735,7 @@ export class ChartCoordinateService {
    */
   private hasPaneSizeChanges(
     oldDimensions: { [paneId: number]: { width: number; height: number } },
-    newDimensions: { [paneId: number]: { width: number; height: number } }
+    newDimensions: { [paneId: number]: { width: number; height: number } },
   ): boolean {
     const oldKeys = Object.keys(oldDimensions);
     const newKeys = Object.keys(newDimensions);
@@ -1643,7 +1764,9 @@ export class ChartCoordinateService {
    * Integration with CornerLayoutManager
    * Get chart dimensions for layout manager
    */
-  getChartDimensionsForLayout(chart: IChartApi): { width: number; height: number } | null {
+  getChartDimensionsForLayout(
+    chart: IChartApi,
+  ): { width: number; height: number } | null {
     try {
       const chartElement = chart.chartElement();
       if (!chartElement) return null;
@@ -1661,7 +1784,9 @@ export class ChartCoordinateService {
   /**
    * Get chart layout dimensions including axis information for layout manager
    */
-  getChartLayoutDimensionsForManager(chart: IChartApi): ChartLayoutDimensions | null {
+  getChartLayoutDimensionsForManager(
+    chart: IChartApi,
+  ): ChartLayoutDimensions | null {
     try {
       const chartElement = chart.chartElement();
       if (!chartElement) return null;
@@ -1683,13 +1808,13 @@ export class ChartCoordinateService {
         timeScaleHeight = timeScale.height() || 35;
 
         // Get left price scale width
-        const leftPriceScale = chart.priceScale('left');
+        const leftPriceScale = chart.priceScale("left");
         if (leftPriceScale) {
           leftPriceScaleWidth = leftPriceScale.width() || 0;
         }
 
         // Get right price scale width
-        const rightPriceScale = chart.priceScale('right');
+        const rightPriceScale = chart.priceScale("right");
         if (rightPriceScale) {
           rightPriceScaleWidth = rightPriceScale.width() || 0;
         }
@@ -1744,22 +1869,22 @@ export class ChartCoordinateService {
   positionToCorner(position: ElementPosition): string {
     // Map supported positions to corners, with fallbacks for unsupported positions
     switch (position) {
-      case 'top-left':
-        return 'top-left';
-      case 'top-right':
-        return 'top-right';
-      case 'bottom-left':
-        return 'bottom-left';
-      case 'bottom-right':
-        return 'bottom-right';
-      case 'top-center':
-        return 'top-right'; // Fallback to top-right
-      case 'bottom-center':
-        return 'bottom-right'; // Fallback to bottom-right
-      case 'center':
-        return 'top-right'; // Fallback to top-right
+      case "top-left":
+        return "top-left";
+      case "top-right":
+        return "top-right";
+      case "bottom-left":
+        return "bottom-left";
+      case "bottom-right":
+        return "bottom-right";
+      case "top-center":
+        return "top-right"; // Fallback to top-right
+      case "bottom-center":
+        return "bottom-right"; // Fallback to bottom-right
+      case "center":
+        return "top-right"; // Fallback to top-right
       default:
-        return 'top-right';
+        return "top-right";
     }
   }
 
@@ -1777,14 +1902,14 @@ export class ChartCoordinateService {
     chart: IChartApi,
     paneId: number,
     position: ElementPosition,
-    config?: PositioningConfig
+    config?: PositioningConfig,
   ): LegendCoordinates | null {
     // Use existing getPaneCoordinates method
     const paneCoords = this.getPaneCoordinates(chart, paneId);
     if (!paneCoords) return null;
 
     // Merge configuration with defaults
-    const margins = { ...getMargins('legend'), ...(config?.margins || {}) };
+    const margins = { ...getMargins("legend"), ...(config?.margins || {}) };
 
     // For initial positioning, use default dimensions
     // The actual dimensions will be calculated when the element is rendered
@@ -1812,7 +1937,7 @@ export class ChartCoordinateService {
       dimensions,
       position,
       margins,
-      offset
+      offset,
     );
 
     return {
@@ -1831,7 +1956,7 @@ export class ChartCoordinateService {
     paneId: number,
     position: ElementPosition,
     legendElement: HTMLElement,
-    config?: PositioningConfig
+    config?: PositioningConfig,
   ): LegendCoordinates | null {
     // Use existing getPaneCoordinates method
     const paneCoords = this.getPaneCoordinates(chart, paneId);
@@ -1859,11 +1984,17 @@ export class ChartCoordinateService {
     }
 
     // Ensure minimum dimensions
-    actualDimensions.width = Math.max(actualDimensions.width, DIMENSIONS.legend.minWidth);
-    actualDimensions.height = Math.max(actualDimensions.height, DIMENSIONS.legend.minHeight);
+    actualDimensions.width = Math.max(
+      actualDimensions.width,
+      DIMENSIONS.legend.minWidth,
+    );
+    actualDimensions.height = Math.max(
+      actualDimensions.height,
+      DIMENSIONS.legend.minHeight,
+    );
 
     // Merge configuration with defaults
-    const margins = { ...getMargins('legend'), ...(config?.margins || {}) };
+    const margins = { ...getMargins("legend"), ...(config?.margins || {}) };
     const zIndex = config?.zIndex || Z_INDEX.legend;
     const offset = config?.offset || { x: 0, y: 0 };
 
@@ -1883,7 +2014,7 @@ export class ChartCoordinateService {
       actualDimensions,
       position,
       margins,
-      offset
+      offset,
     );
 
     return {
@@ -1903,9 +2034,9 @@ export class ChartCoordinateService {
     tooltipWidth: number,
     tooltipHeight: number,
     containerBounds: BoundingBox,
-    preferredAnchor: 'top' | 'bottom' | 'left' | 'right' = 'top'
+    preferredAnchor: "top" | "bottom" | "left" | "right" = "top",
   ): TooltipPosition {
-    const margins = getMargins('tooltip');
+    const margins = getMargins("tooltip");
     const offset = { x: 10, y: 10 };
 
     let x = cursorX;
@@ -1914,19 +2045,19 @@ export class ChartCoordinateService {
 
     // Calculate position based on preferred anchor
     switch (preferredAnchor) {
-      case 'top':
+      case "top":
         x = cursorX - tooltipWidth / 2;
         y = cursorY - tooltipHeight - offset.y;
         break;
-      case 'bottom':
+      case "bottom":
         x = cursorX - tooltipWidth / 2;
         y = cursorY + offset.y;
         break;
-      case 'left':
+      case "left":
         x = cursorX - tooltipWidth - offset.x;
         y = cursorY - tooltipHeight / 2;
         break;
-      case 'right':
+      case "right":
         x = cursorX + offset.x;
         y = cursorY - tooltipHeight / 2;
         break;
@@ -1935,19 +2066,19 @@ export class ChartCoordinateService {
     // Adjust if tooltip goes outside container bounds
     if (x < containerBounds.left + margins.left) {
       x = containerBounds.left + margins.left;
-      if (anchor === 'left') anchor = 'right';
+      if (anchor === "left") anchor = "right";
     }
     if (x + tooltipWidth > containerBounds.right - margins.right) {
       x = containerBounds.right - tooltipWidth - margins.right;
-      if (anchor === 'right') anchor = 'left';
+      if (anchor === "right") anchor = "left";
     }
     if (y < containerBounds.top + margins.top) {
       y = containerBounds.top + margins.top;
-      if (anchor === 'top') anchor = 'bottom';
+      if (anchor === "top") anchor = "bottom";
     }
     if (y + tooltipHeight > containerBounds.bottom - margins.bottom) {
       y = containerBounds.bottom - tooltipHeight - margins.bottom;
-      if (anchor === 'bottom') anchor = 'top';
+      if (anchor === "bottom") anchor = "top";
     }
 
     return { x, y, anchor, offset };
@@ -1964,7 +2095,7 @@ export class ChartCoordinateService {
     endPrice: number,
     chart: IChartApi,
     series?: ISeriesApi<any>,
-    _paneId: number = 0
+    _paneId: number = 0,
   ): BoundingBox | null {
     try {
       const timeScale = chart.timeScale();
@@ -2012,11 +2143,11 @@ export class ChartCoordinateService {
    */
   calculateMultiPaneLayout(
     totalHeight: number,
-    paneHeights: number[] | 'equal' | { [key: number]: number }
+    paneHeights: number[] | "equal" | { [key: number]: number },
   ): { [paneId: number]: BoundingBox } {
     const layout: { [paneId: number]: BoundingBox } = {};
 
-    if (paneHeights === 'equal') {
+    if (paneHeights === "equal") {
       // Equal height distribution
       const paneCount = Object.keys(layout).length || 1;
       const heightPerPane = totalHeight / paneCount;
@@ -2026,7 +2157,7 @@ export class ChartCoordinateService {
           0,
           i * heightPerPane,
           0, // Width will be set by chart
-          heightPerPane
+          heightPerPane,
         );
       }
     } else if (Array.isArray(paneHeights)) {
@@ -2037,7 +2168,7 @@ export class ChartCoordinateService {
           0,
           currentY,
           0, // Width will be set by chart
-          height
+          height,
         );
         currentY += height;
       });
@@ -2049,7 +2180,7 @@ export class ChartCoordinateService {
           0,
           currentY,
           0, // Width will be set by chart
-          height
+          height,
         );
         currentY += height;
       }
@@ -2067,16 +2198,19 @@ export class ChartCoordinateService {
     labelWidth: number,
     labelHeight: number,
     containerBounds: BoundingBox,
-    axis: 'x' | 'y'
+    axis: "x" | "y",
   ): { x: number; y: number } {
-    const margins = getMargins('content');
+    const margins = getMargins("content");
 
-    if (axis === 'x') {
+    if (axis === "x") {
       // Time axis label
       return {
         x: Math.max(
           containerBounds.left + margins.left,
-          Math.min(crosshairX - labelWidth / 2, containerBounds.right - labelWidth - margins.right)
+          Math.min(
+            crosshairX - labelWidth / 2,
+            containerBounds.right - labelWidth - margins.right,
+          ),
         ),
         y: containerBounds.bottom - labelHeight - margins.bottom,
       };
@@ -2088,8 +2222,8 @@ export class ChartCoordinateService {
           containerBounds.top + margins.top,
           Math.min(
             crosshairY - labelHeight / 2,
-            containerBounds.bottom - labelHeight - margins.bottom
-          )
+            containerBounds.bottom - labelHeight - margins.bottom,
+          ),
         ),
       };
     }
@@ -2103,33 +2237,33 @@ export class ChartCoordinateService {
     dimensions: { width: number; height: number },
     position: ElementPosition,
     margins: Margins,
-    offset: { x?: number; y?: number }
+    offset: { x?: number; y?: number },
   ): { top: number; left: number; right?: number; bottom?: number } {
     const offsetX = offset.x || 0;
     const offsetY = offset.y || 0;
 
     switch (position) {
-      case 'top-left':
+      case "top-left":
         return {
           top: bounds.top + margins.top + offsetY,
           left: bounds.left + margins.left + offsetX,
         };
 
-      case 'top-right':
+      case "top-right":
         return {
           top: bounds.top + margins.top + offsetY,
           left: bounds.right - dimensions.width - margins.right - offsetX,
           right: margins.right + offsetX,
         };
 
-      case 'bottom-left':
+      case "bottom-left":
         return {
           top: bounds.bottom - dimensions.height - margins.bottom - offsetY,
           left: bounds.left + margins.left + offsetX,
           bottom: margins.bottom + offsetY,
         };
 
-      case 'bottom-right':
+      case "bottom-right":
         return {
           top: bounds.bottom - dimensions.height - margins.bottom - offsetY,
           left: bounds.right - dimensions.width - margins.right - offsetX,
@@ -2137,7 +2271,7 @@ export class ChartCoordinateService {
           bottom: margins.bottom + offsetY,
         };
 
-      case 'center':
+      case "center":
         return {
           top: bounds.top + (bounds.height - dimensions.height) / 2 + offsetY,
           left: bounds.left + (bounds.width - dimensions.width) / 2 + offsetX,
@@ -2156,7 +2290,7 @@ export class ChartCoordinateService {
    */
   validatePositioning(
     element: BoundingBox,
-    container: BoundingBox
+    container: BoundingBox,
   ): { isValid: boolean; adjustments: { x?: number; y?: number } } {
     const adjustments: { x?: number; y?: number } = {};
     let isValid = true;
@@ -2186,13 +2320,15 @@ export class ChartCoordinateService {
    */
   applyPositionToElement(
     element: HTMLElement,
-    coordinates: LegendCoordinates | { top: number; left: number; right?: number; bottom?: number }
+    coordinates:
+      | LegendCoordinates
+      | { top: number; left: number; right?: number; bottom?: number },
   ): void {
     // Reset all position properties
-    element.style.top = 'auto';
-    element.style.left = 'auto';
-    element.style.right = 'auto';
-    element.style.bottom = 'auto';
+    element.style.top = "auto";
+    element.style.left = "auto";
+    element.style.right = "auto";
+    element.style.bottom = "auto";
 
     // Apply new position
     if (coordinates.top !== undefined) {
@@ -2209,13 +2345,13 @@ export class ChartCoordinateService {
     }
 
     // Apply z-index if available
-    if ('zIndex' in coordinates && coordinates.zIndex !== undefined) {
+    if ("zIndex" in coordinates && coordinates.zIndex !== undefined) {
       element.style.zIndex = String(coordinates.zIndex);
     }
 
     // Ensure position is absolute
-    if (!element.style.position || element.style.position === 'static') {
-      element.style.position = 'absolute';
+    if (!element.style.position || element.style.position === "static") {
+      element.style.position = "absolute";
     }
   }
 
@@ -2226,7 +2362,7 @@ export class ChartCoordinateService {
     currentWidth: number,
     currentHeight: number,
     baseWidth: number = DIMENSIONS.chart.defaultWidth,
-    baseHeight: number = DIMENSIONS.chart.defaultHeight
+    baseHeight: number = DIMENSIONS.chart.defaultHeight,
   ): { x: number; y: number; uniform: number } {
     const scaleX = currentWidth / baseWidth;
     const scaleY = currentHeight / baseHeight;
@@ -2243,14 +2379,14 @@ export class ChartCoordinateService {
     paneId: number,
     corner: string,
     widgets: LayoutWidget[],
-    index: number
+    index: number,
   ): WidgetPosition | null {
     // Get pane coordinates
     const paneCoords = this.getPaneCoordinates(chart, paneId);
     if (!paneCoords) return null;
 
-    const isTopCorner = corner.startsWith('top');
-    const isRightCorner = corner.endsWith('right');
+    const isTopCorner = corner.startsWith("top");
+    const isRightCorner = corner.endsWith("right");
 
     // Get actual axis dimensions from lightweight-charts APIs
     const axisDimensions = this.getAxisDimensions(chart);
@@ -2268,12 +2404,12 @@ export class ChartCoordinateService {
           // Estimate height based on widget type
           if (
             prevWidget.getContainerClassName &&
-            prevWidget.getContainerClassName().includes('legend')
+            prevWidget.getContainerClassName().includes("legend")
           ) {
             height = 24; // Default legend height
           } else if (
             prevWidget.getContainerClassName &&
-            prevWidget.getContainerClassName().includes('button')
+            prevWidget.getContainerClassName().includes("button")
           ) {
             height = 16; // Default button height
           } else {
@@ -2340,7 +2476,7 @@ export class ChartCoordinateService {
 
     try {
       // Get left Y-axis (price scale) width using IPriceScaleApi
-      const leftPriceScale = chart.priceScale('left');
+      const leftPriceScale = chart.priceScale("left");
       if (leftPriceScale) {
         leftPriceScaleWidth = leftPriceScale.width();
       }
@@ -2350,7 +2486,7 @@ export class ChartCoordinateService {
 
     try {
       // Get right Y-axis (price scale) width using IPriceScaleApi
-      const rightPriceScale = chart.priceScale('right');
+      const rightPriceScale = chart.priceScale("right");
       if (rightPriceScale) {
         rightPriceScaleWidth = rightPriceScale.width();
       }
@@ -2381,7 +2517,11 @@ export class ChartCoordinateService {
   /**
    * Calculate cumulative offset for widget stacking
    */
-  calculateCumulativeOffset(widgets: LayoutWidget[], index: number, gap: number = 8): number {
+  calculateCumulativeOffset(
+    widgets: LayoutWidget[],
+    index: number,
+    gap: number = 8,
+  ): number {
     let cumulativeHeight = 0;
     for (let i = 0; i < index; i++) {
       const prevWidget = widgets[i];
@@ -2399,17 +2539,18 @@ export class ChartCoordinateService {
   validateStackingBounds(
     corner: string,
     widgets: LayoutWidget[],
-    containerBounds: BoundingBox
+    containerBounds: BoundingBox,
   ): { isValid: boolean; overflowingWidgets: LayoutWidget[] } {
     const overflowing: LayoutWidget[] = [];
-    const isTopCorner = corner.startsWith('top');
+    const isTopCorner = corner.startsWith("top");
     let cumulativeHeight = UniversalSpacing.EDGE_PADDING; // Edge padding
 
     for (const widget of widgets) {
       if (!widget.visible || !widget.getDimensions) continue;
 
       const dims = widget.getDimensions();
-      const totalHeightRequired = cumulativeHeight + dims.height + UniversalSpacing.EDGE_PADDING; // Edge padding
+      const totalHeightRequired =
+        cumulativeHeight + dims.height + UniversalSpacing.EDGE_PADDING; // Edge padding
 
       if (isTopCorner) {
         if (totalHeightRequired > containerBounds.height) {
@@ -2463,7 +2604,7 @@ export class ChartCoordinateService {
     // Watch for chart element resize and pane changes
     try {
       const chartElement = chart.chartElement();
-      if (chartElement && typeof ResizeObserver !== 'undefined') {
+      if (chartElement && typeof ResizeObserver !== "undefined") {
         let lastLayoutUpdate = 0;
         const layoutThrottleDelay = 16; // ~60fps max to prevent X-axis lag
         const resizeObserver = new ResizeObserver(() => {
@@ -2491,7 +2632,10 @@ export class ChartCoordinateService {
             try {
               const paneSize = chart.paneSize(i);
               if (paneSize) {
-                currentPaneSizes[i] = { width: paneSize.width, height: paneSize.height };
+                currentPaneSizes[i] = {
+                  width: paneSize.width,
+                  height: paneSize.height,
+                };
               }
             } catch {
               break; // No more panes
@@ -2504,7 +2648,11 @@ export class ChartCoordinateService {
             for (let i = 0; i < currentPaneSizes.length; i++) {
               const current = currentPaneSizes[i];
               const last = lastPaneSizes[i];
-              if (!last || current.width !== last.width || current.height !== last.height) {
+              if (
+                !last ||
+                current.width !== last.width ||
+                current.height !== last.height
+              ) {
                 changed = true;
                 break;
               }
@@ -2558,12 +2706,17 @@ export class ChartCoordinateService {
     data: Array<{ x: number; originalData: Record<string, any> }>,
     scope: { horizontalPixelRatio: number; verticalPixelRatio: number },
     priceConverter: PriceToCoordinateConverter,
-    config: SeriesDataConversionConfig
+    config: SeriesDataConversionConfig,
   ): SeriesDataConversionResult[] {
     if (!data) return [];
 
     const coordinates: SeriesDataConversionResult[] = [];
-    const { valueKeys, validateNumbers = true, checkFinite = true, customValidator } = config;
+    const {
+      valueKeys,
+      validateNumbers = true,
+      checkFinite = true,
+      customValidator,
+    } = config;
 
     for (const item of data) {
       const originalData = item.originalData;
@@ -2575,9 +2728,13 @@ export class ChartCoordinateService {
 
       // Validate numeric values if enabled
       if (validateNumbers) {
-        const hasInvalidValues = valueKeys.some(key => {
+        const hasInvalidValues = valueKeys.some((key) => {
           const value = originalData[key];
-          return typeof value !== 'number' || isNaN(value) || (checkFinite && !isFinite(value));
+          return (
+            typeof value !== "number" ||
+            isNaN(value) ||
+            (checkFinite && !isFinite(value))
+          );
         });
 
         if (hasInvalidValues) {
@@ -2630,17 +2787,21 @@ export class ChartCoordinateService {
       allowNull?: boolean;
       allowUndefined?: boolean;
       checkFinite?: boolean;
-    } = {}
+    } = {},
   ): boolean {
-    const { allowNull = false, allowUndefined = false, checkFinite = true } = options;
+    const {
+      allowNull = false,
+      allowUndefined = false,
+      checkFinite = true,
+    } = options;
 
-    return keys.every(key => {
+    return keys.every((key) => {
       const value = data[key];
 
       if (value === null && allowNull) return true;
       if (value === undefined && allowUndefined) return true;
 
-      if (typeof value !== 'number') return false;
+      if (typeof value !== "number") return false;
       if (isNaN(value)) return false;
       if (checkFinite && !isFinite(value)) return false;
 
@@ -2659,7 +2820,7 @@ export class ChartCoordinateService {
   convertPricesToCoordinates(
     values: Record<string, number>,
     priceConverter: PriceToCoordinateConverter,
-    pixelRatio: number
+    pixelRatio: number,
   ): Record<string, number> | null {
     const result: Record<string, number> = {};
 
@@ -2682,21 +2843,21 @@ export class ChartCoordinateService {
   static readonly SeriesDataConfigs = {
     /** Configuration for ribbon series (upper, lower) */
     ribbon: {
-      valueKeys: ['upper', 'lower'],
+      valueKeys: ["upper", "lower"],
       validateNumbers: true,
       checkFinite: true,
     } as SeriesDataConversionConfig,
 
     /** Configuration for band series (upper, middle, lower) */
     band: {
-      valueKeys: ['upper', 'middle', 'lower'],
+      valueKeys: ["upper", "middle", "lower"],
       validateNumbers: true,
       checkFinite: true,
     } as SeriesDataConversionConfig,
 
     /** Configuration for gradient ribbon series (upper, lower with fillColor) */
     gradientRibbon: {
-      valueKeys: ['upper', 'lower'],
+      valueKeys: ["upper", "lower"],
       validateNumbers: true,
       checkFinite: true,
       customValidator: (data: any) => {
@@ -2707,7 +2868,7 @@ export class ChartCoordinateService {
 
     /** Configuration for single value series */
     singleValue: {
-      valueKeys: ['value'],
+      valueKeys: ["value"],
       validateNumbers: true,
       checkFinite: true,
     } as SeriesDataConversionConfig,

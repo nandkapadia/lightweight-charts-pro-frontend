@@ -11,9 +11,9 @@
  * Following DRY principles - single source of truth for template processing
  */
 
-import { UTCTimestamp } from 'lightweight-charts';
-import { TemplateContext, TemplateFormatting } from '../types/ChartInterfaces';
-import { Singleton } from '../utils/SingletonBase';
+import { UTCTimestamp } from "lightweight-charts";
+import { TemplateContext, TemplateFormatting } from "../types/ChartInterfaces";
+import { Singleton } from "../utils/SingletonBase";
 
 /**
  * Interface for series data used in template processing
@@ -189,7 +189,7 @@ export class TemplateEngine {
   public processTemplate(
     template: string,
     context: TemplateContext = {},
-    options: TemplateOptions = {}
+    options: TemplateOptions = {},
   ): TemplateResult {
     // Initialize result with template and empty metadata
     const result: TemplateResult = {
@@ -220,27 +220,35 @@ export class TemplateEngine {
 
           if (value !== null && value !== undefined) {
             // Format the value
-            const formattedValue = this.formatValue(value, placeholderKey, context.formatting);
+            const formattedValue = this.formatValue(
+              value,
+              placeholderKey,
+              context.formatting,
+            );
 
             // Replace in content
             result.content = result.content.replace(
-              new RegExp(this.escapeRegex(fullPlaceholder), 'g'),
-              options.escapeHtml ? this.escapeHtml(formattedValue) : formattedValue
+              new RegExp(this.escapeRegex(fullPlaceholder), "g"),
+              options.escapeHtml
+                ? this.escapeHtml(formattedValue)
+                : formattedValue,
             );
 
             result.processedPlaceholders.push(fullPlaceholder);
           } else {
             // Handle missing value
-            const defaultValue = options.defaultValue || '';
+            const defaultValue = options.defaultValue || "";
             result.content = result.content.replace(
-              new RegExp(this.escapeRegex(fullPlaceholder), 'g'),
-              defaultValue
+              new RegExp(this.escapeRegex(fullPlaceholder), "g"),
+              defaultValue,
             );
 
             result.missingPlaceholders.push(fullPlaceholder);
 
             if (options.strict) {
-              throw new Error(`Missing data for placeholder: ${fullPlaceholder}`);
+              throw new Error(
+                `Missing data for placeholder: ${fullPlaceholder}`,
+              );
             }
           }
         } catch (error) {
@@ -267,7 +275,10 @@ export class TemplateEngine {
   /**
    * Extract value for a specific placeholder key
    */
-  private extractPlaceholderValue(key: string, context: TemplateContext): unknown {
+  private extractPlaceholderValue(
+    key: string,
+    context: TemplateContext,
+  ): unknown {
     const { seriesData, customData } = context;
 
     // Check custom data first
@@ -279,25 +290,25 @@ export class TemplateEngine {
     if (seriesData) {
       const typedSeriesData = seriesData as SeriesDataValue;
       switch (key) {
-        case 'value':
+        case "value":
           return this.extractSmartValue(typedSeriesData);
-        case 'open':
+        case "open":
           return typedSeriesData.open;
-        case 'high':
+        case "high":
           return typedSeriesData.high;
-        case 'low':
+        case "low":
           return typedSeriesData.low;
-        case 'close':
+        case "close":
           return typedSeriesData.close;
-        case 'upper':
+        case "upper":
           return typedSeriesData.upper;
-        case 'middle':
+        case "middle":
           return typedSeriesData.middle;
-        case 'lower':
+        case "lower":
           return typedSeriesData.lower;
-        case 'volume':
+        case "volume":
           return typedSeriesData.volume;
-        case 'time':
+        case "time":
           return typedSeriesData.time;
         default:
           // Check if key exists directly in series data
@@ -348,35 +359,47 @@ export class TemplateEngine {
   /**
    * Format value according to type and formatting options
    */
-  private formatValue(value: unknown, key: string, formatting?: TemplateFormatting): string {
+  private formatValue(
+    value: unknown,
+    key: string,
+    formatting?: TemplateFormatting,
+  ): string {
     if (value === null || value === undefined) {
-      return '';
+      return "";
     }
 
     // Handle time formatting
-    if (key === 'time') {
+    if (key === "time") {
       return this.formatTime(value, formatting?.timeFormat);
     }
 
     // Handle numeric formatting with trade-specific enhancements
-    if (typeof value === 'number') {
+    if (typeof value === "number") {
       // Trade-specific formatting for prices and P&L
-      if (key.includes('price') || key.includes('pnl')) {
-        const formatted = this.formatNumber(value, formatting?.valueFormat, formatting?.locale);
+      if (key.includes("price") || key.includes("pnl")) {
+        const formatted = this.formatNumber(
+          value,
+          formatting?.valueFormat,
+          formatting?.locale,
+        );
         // Add sign for P&L values
-        if (key.includes('pnl') && value >= 0) {
+        if (key.includes("pnl") && value >= 0) {
           return `+${formatted}`;
         }
         return formatted;
       }
 
       // Percentage formatting
-      if (key.includes('percentage') || key.includes('percent')) {
-        const format = formatting?.percentageFormat || '.1f';
-        return `${value.toFixed(format === '.1f' ? 1 : 2)}%`;
+      if (key.includes("percentage") || key.includes("percent")) {
+        const format = formatting?.percentageFormat || ".1f";
+        return `${value.toFixed(format === ".1f" ? 1 : 2)}%`;
       }
 
-      return this.formatNumber(value, formatting?.valueFormat, formatting?.locale);
+      return this.formatNumber(
+        value,
+        formatting?.valueFormat,
+        formatting?.locale,
+      );
     }
 
     // Default to string conversion
@@ -386,7 +409,11 @@ export class TemplateEngine {
   /**
    * Format number according to format specification
    */
-  private formatNumber(value: number, format?: string, locale?: string): string {
+  private formatNumber(
+    value: number,
+    format?: string,
+    locale?: string,
+  ): string {
     if (!format) {
       return value.toFixed(2); // Default to 2 decimal places
     }
@@ -413,8 +440,11 @@ export class TemplateEngine {
   /**
    * Format time value
    */
-  private formatTime(time: UTCTimestamp | string | number | unknown, format?: string): string {
-    if (!time) return '';
+  private formatTime(
+    time: UTCTimestamp | string | number | unknown,
+    format?: string,
+  ): string {
+    if (!time) return "";
 
     try {
       let date: Date;
@@ -422,10 +452,10 @@ export class TemplateEngine {
       // Convert time to Date object
       if (time instanceof Date) {
         date = time;
-      } else if (typeof time === 'number') {
+      } else if (typeof time === "number") {
         // Assume Unix timestamp (seconds or milliseconds)
         date = new Date(time > 1e10 ? time : time * 1000);
-      } else if (typeof time === 'string') {
+      } else if (typeof time === "string") {
         date = new Date(time);
       } else {
         return time.toString();
@@ -450,16 +480,16 @@ export class TemplateEngine {
   private formatDateWithCustomFormat(date: Date, format: string): string {
     const formatMap: { [key: string]: string } = {
       YYYY: date.getFullYear().toString(),
-      MM: (date.getMonth() + 1).toString().padStart(2, '0'),
-      DD: date.getDate().toString().padStart(2, '0'),
-      HH: date.getHours().toString().padStart(2, '0'),
-      mm: date.getMinutes().toString().padStart(2, '0'),
-      ss: date.getSeconds().toString().padStart(2, '0'),
+      MM: (date.getMonth() + 1).toString().padStart(2, "0"),
+      DD: date.getDate().toString().padStart(2, "0"),
+      HH: date.getHours().toString().padStart(2, "0"),
+      mm: date.getMinutes().toString().padStart(2, "0"),
+      ss: date.getSeconds().toString().padStart(2, "0"),
     };
 
     let result = format;
     for (const [placeholder, value] of Object.entries(formatMap)) {
-      result = result.replace(new RegExp(placeholder, 'g'), value);
+      result = result.replace(new RegExp(placeholder, "g"), value);
     }
 
     return result;
@@ -469,7 +499,7 @@ export class TemplateEngine {
    * Escape special regex characters
    */
   private escapeRegex(str: string): string {
-    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   }
 
   /**
@@ -477,20 +507,23 @@ export class TemplateEngine {
    */
   private escapeHtml(str: string): string {
     const escapeMap: { [key: string]: string } = {
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;',
-      "'": '&#39;',
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;",
     };
 
-    return str.replace(/[&<>"']/g, match => escapeMap[match]);
+    return str.replace(/[&<>"']/g, (match) => escapeMap[match]);
   }
 
   /**
    * Validate template syntax
    */
-  public validateTemplate(template: string): { isValid: boolean; errors: string[] } {
+  public validateTemplate(template: string): {
+    isValid: boolean;
+    errors: string[];
+  } {
     const errors: string[] = [];
 
     try {
@@ -502,13 +535,13 @@ export class TemplateEngine {
       const allDollarPairs = [...template.matchAll(invalidPlaceholderRegex)];
 
       if (allDollarPairs.length !== validPlaceholders.length) {
-        errors.push('Template contains malformed placeholders');
+        errors.push("Template contains malformed placeholders");
       }
 
       // Check for unmatched $$ pairs
       const dollarCount = (template.match(/\$/g) || []).length;
       if (dollarCount % 4 !== 0) {
-        errors.push('Template contains unmatched $$ pairs');
+        errors.push("Template contains unmatched $$ pairs");
       }
     } catch (error) {
       errors.push(`Template validation error: ${error}`);
@@ -526,7 +559,7 @@ export class TemplateEngine {
   public getPlaceholders(template: string): string[] {
     const placeholderRegex = /\$\$([a-zA-Z_][a-zA-Z0-9_]*)\$\$/g;
     const matches = [...template.matchAll(placeholderRegex)];
-    return matches.map(match => match[0]);
+    return matches.map((match) => match[0]);
   }
 
   /**
@@ -535,7 +568,7 @@ export class TemplateEngine {
   public createContextFromSeriesData(
     seriesData: SeriesDataValue,
     customData?: Record<string, unknown>,
-    formatting?: TemplateContext['formatting']
+    formatting?: TemplateContext["formatting"],
   ): TemplateContext {
     return {
       seriesData,

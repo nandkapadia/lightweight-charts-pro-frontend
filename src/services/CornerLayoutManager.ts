@@ -57,12 +57,15 @@ import {
   CornerLayoutState,
   LayoutManagerEvents,
   ChartLayoutDimensions,
-} from '../types/layout';
-import { IChartApi } from 'lightweight-charts';
-import { ChartCoordinateService } from './ChartCoordinateService';
-import { LayoutSpacing } from '../primitives/PrimitiveDefaults';
-import { KeyedSingletonManager, createInstanceKey } from '../utils/KeyedSingletonManager';
-import { cleanupInstance } from '../utils/Disposable';
+} from "../types/layout";
+import { IChartApi } from "lightweight-charts";
+import { ChartCoordinateService } from "./ChartCoordinateService";
+import { LayoutSpacing } from "../primitives/PrimitiveDefaults";
+import {
+  KeyedSingletonManager,
+  createInstanceKey,
+} from "../utils/KeyedSingletonManager";
+import { cleanupInstance } from "../utils/Disposable";
 
 /**
  * CornerLayoutManager - Automatic corner-based widget positioning
@@ -79,10 +82,10 @@ export class CornerLayoutManager extends KeyedSingletonManager<CornerLayoutManag
   };
 
   private cornerStates: Record<Corner, CornerLayoutState> = {
-    'top-left': { widgets: [], totalHeight: 0, totalWidth: 0 },
-    'top-right': { widgets: [], totalHeight: 0, totalWidth: 0 },
-    'bottom-left': { widgets: [], totalHeight: 0, totalWidth: 0 },
-    'bottom-right': { widgets: [], totalHeight: 0, totalWidth: 0 },
+    "top-left": { widgets: [], totalHeight: 0, totalWidth: 0 },
+    "top-right": { widgets: [], totalHeight: 0, totalWidth: 0 },
+    "bottom-left": { widgets: [], totalHeight: 0, totalWidth: 0 },
+    "bottom-right": { widgets: [], totalHeight: 0, totalWidth: 0 },
   };
 
   private chartDimensions: ChartLayoutDimensions = {
@@ -109,26 +112,33 @@ export class CornerLayoutManager extends KeyedSingletonManager<CornerLayoutManag
     this.paneId = paneId;
   }
 
-  public static getInstance(chartId?: string, paneId?: number): CornerLayoutManager {
-    const key = createInstanceKey(chartId, 'pane', paneId);
+  public static getInstance(
+    chartId?: string,
+    paneId?: number,
+  ): CornerLayoutManager {
+    const key = createInstanceKey(chartId, "pane", paneId);
     return KeyedSingletonManager.getOrCreateInstance(
-      'CornerLayoutManager',
+      "CornerLayoutManager",
       key,
-      () => new CornerLayoutManager(chartId || 'default', paneId || 0)
+      () => new CornerLayoutManager(chartId || "default", paneId || 0),
     );
   }
 
   public static cleanup(chartId: string, paneId?: number): void {
     if (paneId !== undefined) {
       // Clean up specific pane
-      const key = createInstanceKey(chartId, 'pane', paneId);
-      KeyedSingletonManager.destroyInstanceByKey('CornerLayoutManager', key);
+      const key = createInstanceKey(chartId, "pane", paneId);
+      KeyedSingletonManager.destroyInstanceByKey("CornerLayoutManager", key);
     } else {
       // Clean up all panes for this chart
-      const allKeys = KeyedSingletonManager.getInstanceKeys('CornerLayoutManager');
-      const keysToDelete = allKeys.filter(key => key.startsWith(`${chartId}-pane-`));
-      keysToDelete.forEach(key => {
-        KeyedSingletonManager.destroyInstanceByKey('CornerLayoutManager', key);
+      const allKeys = KeyedSingletonManager.getInstanceKeys(
+        "CornerLayoutManager",
+      );
+      const keysToDelete = allKeys.filter((key) =>
+        key.startsWith(`${chartId}-pane-`),
+      );
+      keysToDelete.forEach((key) => {
+        KeyedSingletonManager.destroyInstanceByKey("CornerLayoutManager", key);
       });
     }
   }
@@ -224,7 +234,7 @@ export class CornerLayoutManager extends KeyedSingletonManager<CornerLayoutManag
     for (const corner of Object.keys(this.cornerStates) as Corner[]) {
       const state = this.cornerStates[corner];
       const initialLength = state.widgets.length;
-      state.widgets = state.widgets.filter(w => w.id !== widgetId);
+      state.widgets = state.widgets.filter((w) => w.id !== widgetId);
 
       if (state.widgets.length !== initialLength) {
         this.recalculateCornerLayout(corner);
@@ -239,7 +249,7 @@ export class CornerLayoutManager extends KeyedSingletonManager<CornerLayoutManag
   public updateWidgetVisibility(widgetId: string, visible: boolean): void {
     for (const corner of Object.keys(this.cornerStates) as Corner[]) {
       const state = this.cornerStates[corner];
-      const widget = state.widgets.find(w => w.id === widgetId);
+      const widget = state.widgets.find((w) => w.id === widgetId);
 
       if (widget && widget.visible !== visible) {
         widget.visible = visible;
@@ -255,10 +265,16 @@ export class CornerLayoutManager extends KeyedSingletonManager<CornerLayoutManag
   public getWidgetPosition(widgetId: string): Position | null {
     for (const corner of Object.keys(this.cornerStates) as Corner[]) {
       const state = this.cornerStates[corner];
-      const widgetIndex = state.widgets.findIndex(w => w.id === widgetId && w.visible);
+      const widgetIndex = state.widgets.findIndex(
+        (w) => w.id === widgetId && w.visible,
+      );
 
       if (widgetIndex !== -1) {
-        return this.calculateWidgetPosition(corner, widgetIndex, state.widgets[widgetIndex]);
+        return this.calculateWidgetPosition(
+          corner,
+          widgetIndex,
+          state.widgets[widgetIndex],
+        );
       }
     }
     return null;
@@ -278,7 +294,7 @@ export class CornerLayoutManager extends KeyedSingletonManager<CornerLayoutManag
    */
   private recalculateCornerLayout(corner: Corner): void {
     const state = this.cornerStates[corner];
-    const visibleWidgets = state.widgets.filter(w => w.visible);
+    const visibleWidgets = state.widgets.filter((w) => w.visible);
 
     // Calculate total dimensions
     state.totalHeight = this.calculateTotalHeight(visibleWidgets);
@@ -309,10 +325,12 @@ export class CornerLayoutManager extends KeyedSingletonManager<CornerLayoutManag
   private calculateWidgetPosition(
     corner: Corner,
     index: number,
-    widget: IPositionableWidget
+    widget: IPositionableWidget,
   ): Position {
     // Use fast synchronous positioning for immediate resize response
-    const visibleWidgets = this.cornerStates[corner].widgets.filter(w => w.visible);
+    const visibleWidgets = this.cornerStates[corner].widgets.filter(
+      (w) => w.visible,
+    );
     const widgetsBeforeThis = visibleWidgets.slice(0, index);
 
     // Calculate cumulative height of widgets above this one
@@ -331,7 +349,10 @@ export class CornerLayoutManager extends KeyedSingletonManager<CornerLayoutManag
     // For all pane widgets, use pane coordinates (including paneId = 0)
     if (this.chartApi) {
       // Get pane coordinates for proper positioning
-      const paneCoords = this.coordinateService.getPaneCoordinates(this.chartApi, this.paneId);
+      const paneCoords = this.coordinateService.getPaneCoordinates(
+        this.chartApi,
+        this.paneId,
+      );
 
       if (paneCoords) {
         const widgetDimensions = widget.getDimensions();
@@ -346,15 +367,16 @@ export class CornerLayoutManager extends KeyedSingletonManager<CornerLayoutManag
         };
 
         switch (corner) {
-          case 'top-left':
+          case "top-left":
             top = bounds.top + this.config.edgePadding + cumulativeHeight;
             left = bounds.left + this.config.edgePadding;
             break;
-          case 'top-right':
+          case "top-right":
             top = bounds.top + this.config.edgePadding + cumulativeHeight;
-            left = bounds.right - widgetDimensions.width - this.config.edgePadding;
+            left =
+              bounds.right - widgetDimensions.width - this.config.edgePadding;
             break;
-          case 'bottom-left':
+          case "bottom-left":
             top =
               bounds.bottom -
               this.config.edgePadding -
@@ -362,13 +384,14 @@ export class CornerLayoutManager extends KeyedSingletonManager<CornerLayoutManag
               cumulativeHeight;
             left = bounds.left + this.config.edgePadding;
             break;
-          case 'bottom-right':
+          case "bottom-right":
             top =
               bounds.bottom -
               this.config.edgePadding -
               this.calculateTotalHeight(visibleWidgets) +
               cumulativeHeight;
-            left = bounds.right - widgetDimensions.width - this.config.edgePadding;
+            left =
+              bounds.right - widgetDimensions.width - this.config.edgePadding;
             break;
           default:
             top = bounds.top + this.config.edgePadding;
@@ -389,15 +412,16 @@ export class CornerLayoutManager extends KeyedSingletonManager<CornerLayoutManag
     const widgetDimensions = widget.getDimensions();
 
     switch (corner) {
-      case 'top-left':
+      case "top-left":
         top = this.config.edgePadding + cumulativeHeight;
         left = this.config.edgePadding;
         break;
-      case 'top-right':
+      case "top-right":
         top = this.config.edgePadding + cumulativeHeight;
-        left = containerWidth - widgetDimensions.width - this.config.edgePadding;
+        left =
+          containerWidth - widgetDimensions.width - this.config.edgePadding;
         break;
-      case 'bottom-left':
+      case "bottom-left":
         top =
           containerHeight -
           this.config.edgePadding -
@@ -405,13 +429,14 @@ export class CornerLayoutManager extends KeyedSingletonManager<CornerLayoutManag
           cumulativeHeight;
         left = this.config.edgePadding;
         break;
-      case 'bottom-right':
+      case "bottom-right":
         top =
           containerHeight -
           this.config.edgePadding -
           this.calculateTotalHeight(visibleWidgets) +
           cumulativeHeight;
-        left = containerWidth - widgetDimensions.width - this.config.edgePadding;
+        left =
+          containerWidth - widgetDimensions.width - this.config.edgePadding;
         break;
       default:
         top = this.config.edgePadding;
@@ -447,7 +472,9 @@ export class CornerLayoutManager extends KeyedSingletonManager<CornerLayoutManag
   private calculateTotalWidth(widgets: IPositionableWidget[]): number {
     if (widgets.length === 0) return 0;
 
-    const maxWidgetWidth = Math.max(...widgets.map(w => w.getDimensions().width));
+    const maxWidgetWidth = Math.max(
+      ...widgets.map((w) => w.getDimensions().width),
+    );
     return maxWidgetWidth + this.config.edgePadding * 2;
   }
 
@@ -455,7 +482,10 @@ export class CornerLayoutManager extends KeyedSingletonManager<CornerLayoutManag
    * Detect widgets that would overflow the chart area
    * OPTIMIZED: Direct synchronous overflow detection for immediate resize performance
    */
-  private detectOverflow(corner: Corner, widgets: IPositionableWidget[]): IPositionableWidget[] {
+  private detectOverflow(
+    corner: Corner,
+    widgets: IPositionableWidget[],
+  ): IPositionableWidget[] {
     const overflowingWidgets: IPositionableWidget[] = [];
     const containerWidth = this.chartDimensions.container.width || 800;
     const containerHeight = this.chartDimensions.container.height || 600;
@@ -471,7 +501,12 @@ export class CornerLayoutManager extends KeyedSingletonManager<CornerLayoutManag
       const rightEdge = left + dimensions.width;
       const bottomEdge = top + dimensions.height;
 
-      if (rightEdge > containerWidth || bottomEdge > containerHeight || left < 0 || top < 0) {
+      if (
+        rightEdge > containerWidth ||
+        bottomEdge > containerHeight ||
+        left < 0 ||
+        top < 0
+      ) {
         overflowingWidgets.push(widget);
       }
     });
@@ -491,7 +526,7 @@ export class CornerLayoutManager extends KeyedSingletonManager<CornerLayoutManag
    */
   public destroy(): void {
     // Clear all corner states
-    Object.keys(this.cornerStates).forEach(corner => {
+    Object.keys(this.cornerStates).forEach((corner) => {
       this.cornerStates[corner as Corner].widgets = [];
       this.cornerStates[corner as Corner].totalHeight = 0;
       this.cornerStates[corner as Corner].totalWidth = 0;
@@ -501,6 +536,6 @@ export class CornerLayoutManager extends KeyedSingletonManager<CornerLayoutManag
     this.events = {};
 
     // Clear all references to allow garbage collection
-    cleanupInstance(this, ['chartApi', 'coordinateService', 'config']);
+    cleanupInstance(this, ["chartApi", "coordinateService", "config"]);
   }
 }

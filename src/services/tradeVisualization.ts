@@ -39,10 +39,10 @@
  * ```
  */
 
-import { UTCTimestamp, SeriesMarker, Time } from 'lightweight-charts';
-import { TradeConfig, TradeVisualizationOptions } from '../types';
-import { TradeTemplateProcessor } from './TradeTemplateProcessor';
-import { UniversalSpacing } from '../primitives/PrimitiveDefaults';
+import { UTCTimestamp, SeriesMarker, Time } from "lightweight-charts";
+import { TradeConfig, TradeVisualizationOptions } from "../types";
+import { TradeTemplateProcessor } from "./TradeTemplateProcessor";
+import { UniversalSpacing } from "../primitives/PrimitiveDefaults";
 
 // ============================================================================
 // CRITICAL: Timezone-agnostic parsing functions
@@ -70,7 +70,7 @@ import { UniversalSpacing } from '../primitives/PrimitiveDefaults';
 function parseTime(time: string | number): UTCTimestamp | null {
   try {
     // If it's already a number (Unix timestamp), convert to seconds if needed
-    if (typeof time === 'number') {
+    if (typeof time === "number") {
       // If timestamp is in milliseconds, convert to seconds
       if (time > 1000000000000) {
         return Math.floor(time / 1000) as UTCTimestamp;
@@ -79,7 +79,7 @@ function parseTime(time: string | number): UTCTimestamp | null {
     }
 
     // If it's a string, try to parse as date
-    if (typeof time === 'string') {
+    if (typeof time === "string") {
       // First try to parse as Unix timestamp string
       const timestamp = parseInt(time, 10);
       if (!isNaN(timestamp)) {
@@ -91,7 +91,7 @@ function parseTime(time: string | number): UTCTimestamp | null {
       }
 
       // Try to parse as ISO date string - CRITICAL: No timezone conversion
-      if (time.includes('T') || time.includes('Z') || time.includes('+')) {
+      if (time.includes("T") || time.includes("Z") || time.includes("+")) {
         // ISO format - parse directly to avoid local timezone conversion
         const date = new Date(time);
         if (isNaN(date.getTime())) {
@@ -118,7 +118,10 @@ function parseTime(time: string | number): UTCTimestamp | null {
 /**
  * Find nearest available timestamp in chart data
  */
-function findNearestTime(targetTime: UTCTimestamp, chartData: any[]): UTCTimestamp | null {
+function findNearestTime(
+  targetTime: UTCTimestamp,
+  chartData: any[],
+): UTCTimestamp | null {
   if (!chartData || chartData.length === 0) {
     return null;
   }
@@ -131,12 +134,12 @@ function findNearestTime(targetTime: UTCTimestamp, chartData: any[]): UTCTimesta
 
     let itemTime: UTCTimestamp | null = null;
 
-    if (typeof item.time === 'number') {
+    if (typeof item.time === "number") {
       itemTime =
         item.time > 1000000000000
           ? (Math.floor(item.time / 1000) as UTCTimestamp)
           : (item.time as UTCTimestamp);
-    } else if (typeof item.time === 'string') {
+    } else if (typeof item.time === "string") {
       itemTime = parseTime(item.time);
     }
 
@@ -161,7 +164,7 @@ export interface TradeRectangleData {
   fillColor: string;
   borderColor: string;
   borderWidth: number;
-  borderStyle: 'solid' | 'dashed' | 'dotted';
+  borderStyle: "solid" | "dashed" | "dotted";
   opacity: number;
   priceScaleId?: string;
   quantity?: number;
@@ -176,7 +179,7 @@ export interface TradeRectangleData {
 function createTradeRectangles(
   trades: TradeConfig[],
   options: TradeVisualizationOptions,
-  chartData?: any[]
+  chartData?: any[],
 ): TradeRectangleData[] {
   const rectangles: TradeRectangleData[] = [];
 
@@ -186,8 +189,8 @@ function createTradeRectangles(
     // Validate trade data - allow exitTime to be null for open trades
     if (
       !trade.entryTime ||
-      typeof trade.entryPrice !== 'number' ||
-      typeof trade.exitPrice !== 'number'
+      typeof trade.entryPrice !== "number" ||
+      typeof trade.exitPrice !== "number"
     ) {
       return;
     }
@@ -241,8 +244,8 @@ function createTradeRectangles(
     const isProfitable = trade.isProfitable ?? false; // Default to false if not specified
 
     const color = isProfitable
-      ? options.rectangleColorProfit || '#4CAF50' // Green for profitable
-      : options.rectangleColorLoss || '#F44336'; // Red for unprofitable
+      ? options.rectangleColorProfit || "#4CAF50" // Green for profitable
+      : options.rectangleColorLoss || "#F44336"; // Red for unprofitable
 
     const opacity = options.rectangleFillOpacity || 0.25;
 
@@ -260,7 +263,7 @@ function createTradeRectangles(
       fillColor: color,
       borderColor: color,
       borderWidth: options.rectangleBorderWidth || 3,
-      borderStyle: 'solid' as const,
+      borderStyle: "solid" as const,
       opacity: opacity,
       // Pass all additional trade data for template access
       ...trade, // Spread all trade properties for flexible template access
@@ -276,7 +279,7 @@ function createTradeRectangles(
 function createTradeMarkers(
   trades: TradeConfig[],
   options: TradeVisualizationOptions,
-  chartData?: any[]
+  chartData?: any[],
 ): SeriesMarker<Time>[] {
   const markers: SeriesMarker<Time>[] = [];
 
@@ -286,8 +289,8 @@ function createTradeMarkers(
     // Validate trade data - allow exitTime to be null for open trades
     if (
       !trade.entryTime ||
-      typeof trade.entryPrice !== 'number' ||
-      typeof trade.exitPrice !== 'number'
+      typeof trade.entryPrice !== "number" ||
+      typeof trade.exitPrice !== "number"
     ) {
       return;
     }
@@ -322,24 +325,28 @@ function createTradeMarkers(
     }
 
     // Entry marker - use tradeType for color selection
-    const tradeType = trade.trade_type || trade.tradeType || 'long';
+    const tradeType = trade.trade_type || trade.tradeType || "long";
     const entryColor =
-      tradeType === 'long'
-        ? options.entryMarkerColorLong || '#2196F3'
-        : options.entryMarkerColorShort || '#FF9800';
+      tradeType === "long"
+        ? options.entryMarkerColorLong || "#2196F3"
+        : options.entryMarkerColorShort || "#FF9800";
 
     // Generate entry marker text using template or default
-    let entryMarkerText = '';
+    let entryMarkerText = "";
     if (options.showMarkerText !== false) {
       // Default to true if not specified
       if (options.entryMarkerTemplate) {
         // Use entry-specific template
         const result = TradeTemplateProcessor.processTemplate(
           options.entryMarkerTemplate,
-          trade // Pass entire trade object for flexible template access
+          trade, // Pass entire trade object for flexible template access
         );
         entryMarkerText = result.content;
-      } else if (options.showPnlInMarkers && trade.text && typeof trade.text === 'string') {
+      } else if (
+        options.showPnlInMarkers &&
+        trade.text &&
+        typeof trade.text === "string"
+      ) {
         // Use custom text from trade if showPnlInMarkers is true
         entryMarkerText = trade.text as string;
       } else if (options.showPnlInMarkers && trade.pnl !== undefined) {
@@ -354,12 +361,15 @@ function createTradeMarkers(
     const entryMarker: SeriesMarker<Time> = {
       time: adjustedEntryTime,
       position:
-        (options.entryMarkerPosition as 'belowBar' | 'aboveBar') ||
-        (tradeType === 'long' ? 'belowBar' : 'aboveBar'),
+        (options.entryMarkerPosition as "belowBar" | "aboveBar") ||
+        (tradeType === "long" ? "belowBar" : "aboveBar"),
       color: entryColor,
       shape:
-        (options.entryMarkerShape as 'arrowUp' | 'arrowDown' | 'circle' | 'square') ||
-        (tradeType === 'long' ? 'arrowUp' : 'arrowDown'),
+        (options.entryMarkerShape as
+          | "arrowUp"
+          | "arrowDown"
+          | "circle"
+          | "square") || (tradeType === "long" ? "arrowUp" : "arrowDown"),
       text: entryMarkerText,
       size: options.markerSize || 1,
     };
@@ -371,18 +381,18 @@ function createTradeMarkers(
       const isProfit = trade.isProfitable ?? false; // Default to false if not specified
 
       const exitColor = isProfit
-        ? options.exitMarkerColorProfit || '#4CAF50' // Green for profitable
-        : options.exitMarkerColorLoss || '#F44336'; // Red for unprofitable
+        ? options.exitMarkerColorProfit || "#4CAF50" // Green for profitable
+        : options.exitMarkerColorLoss || "#F44336"; // Red for unprofitable
 
       // Generate exit marker text using template or default
-      let exitMarkerText = '';
+      let exitMarkerText = "";
       if (options.showMarkerText !== false) {
         // Default to true if not specified
         if (options.exitMarkerTemplate) {
           // Use exit-specific template
           const result = TradeTemplateProcessor.processTemplate(
             options.exitMarkerTemplate,
-            trade // Pass entire trade object for flexible template access
+            trade, // Pass entire trade object for flexible template access
           );
           exitMarkerText = result.content;
         } else {
@@ -394,12 +404,15 @@ function createTradeMarkers(
       const exitMarker: SeriesMarker<Time> = {
         time: adjustedExitTime,
         position:
-          (options.exitMarkerPosition as 'belowBar' | 'aboveBar') ||
-          (tradeType === 'long' ? 'aboveBar' : 'belowBar'),
+          (options.exitMarkerPosition as "belowBar" | "aboveBar") ||
+          (tradeType === "long" ? "aboveBar" : "belowBar"),
         color: exitColor,
         shape:
-          (options.exitMarkerShape as 'arrowUp' | 'arrowDown' | 'circle' | 'square') ||
-          (tradeType === 'long' ? 'arrowDown' : 'arrowUp'),
+          (options.exitMarkerShape as
+            | "arrowUp"
+            | "arrowDown"
+            | "circle"
+            | "square") || (tradeType === "long" ? "arrowDown" : "arrowUp"),
         text: exitMarkerText,
         size: options.markerSize || 1,
       };
@@ -415,7 +428,7 @@ export function createTradeVisualElements(
   trades: TradeConfig[],
   options: TradeVisualizationOptions,
   chartData?: any[],
-  _priceScaleId?: string
+  _priceScaleId?: string,
 ): {
   markers: SeriesMarker<Time>[];
   rectangles: TradeRectangleData[];
@@ -430,19 +443,19 @@ export function createTradeVisualElements(
   }
 
   // Create markers if enabled
-  if (options && (options.style === 'markers' || options.style === 'both')) {
+  if (options && (options.style === "markers" || options.style === "both")) {
     markers.push(...createTradeMarkers(trades, options, chartData));
   }
 
   // Create rectangles if enabled - these will be handled by RectanglePlugin
-  if (options && (options.style === 'rectangles' || options.style === 'both')) {
+  if (options && (options.style === "rectangles" || options.style === "both")) {
     const newRectangles = createTradeRectangles(trades, options, chartData);
     rectangles.push(...newRectangles);
   }
 
   // Create annotations if enabled
   if (options.showAnnotations) {
-    trades.forEach(trade => {
+    trades.forEach((trade) => {
       const textParts: string[] = [];
 
       if (options.showTradeId && trade.id) {
@@ -473,13 +486,14 @@ export function createTradeVisualElements(
       const midPrice = (trade.entryPrice + trade.exitPrice) / 2;
 
       annotations.push({
-        type: 'text',
+        type: "text",
         time: midTime,
         price: midPrice,
-        text: textParts.join(' | '),
+        text: textParts.join(" | "),
         fontSize: options.annotationFontSize || 12,
-        backgroundColor: options.annotationBackground || 'rgba(255, 255, 255, 0.8)',
-        color: '#000000',
+        backgroundColor:
+          options.annotationBackground || "rgba(255, 255, 255, 0.8)",
+        color: "#000000",
         padding: UniversalSpacing.DEFAULT_PADDING,
       });
     });
@@ -495,7 +509,7 @@ export function createTradeVisualElements(
 export function convertTradeRectanglesToPluginFormat(
   tradeRectangles: TradeRectangleData[],
   chart: any,
-  series?: any
+  series?: any,
 ): any[] {
   if (!chart || !series) {
     return [];
@@ -511,7 +525,9 @@ export function convertTradeRectanglesToPluginFormat(
 
   // Import ChartCoordinateService dynamically to avoid circular dependencies
   // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { ChartCoordinateService } = require('../services/ChartCoordinateService');
+  const {
+    ChartCoordinateService,
+  } = require("../services/ChartCoordinateService");
   const coordinateService = ChartCoordinateService.getInstance();
 
   return tradeRectangles
@@ -525,7 +541,7 @@ export function convertTradeRectanglesToPluginFormat(
           rect.price2,
           chart,
           series,
-          0 // paneId
+          0, // paneId
         );
 
         if (!boundingBox) {
@@ -544,9 +560,9 @@ export function convertTradeRectanglesToPluginFormat(
           fillOpacity: rect.opacity,
           borderOpacity: 1.0,
           label: `Trade ${index + 1}`,
-          labelColor: '#000000',
+          labelColor: "#000000",
           labelFontSize: 12,
-          labelBackground: 'rgba(255, 255, 255, 0.8)',
+          labelBackground: "rgba(255, 255, 255, 0.8)",
           labelPadding: 4,
           zIndex: 10,
         };
@@ -556,7 +572,7 @@ export function convertTradeRectanglesToPluginFormat(
         return null;
       }
     })
-    .filter(rect => rect !== null); // Remove null entries
+    .filter((rect) => rect !== null); // Remove null entries
 }
 
 /**
@@ -565,14 +581,14 @@ export function convertTradeRectanglesToPluginFormat(
 export async function convertTradeRectanglesToPluginFormatWhenReady(
   tradeRectangles: TradeRectangleData[],
   chart: any,
-  series?: any
+  series?: any,
 ): Promise<any[]> {
   if (!chart || !series) {
     return [];
   }
 
   // Import ChartReadyDetector dynamically to avoid circular dependencies
-  const { ChartReadyDetector } = await import('../utils/chartReadyDetection');
+  const { ChartReadyDetector } = await import("../utils/chartReadyDetection");
 
   try {
     // Wait for chart to be ready with proper dimensions
@@ -581,12 +597,16 @@ export async function convertTradeRectanglesToPluginFormatWhenReady(
       return [];
     }
 
-    const isReady = await ChartReadyDetector.waitForChartReady(chart, container, {
-      minWidth: 200,
-      minHeight: 200,
-      maxAttempts: 10,
-      baseDelay: 200,
-    });
+    const isReady = await ChartReadyDetector.waitForChartReady(
+      chart,
+      container,
+      {
+        minWidth: 200,
+        minHeight: 200,
+        maxAttempts: 10,
+        baseDelay: 200,
+      },
+    );
 
     if (!isReady) {
       return [];

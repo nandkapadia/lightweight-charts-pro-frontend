@@ -42,12 +42,12 @@
  * - Trigger callbacks on state changes
  */
 
-import { IChartApi } from 'lightweight-charts';
-import { logger } from '../utils/logger';
-import { KeyedSingletonManager } from '../utils/KeyedSingletonManager';
-import { handleError, ErrorSeverity } from '../utils/errorHandler';
-import { DIMENSIONS } from '../config/positioningConfig';
-import { cleanupInstance } from '../utils/Disposable';
+import { IChartApi } from "lightweight-charts";
+import { logger } from "../utils/logger";
+import { KeyedSingletonManager } from "../utils/KeyedSingletonManager";
+import { handleError, ErrorSeverity } from "../utils/errorHandler";
+import { DIMENSIONS } from "../config/positioningConfig";
+import { cleanupInstance } from "../utils/Disposable";
 
 /**
  * Pane collapse state
@@ -83,7 +83,7 @@ export class PaneCollapseManager extends KeyedSingletonManager<PaneCollapseManag
     this.chartApi = chartApi;
     this.config = {
       collapsedHeight: DIMENSIONS.pane.collapsedHeight,
-      chartId: config.chartId || 'default',
+      chartId: config.chartId || "default",
       ...config,
     };
   }
@@ -94,13 +94,13 @@ export class PaneCollapseManager extends KeyedSingletonManager<PaneCollapseManag
   public static getInstance(
     chartApi: IChartApi,
     chartId?: string,
-    config: PaneCollapseConfig = {}
+    config: PaneCollapseConfig = {},
   ): PaneCollapseManager {
-    const key = chartId || 'default';
+    const key = chartId || "default";
     return KeyedSingletonManager.getOrCreateInstance(
-      'PaneCollapseManager',
+      "PaneCollapseManager",
       key,
-      () => new PaneCollapseManager(chartApi, { ...config, chartId: key })
+      () => new PaneCollapseManager(chartApi, { ...config, chartId: key }),
     );
   }
 
@@ -108,8 +108,8 @@ export class PaneCollapseManager extends KeyedSingletonManager<PaneCollapseManag
    * Destroy singleton instance for a chart
    */
   public static destroyInstance(chartId?: string): void {
-    const key = chartId || 'default';
-    KeyedSingletonManager.destroyInstanceByKey('PaneCollapseManager', key);
+    const key = chartId || "default";
+    KeyedSingletonManager.destroyInstanceByKey("PaneCollapseManager", key);
   }
 
   /**
@@ -123,15 +123,17 @@ export class PaneCollapseManager extends KeyedSingletonManager<PaneCollapseManag
     callbacks?: {
       onPaneCollapse?: (paneId: number, isCollapsed: boolean) => void;
       onPaneExpand?: (paneId: number, isCollapsed: boolean) => void;
-    }
+    },
   ): void {
     if (!this.states.has(paneId)) {
       this.states.set(paneId, {
         isCollapsed: false,
         originalHeight: 0,
-        collapsedHeight: this.config?.collapsedHeight || DIMENSIONS.pane.collapsedHeight,
+        collapsedHeight:
+          this.config?.collapsedHeight || DIMENSIONS.pane.collapsedHeight,
         // Use per-pane callbacks if provided, otherwise fallback to config callbacks
-        onPaneCollapse: callbacks?.onPaneCollapse || this.config?.onPaneCollapse,
+        onPaneCollapse:
+          callbacks?.onPaneCollapse || this.config?.onPaneCollapse,
         onPaneExpand: callbacks?.onPaneExpand || this.config?.onPaneExpand,
       });
     }
@@ -157,7 +159,9 @@ export class PaneCollapseManager extends KeyedSingletonManager<PaneCollapseManag
   public toggle(paneId: number): void {
     const state = this.states.get(paneId);
     if (!state) {
-      logger.error('Pane state not initialized', 'PaneCollapseManager', { paneId });
+      logger.error("Pane state not initialized", "PaneCollapseManager", {
+        paneId,
+      });
       return;
     }
 
@@ -168,7 +172,7 @@ export class PaneCollapseManager extends KeyedSingletonManager<PaneCollapseManag
         this.collapse(paneId);
       }
     } catch (error) {
-      handleError(error, 'PaneCollapseManager.toggle', ErrorSeverity.WARNING);
+      handleError(error, "PaneCollapseManager.toggle", ErrorSeverity.WARNING);
     }
   }
 
@@ -191,7 +195,9 @@ export class PaneCollapseManager extends KeyedSingletonManager<PaneCollapseManag
     try {
       const panes = this.chartApi.panes();
       if (!panes || !panes[paneId]) {
-        logger.error('Pane not found in chart.panes()', 'PaneCollapseManager', { paneId });
+        logger.error("Pane not found in chart.panes()", "PaneCollapseManager", {
+          paneId,
+        });
         return;
       }
 
@@ -266,7 +272,7 @@ export class PaneCollapseManager extends KeyedSingletonManager<PaneCollapseManag
         state.onPaneCollapse(paneId, true);
       }
     } catch (error) {
-      handleError(error, 'PaneCollapseManager.collapse', ErrorSeverity.ERROR);
+      handleError(error, "PaneCollapseManager.collapse", ErrorSeverity.ERROR);
     }
   }
 
@@ -288,7 +294,9 @@ export class PaneCollapseManager extends KeyedSingletonManager<PaneCollapseManag
     try {
       const panes = this.chartApi.panes();
       if (!panes || !panes[paneId]) {
-        logger.error('Pane not found in chart.panes()', 'PaneCollapseManager', { paneId });
+        logger.error("Pane not found in chart.panes()", "PaneCollapseManager", {
+          paneId,
+        });
         return;
       }
 
@@ -363,7 +371,7 @@ export class PaneCollapseManager extends KeyedSingletonManager<PaneCollapseManag
         state.onPaneExpand(paneId, false);
       }
     } catch (error) {
-      handleError(error, 'PaneCollapseManager.expand', ErrorSeverity.ERROR);
+      handleError(error, "PaneCollapseManager.expand", ErrorSeverity.ERROR);
     }
   }
 
@@ -374,6 +382,6 @@ export class PaneCollapseManager extends KeyedSingletonManager<PaneCollapseManag
     this.states.clear();
 
     // Clear all references to allow garbage collection
-    cleanupInstance(this, ['chartApi', 'config']);
+    cleanupInstance(this, ["chartApi", "config"]);
   }
 }

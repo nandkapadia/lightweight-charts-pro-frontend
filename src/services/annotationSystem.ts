@@ -44,10 +44,10 @@
  * ```
  */
 
-import { Annotation, AnnotationLayer, AnnotationText } from '../types';
-import { logger } from '../utils/logger';
-import { ShapeData } from '../types/ChartInterfaces';
-import { UTCTimestamp, SeriesMarker, Time } from 'lightweight-charts';
+import { Annotation, AnnotationLayer, AnnotationText } from "../types";
+import { logger } from "../utils/logger";
+import { ShapeData } from "../types/ChartInterfaces";
+import { UTCTimestamp, SeriesMarker, Time } from "lightweight-charts";
 
 /**
  * Result of annotation processing containing all visual elements
@@ -64,14 +64,14 @@ export interface AnnotationVisualElements {
 }
 
 export const createAnnotationVisualElements = (
-  annotations: Annotation[]
+  annotations: Annotation[],
 ): AnnotationVisualElements => {
   const markers: SeriesMarker<Time>[] = [];
   const shapes: ShapeData[] = [];
   const texts: AnnotationText[] = [];
 
   // Immediate return if annotations is null, undefined, or not an object
-  if (!annotations || typeof annotations !== 'object') {
+  if (!annotations || typeof annotations !== "object") {
     return { markers, shapes, texts };
   }
 
@@ -84,7 +84,7 @@ export const createAnnotationVisualElements = (
 
     // Additional safety check - ensure annotations is actually an array
     try {
-      if (typeof annotations.forEach !== 'function') {
+      if (typeof annotations.forEach !== "function") {
         return { markers, shapes, texts };
       }
     } catch {
@@ -100,7 +100,10 @@ export const createAnnotationVisualElements = (
     }
 
     // Final safety check
-    if (!Array.isArray(annotationsArray) || typeof annotationsArray.forEach !== 'function') {
+    if (
+      !Array.isArray(annotationsArray) ||
+      typeof annotationsArray.forEach !== "function"
+    ) {
       return { markers, shapes, texts };
     }
 
@@ -109,63 +112,81 @@ export const createAnnotationVisualElements = (
       annotationsArray.forEach((annotation, _index) => {
         try {
           // Validate annotation object
-          if (!annotation || typeof annotation !== 'object') {
+          if (!annotation || typeof annotation !== "object") {
             return;
           }
 
           // Create marker based on annotation type
           if (
-            annotation.type === 'arrow' ||
-            annotation.type === 'shape' ||
-            annotation.type === 'circle'
+            annotation.type === "arrow" ||
+            annotation.type === "shape" ||
+            annotation.type === "circle"
           ) {
             const marker: SeriesMarker<Time> = {
               time: parseTime(annotation.time),
               position: normalizePosition(annotation.position),
-              color: annotation.color || '#2196F3',
-              shape: annotation.type === 'arrow' ? 'arrowUp' : 'circle',
-              text: annotation.text || '',
+              color: annotation.color || "#2196F3",
+              shape: annotation.type === "arrow" ? "arrowUp" : "circle",
+              text: annotation.text || "",
               size: annotation.fontSize || 1,
             };
             markers.push(marker);
           }
 
           // Create shape if specified
-          if (annotation.type === 'rectangle' || annotation.type === 'line') {
+          if (annotation.type === "rectangle" || annotation.type === "line") {
             const shape: ShapeData = {
               type: annotation.type,
-              points: [{ time: parseTime(annotation.time), price: annotation.price ?? 0 }],
-              color: annotation.color || '#2196F3',
-              fillColor: annotation.backgroundColor || '#2196F3',
+              points: [
+                {
+                  time: parseTime(annotation.time),
+                  price: annotation.price ?? 0,
+                },
+              ],
+              color: annotation.color || "#2196F3",
+              fillColor: annotation.backgroundColor || "#2196F3",
               borderWidth: annotation.borderWidth || 1,
-              text: annotation.text || '',
+              text: annotation.text || "",
             };
             shapes.push(shape);
           }
 
           // Create text annotation if specified
-          if (annotation.type === 'text') {
+          if (annotation.type === "text") {
             const text: AnnotationText = {
               time: parseTime(annotation.time),
               price: annotation.price,
               text: annotation.text,
-              color: annotation.textColor || '#131722',
-              backgroundColor: annotation.backgroundColor || 'rgba(255, 255, 255, 0.9)',
+              color: annotation.textColor || "#131722",
+              backgroundColor:
+                annotation.backgroundColor || "rgba(255, 255, 255, 0.9)",
               fontSize: annotation.fontSize || 12,
-              fontFamily: 'Arial',
+              fontFamily: "Arial",
               position: normalizePosition(annotation.position),
             };
             texts.push(text);
           }
         } catch (error) {
-          logger.error('Annotation text extraction failed', 'AnnotationSystem', error);
+          logger.error(
+            "Annotation text extraction failed",
+            "AnnotationSystem",
+            error,
+          );
         }
       });
     } catch (forEachError) {
-      logger.error('Annotation forEach operation failed', 'AnnotationSystem', forEachError);
+      logger.error(
+        "Annotation forEach operation failed",
+        "AnnotationSystem",
+        forEachError,
+      );
     }
   } catch (outerError) {
-    logger.error('Annotation system outer operation failed', 'AnnotationSystem', outerError);
+    logger.error(
+      "Annotation system outer operation failed",
+      "AnnotationSystem",
+      outerError,
+    );
   }
 
   return { markers, shapes, texts };
@@ -176,17 +197,22 @@ export const createAnnotationVisualElements = (
  * Handles string, number (UTCTimestamp), and BusinessDay inputs
  */
 function parseTime(time: Time): UTCTimestamp {
-  if (typeof time === 'number') {
+  if (typeof time === "number") {
     // Already a timestamp
     return time as UTCTimestamp;
   }
-  if (typeof time === 'string') {
+  if (typeof time === "string") {
     // Convert string time to UTC timestamp
     const date = new Date(time);
     return Math.floor(date.getTime() / 1000) as UTCTimestamp;
   }
   // BusinessDay object { year, month, day }
-  if (typeof time === 'object' && 'year' in time && 'month' in time && 'day' in time) {
+  if (
+    typeof time === "object" &&
+    "year" in time &&
+    "month" in time &&
+    "day" in time
+  ) {
     const date = new Date(time.year, time.month - 1, time.day);
     return Math.floor(date.getTime() / 1000) as UTCTimestamp;
   }
@@ -199,23 +225,23 @@ function parseTime(time: Time): UTCTimestamp {
  * Converts 'above' -> 'aboveBar', 'below' -> 'belowBar'
  */
 function normalizePosition(
-  position?: 'aboveBar' | 'belowBar' | 'inBar' | 'above' | 'below'
-): 'aboveBar' | 'belowBar' | 'inBar' {
-  if (position === 'above') return 'aboveBar';
-  if (position === 'below') return 'belowBar';
-  return position || 'aboveBar';
+  position?: "aboveBar" | "belowBar" | "inBar" | "above" | "below",
+): "aboveBar" | "belowBar" | "inBar" {
+  if (position === "above") return "aboveBar";
+  if (position === "below") return "belowBar";
+  return position || "aboveBar";
 }
 
 // Utility functions for annotation management
 export function filterAnnotationsByTimeRange(
   annotations: Annotation[],
   startTime: string,
-  endTime: string
+  endTime: string,
 ): Annotation[] {
   const start = parseTime(startTime);
   const end = parseTime(endTime);
 
-  return annotations.filter(annotation => {
+  return annotations.filter((annotation) => {
     const time = parseTime(annotation.time);
     return time >= start && time <= end;
   });
@@ -224,9 +250,9 @@ export function filterAnnotationsByTimeRange(
 export function filterAnnotationsByPriceRange(
   annotations: Annotation[],
   minPrice: number,
-  maxPrice: number
+  maxPrice: number,
 ): Annotation[] {
-  return annotations.filter(annotation => {
+  return annotations.filter((annotation) => {
     if (annotation.price === undefined) return false;
     return annotation.price >= minPrice && annotation.price <= maxPrice;
   });
@@ -234,7 +260,7 @@ export function filterAnnotationsByPriceRange(
 
 export function createAnnotationLayer(
   name: string,
-  annotations: Annotation[] = []
+  annotations: Annotation[] = [],
 ): AnnotationLayer {
   return {
     name,

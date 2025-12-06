@@ -44,7 +44,13 @@
  * ```
  */
 
-import { IChartApi, ISeriesApi, Time, SeriesDataItemTypeMap, MouseEventParams } from 'lightweight-charts';
+import {
+  IChartApi,
+  ISeriesApi,
+  Time,
+  SeriesDataItemTypeMap,
+  MouseEventParams,
+} from "lightweight-charts";
 
 /**
  * Event types for primitive interactions
@@ -54,7 +60,10 @@ import { IChartApi, ISeriesApi, Time, SeriesDataItemTypeMap, MouseEventParams } 
 /**
  * Series data map type for event payloads
  */
-export type SeriesDataMap = Map<ISeriesApi<keyof SeriesDataItemTypeMap>, SeriesDataItemTypeMap[keyof SeriesDataItemTypeMap]>;
+export type SeriesDataMap = Map<
+  ISeriesApi<keyof SeriesDataItemTypeMap>,
+  SeriesDataItemTypeMap[keyof SeriesDataItemTypeMap]
+>;
 
 export interface PrimitiveEventTypes {
   /**
@@ -137,7 +146,7 @@ export interface PrimitiveEventTypes {
  * Event listener type
  */
 export type PrimitiveEventListener<K extends keyof PrimitiveEventTypes> = (
-  event: PrimitiveEventTypes[K]
+  event: PrimitiveEventTypes[K],
 ) => void;
 
 /**
@@ -161,13 +170,16 @@ export class PrimitiveEventManager {
 
   private chart: IChartApi | null = null;
   private chartId: string;
-  private eventListeners: Map<string, Set<(event: unknown) => void>> = new Map();
+  private eventListeners: Map<string, Set<(event: unknown) => void>> =
+    new Map();
   private chartEventCleanup: Array<() => void> = [];
   private _isDestroyed: boolean = false;
 
   // Crosshair tracking
-  private lastCrosshairPosition: { time: Time | null; point: { x: number; y: number } | null } | null =
-    null;
+  private lastCrosshairPosition: {
+    time: Time | null;
+    point: { x: number; y: number } | null;
+  } | null = null;
 
   private constructor(chartId: string) {
     this.chartId = chartId;
@@ -178,11 +190,16 @@ export class PrimitiveEventManager {
    */
   public static getInstance(chartId: string): PrimitiveEventManager {
     if (!PrimitiveEventManager.instances.has(chartId)) {
-      PrimitiveEventManager.instances.set(chartId, new PrimitiveEventManager(chartId));
+      PrimitiveEventManager.instances.set(
+        chartId,
+        new PrimitiveEventManager(chartId),
+      );
     }
     const instance = PrimitiveEventManager.instances.get(chartId);
     if (!instance) {
-      throw new Error(`PrimitiveEventManager instance not found for chartId: ${chartId}`);
+      throw new Error(
+        `PrimitiveEventManager instance not found for chartId: ${chartId}`,
+      );
     }
     return instance;
   }
@@ -203,7 +220,7 @@ export class PrimitiveEventManager {
    */
   public initialize(chart: IChartApi): void {
     if (this._isDestroyed) {
-      throw new Error('Cannot initialize destroyed PrimitiveEventManager');
+      throw new Error("Cannot initialize destroyed PrimitiveEventManager");
     }
 
     this.chart = chart;
@@ -215,10 +232,10 @@ export class PrimitiveEventManager {
    */
   public subscribe<K extends keyof PrimitiveEventTypes>(
     eventType: K,
-    listener: PrimitiveEventListener<K>
+    listener: PrimitiveEventListener<K>,
   ): EventSubscription {
     if (this._isDestroyed) {
-      throw new Error('Cannot subscribe to destroyed PrimitiveEventManager');
+      throw new Error("Cannot subscribe to destroyed PrimitiveEventManager");
     }
 
     const eventKey = eventType as string;
@@ -251,7 +268,7 @@ export class PrimitiveEventManager {
    */
   public emit<K extends keyof PrimitiveEventTypes>(
     eventType: K,
-    event: PrimitiveEventTypes[K]
+    event: PrimitiveEventTypes[K],
   ): void {
     if (this._isDestroyed) {
       return;
@@ -261,7 +278,7 @@ export class PrimitiveEventManager {
     const listeners = this.eventListeners.get(eventKey);
 
     if (listeners) {
-      listeners.forEach(listener => {
+      listeners.forEach((listener) => {
         try {
           listener(event);
         } catch {
@@ -348,7 +365,7 @@ export class PrimitiveEventManager {
     this.lastCrosshairPosition = { time, point };
 
     // Emit crosshair move event
-    this.emit('crosshairMove', {
+    this.emit("crosshairMove", {
       time,
       point,
       seriesData,
@@ -356,7 +373,7 @@ export class PrimitiveEventManager {
 
     // Emit hover event if point is valid
     if (point && time) {
-      this.emit('hover', {
+      this.emit("hover", {
         time,
         point,
         seriesData,
@@ -381,7 +398,7 @@ export class PrimitiveEventManager {
       });
     }
 
-    this.emit('click', {
+    this.emit("click", {
       time,
       point,
       seriesData,
@@ -396,7 +413,7 @@ export class PrimitiveEventManager {
 
     const visibleRange = this.chart.timeScale().getVisibleRange();
     if (visibleRange) {
-      this.emit('timeScaleChange', {
+      this.emit("timeScaleChange", {
         from: visibleRange.from,
         to: visibleRange.to,
       });
@@ -412,10 +429,10 @@ export class PrimitiveEventManager {
     const chartElement = this.chart.chartElement();
     if (!chartElement || !window.ResizeObserver) return;
 
-    const resizeObserver = new ResizeObserver(entries => {
+    const resizeObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
         const { width, height } = entry.contentRect;
-        this.emit('resize', { width, height });
+        this.emit("resize", { width, height });
       }
     });
 
@@ -427,21 +444,24 @@ export class PrimitiveEventManager {
    * Emit primitive visibility change event
    */
   public emitVisibilityChange(primitiveId: string, visible: boolean): void {
-    this.emit('visibilityChange', { primitiveId, visible });
+    this.emit("visibilityChange", { primitiveId, visible });
   }
 
   /**
    * Emit primitive configuration change event
    */
-  public emitConfigChange(primitiveId: string, config: Record<string, unknown>): void {
-    this.emit('configChange', { primitiveId, config });
+  public emitConfigChange(
+    primitiveId: string,
+    config: Record<string, unknown>,
+  ): void {
+    this.emit("configChange", { primitiveId, config });
   }
 
   /**
    * Emit custom primitive event
    */
   public emitCustomEvent(eventType: string, data: unknown): void {
-    this.emit('custom', { eventType, data });
+    this.emit("custom", { eventType, data });
   }
 
   /**
@@ -493,7 +513,7 @@ export class PrimitiveEventManager {
     if (this._isDestroyed) return;
 
     // Clean up chart event listeners
-    this.chartEventCleanup.forEach(cleanup => {
+    this.chartEventCleanup.forEach((cleanup) => {
       try {
         cleanup();
       } catch {
@@ -539,7 +559,7 @@ export interface EventManagerIntegration {
  */
 export function createEventManagerIntegration(
   chartId: string,
-  chart?: IChartApi
+  chart?: IChartApi,
 ): EventManagerIntegration {
   let eventManager: PrimitiveEventManager | null = null;
   let subscriptions: EventSubscription[] = [];
@@ -560,7 +580,7 @@ export function createEventManagerIntegration(
     },
 
     unsubscribeFromEvents(): void {
-      subscriptions.forEach(sub => sub.unsubscribe());
+      subscriptions.forEach((sub) => sub.unsubscribe());
       subscriptions = [];
     },
   };
