@@ -14,6 +14,11 @@
 import { UTCTimestamp } from "lightweight-charts";
 import { TemplateContext, TemplateFormatting } from "../types/ChartInterfaces";
 import { Singleton } from "../utils/SingletonBase";
+import {
+  normalizeTime,
+  formatTime,
+  type TimeFormatter,
+} from "../utils/timeNormalization";
 
 /**
  * Interface for series data used in template processing
@@ -55,6 +60,27 @@ export interface TemplateOptions {
    * Whether to throw on missing placeholder data (default: false)
    */
   strict?: boolean;
+
+  /**
+   * Custom time formatter function.
+   * If not provided, timestamps are formatted as ISO 8601 UTC strings.
+   * NO timezone conversion is applied - times are displayed as-is.
+   *
+   * @example
+   * ```typescript
+   * // Display in user's local timezone
+   * timeFormatter: (ts) => new Date(ts * 1000).toLocaleString()
+   *
+   * // Display in specific timezone
+   * timeFormatter: (ts) => new Date(ts * 1000).toLocaleString('en-US', {
+   *   timeZone: 'America/New_York'
+   * })
+   *
+   * // Custom format
+   * timeFormatter: (ts) => `${new Date(ts * 1000).toISOString().slice(0, 10)}`
+   * ```
+   */
+  timeFormatter?: TimeFormatter;
 }
 
 /**
@@ -224,6 +250,7 @@ export class TemplateEngine {
               value,
               placeholderKey,
               context.formatting,
+              options.timeFormatter,
             );
 
             // Replace in content
@@ -363,6 +390,7 @@ export class TemplateEngine {
     value: unknown,
     key: string,
     formatting?: TemplateFormatting,
+    timeFormatter?: TimeFormatter,
   ): string {
     if (value === null || value === undefined) {
       return "";
@@ -370,7 +398,7 @@ export class TemplateEngine {
 
     // Handle time formatting
     if (key === "time") {
-      return this.formatTime(value, formatting?.timeFormat);
+      return this.formatTimeValue(value, timeFormatter);
     }
 
     // Handle numeric formatting with trade-specific enhancements
@@ -438,39 +466,36 @@ export class TemplateEngine {
   }
 
   /**
-   * Format time value
+   * Format time value WITHOUT timezone conversion.
+   * Times are normalized to Unix timestamps and formatted as-is.
+   * No automatic timezone conversion is applied.
+   *
+   * @param time - Time value in any supported format
+   * @param formatter - Optional custom time formatter function
+   * @returns Formatted time string
    */
-  private formatTime(
+  private formatTimeValue(
     time: UTCTimestamp | string | number | unknown,
-    format?: string,
+    formatter?: TimeFormatter,
   ): string {
     if (!time) return "";
 
     try {
-      let date: Date;
+      // Normalize the time to Unix timestamp (seconds)
+      // This DOES NOT apply timezone conversion
+      const timestamp = normalizeTime(time as any);
 
-      // Convert time to Date object
-      if (time instanceof Date) {
-        date = time;
-      } else if (typeof time === "number") {
-        // Assume Unix timestamp (seconds or milliseconds)
-        date = new Date(time > 1e10 ? time : time * 1000);
-      } else if (typeof time === "string") {
-        date = new Date(time);
-      } else {
-        return time.toString();
+      // Use custom formatter if provided
+      if (formatter) {
+        return formatter(timestamp);
       }
 
-      // Apply format if specified
-      if (format) {
-        return this.formatDateWithCustomFormat(date, format);
-      }
-
-      // Default formatting
-      return date.toLocaleString();
+      // Default: ISO 8601 UTC format (predictable, no conversion)
+      // Example: "2024-01-15T10:00:00.000Z"
+      return formatTime(timestamp);
     } catch {
-      // Error formatting time - fall back to string conversion
-      return time.toString();
+      // If normalization fails, return string representation
+      return String(time);
     }
   }
 

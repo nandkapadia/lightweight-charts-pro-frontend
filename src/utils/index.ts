@@ -6,40 +6,43 @@
  */
 
 // Disposable utilities
-export type { Disposable } from './Disposable';
-export { cleanupInstance } from './Disposable';
+export type { Disposable } from "./Disposable";
+export { cleanupInstance } from "./Disposable";
 
 // Event emitter
-export { EventEmitter } from './EventEmitter';
+export { EventEmitter } from "./EventEmitter";
 
 // Singleton patterns
-export { KeyedSingletonManager } from './KeyedSingletonManager';
-export { SingletonBase, createSingleton, Singleton } from './SingletonBase';
+export { KeyedSingletonManager } from "./KeyedSingletonManager";
+export { SingletonBase, createSingleton, Singleton } from "./SingletonBase";
 
 // Chart utilities
-export { ChartReadyDetector } from './chartReadyDetection';
-export * from './lightweightChartsUtils';
+export { ChartReadyDetector } from "./chartReadyDetection";
+export * from "./lightweightChartsUtils";
+
+// Time utilities
+export * from "./timeNormalization";
 
 // Color utilities
-export * from './colorUtils';
-export * from './signalColorUtils';
+export * from "./colorUtils";
+export * from "./signalColorUtils";
 
 // Validation utilities
-export * from './coordinateValidation';
-export * from './dataValidation';
+export * from "./coordinateValidation";
+export * from "./dataValidation";
 
 // Rendering utilities
-export * from './renderingUtils';
-export * from './lineStyle';
+export * from "./renderingUtils";
+export * from "./lineStyle";
 
 // Error handling
-export * from './errorHandler';
+export * from "./errorHandler";
 
 // Logging
-export { logger, LogLevel, chartLog, primitiveLog, perfLog } from './logger';
+export { logger, LogLevel, chartLog, primitiveLog, perfLog } from "./logger";
 
 // Security/Sanitization utilities
-export * from './sanitization';
+export * from "./sanitization";
 
 // Performance utilities - exclude debounce (already in colorUtils)
 export {
@@ -51,7 +54,7 @@ export {
   memoize,
   batchDOMUpdates,
   getCachedDimensions,
-} from './performance';
+} from "./performance";
 
 // Resize observer
-export { ResizeObserverManager } from './resizeObserverManager';
+export { ResizeObserverManager } from "./resizeObserverManager";
