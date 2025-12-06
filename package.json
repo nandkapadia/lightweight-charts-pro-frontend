@@ -1,6 +1,6 @@
 {
   "name": "@nandkapadia/lightweight-charts-pro-core",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Framework-agnostic core library for TradingView Lightweight Charts Pro",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -50,7 +50,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/nandkapadia/lightweight-charts-pro-frontend.git"
+    "url": "git+https://github.com/nandkapadia/lightweight-charts-pro-frontend.git"
   },
   "homepage": "https://github.com/nandkapadia/lightweight-charts-pro-frontend#readme",
   "bugs": {
