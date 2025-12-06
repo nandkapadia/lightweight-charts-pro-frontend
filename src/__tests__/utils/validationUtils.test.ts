@@ -119,8 +119,24 @@ describe("validationUtils", () => {
       expect(result.errors![0].code).toBe("NEGATIVE_ENTRY_PRICE");
     });
 
-    it("should reject trade without exit price", () => {
-      const invalidTrade = { ...validTrade, exitPrice: undefined };
+    it("should allow trade without exit price (for open trades)", () => {
+      const openTrade = {
+        ...validTrade,
+        exitPrice: undefined,
+        exitTime: undefined,
+      };
+      const result = validateTrade(openTrade as any, {
+        collectWarnings: true,
+      });
+
+      // Should pass validation (open trades allowed)
+      // but should have a warning about missing exitTime
+      expect(result.warnings).toBeDefined();
+      expect(result.warnings![0].code).toBe("OPEN_TRADE");
+    });
+
+    it("should reject trade with invalid exit price type", () => {
+      const invalidTrade = { ...validTrade, exitPrice: "not a number" };
       const result = validateTrade(invalidTrade as any);
 
       expect(result.valid).toBe(false);

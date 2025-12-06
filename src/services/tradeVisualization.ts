@@ -214,10 +214,18 @@ function createTradeRectangles(
       ) as UTCTimestamp;
     }
 
-    // Validate prices
-    if (trade.entryPrice <= 0 || trade.exitPrice <= 0) {
+    // Validate prices (exitPrice can be undefined for open trades, handled by validation)
+    if (
+      trade.entryPrice <= 0 ||
+      (trade.exitPrice !== undefined &&
+        trade.exitPrice !== null &&
+        trade.exitPrice <= 0)
+    ) {
       return;
     }
+
+    // For rectangles, we need a valid exitPrice (either provided or fallback to entryPrice for open trades)
+    const exitPrice = trade.exitPrice ?? trade.entryPrice;
 
     // Use isProfitable from trade data - no calculations in frontend
     const isProfitable = trade.isProfitable ?? false; // Default to false if not specified
@@ -231,8 +239,8 @@ function createTradeRectangles(
     // Normalize coordinates: time1/price1 should be minimum, time2/price2 should be maximum
     const minTime = Math.min(adjustedTime1, adjustedTime2);
     const maxTime = Math.max(adjustedTime1, adjustedTime2);
-    const minPrice = Math.min(trade.entryPrice, trade.exitPrice);
-    const maxPrice = Math.max(trade.entryPrice, trade.exitPrice);
+    const minPrice = Math.min(trade.entryPrice, exitPrice);
+    const maxPrice = Math.max(trade.entryPrice, exitPrice);
 
     const rectangle: TradeRectangleData = {
       time1: minTime as UTCTimestamp, // Always the earlier time
@@ -375,6 +383,9 @@ function createTradeMarkers(
 
     // Exit marker - only create if trade has been closed
     if (adjustedExitTime) {
+      // For exit markers, we need a valid exitPrice (fallback to entryPrice for open trades)
+      const exitPrice = trade.exitPrice ?? trade.entryPrice;
+
       // Use isProfitable from trade data - no calculations in frontend
       const isProfit = trade.isProfitable ?? false; // Default to false if not specified
 
@@ -395,7 +406,7 @@ function createTradeMarkers(
           exitMarkerText = result.content;
         } else {
           // Default exit marker text
-          exitMarkerText = `$${trade.exitPrice.toFixed(2)}`;
+          exitMarkerText = `$${exitPrice.toFixed(2)}`;
         }
       }
 
@@ -474,14 +485,22 @@ export function createTradeVisualElements(
 
       // Calculate midpoint for annotation position
       const entryTime = parseTime(trade.entryTime);
-      const exitTime = parseTime(trade.exitTime);
 
+      // Skip annotations for open trades (no exitTime)
+      if (!trade.exitTime) {
+        return;
+      }
+
+      const exitTime = parseTime(trade.exitTime);
       if (entryTime === null || exitTime === null) {
         return;
       }
 
+      // For annotations, we need a valid exitPrice
+      const exitPrice = trade.exitPrice ?? trade.entryPrice;
+
       const midTime = (entryTime + exitTime) / 2;
-      const midPrice = (trade.entryPrice + trade.exitPrice) / 2;
+      const midPrice = (trade.entryPrice + exitPrice) / 2;
 
       annotations.push({
         type: "text",

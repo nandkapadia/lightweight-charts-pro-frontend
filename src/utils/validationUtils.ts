@@ -211,27 +211,29 @@ export function validateTrade(
     );
   }
 
-  // Validate exit price
-  if (typeof trade.exitPrice !== "number") {
-    errors.push(
-      createValidationError(
-        "Missing or invalid exit price",
-        "exitPrice",
-        trade.exitPrice,
-        ValidationSeverity.ERROR,
-        "INVALID_EXIT_PRICE",
-      ),
-    );
-  } else if (trade.exitPrice <= 0) {
-    errors.push(
-      createValidationError(
-        "Exit price must be positive",
-        "exitPrice",
-        trade.exitPrice,
-        ValidationSeverity.ERROR,
-        "NEGATIVE_EXIT_PRICE",
-      ),
-    );
+  // Validate exit price (optional for open trades)
+  if (trade.exitPrice !== undefined && trade.exitPrice !== null) {
+    if (typeof trade.exitPrice !== "number") {
+      errors.push(
+        createValidationError(
+          "Invalid exit price (must be a number)",
+          "exitPrice",
+          trade.exitPrice,
+          ValidationSeverity.ERROR,
+          "INVALID_EXIT_PRICE",
+        ),
+      );
+    } else if (trade.exitPrice <= 0) {
+      errors.push(
+        createValidationError(
+          "Exit price must be positive",
+          "exitPrice",
+          trade.exitPrice,
+          ValidationSeverity.ERROR,
+          "NEGATIVE_EXIT_PRICE",
+        ),
+      );
+    }
   }
 
   // Call validation callback if provided
