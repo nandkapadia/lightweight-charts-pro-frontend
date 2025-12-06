@@ -1,0 +1,55 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "entryPoints": [
+    "src/index.ts",
+    "src/plugins/index.ts",
+    "src/primitives/index.ts",
+    "src/series/index.ts",
+    "src/services/index.ts",
+    "src/utils/index.ts"
+  ],
+  "entryPointStrategy": "expand",
+  "out": "docs",
+  "name": "@lightweight-charts-pro/core",
+  "includeVersion": true,
+  "readme": "README.md",
+  "exclude": [
+    "**/*.test.ts",
+    "**/__tests__/**",
+    "**/node_modules/**"
+  ],
+  "excludePrivate": true,
+  "excludeProtected": false,
+  "excludeInternal": false,
+  "categorizeByGroup": true,
+  "categoryOrder": [
+    "Plugins",
+    "Primitives",
+    "Series",
+    "Services",
+    "Utils",
+    "Types",
+    "*"
+  ],
+  "sort": ["source-order"],
+  "searchInComments": true,
+  "searchInDocuments": true,
+  "validation": {
+    "notExported": true,
+    "invalidLink": true,
+    "notDocumented": false
+  },
+  "treatWarningsAsErrors": false,
+  "treatValidationWarningsAsErrors": false,
+  "lightHighlightTheme": "light-plus",
+  "darkHighlightTheme": "dark-plus",
+  "navigation": {
+    "includeCategories": true,
+    "includeGroups": true,
+    "includeFolders": true
+  },
+  "plugin": [],
+  "compilerOptions": {
+    "skipLibCheck": true
+  }
+}

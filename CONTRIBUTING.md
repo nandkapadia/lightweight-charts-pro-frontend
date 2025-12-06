@@ -50,7 +50,22 @@ This project adheres to a Code of Conduct that all contributors are expected to 
    npm install
    ```
 
-5. **Create a branch**
+   This will automatically install Git hooks that run on every commit:
+   - TypeScript type checking
+   - ESLint linting
+   - Prettier formatting
+
+5. **Verify Git hooks are installed**
+   ```bash
+   ls -la .git/hooks/pre-commit
+   ```
+
+   If not installed, run manually:
+   ```bash
+   bash .githooks/install.sh
+   ```
+
+6. **Create a branch**
    ```bash
    git checkout -b feature/your-feature-name
    ```
@@ -254,6 +269,12 @@ Use one of the following scopes:
    npm run build
    ```
 
+   **Note:** Pre-commit hooks automatically run type-check, lint, and format on staged files.
+   To bypass hooks temporarily (not recommended):
+   ```bash
+   git commit --no-verify
+   ```
+
 3. **Test your changes**
    - Add tests for new features
    - Ensure all tests pass
@@ -337,6 +358,20 @@ describe('yourFunction', () => {
 - Run `npm run test:coverage` to check coverage
 
 ## 📚 Documentation
+
+### Automated Documentation
+
+Documentation is automatically generated using TypeDoc from JSDoc comments:
+
+**Generate documentation locally:**
+```bash
+npm run docs        # Generates docs in ./docs
+npm run docs:serve  # Serves docs at http://localhost:8080
+```
+
+**CI/CD Documentation:**
+- Documentation is automatically generated and deployed to GitHub Pages on every push to `master`
+- View live docs at: https://nandkapadia.github.io/lightweight-charts-pro-frontend/
 
 ### JSDoc Requirements
 

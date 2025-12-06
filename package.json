@@ -77,6 +77,7 @@
     "eslint": "^9.36.0",
     "jsdom": "^27.0.0",
     "lightweight-charts": "^5.0.8",
+    "typedoc": "^0.28.15",
     "typescript": "^5.9.2",
     "typescript-eslint": "^8.44.1",
     "vite": "^7.1.7",
@@ -92,6 +93,9 @@
     "test:coverage": "vitest run --coverage",
     "type-check": "tsc --noEmit",
     "lint": "eslint src --ext .ts",
-    "format": "prettier --write \"src/**/*.ts\""
+    "format": "prettier --write \"src/**/*.ts\"",
+    "docs": "typedoc",
+    "docs:serve": "npx http-server docs -p 8080",
+    "prepare": "bash .githooks/install.sh || true"
   }
 }
