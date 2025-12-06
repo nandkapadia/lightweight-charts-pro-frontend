@@ -65,10 +65,11 @@ export function normalizeTime(time: Time): number {
     return time;
   }
 
-  // String that's a numeric timestamp
+  // String that's a numeric timestamp or ISO 8601 string
   if (typeof time === "string") {
+    // Check if it's a pure numeric string first (must match entire string)
     const parsed = parseFloat(time);
-    if (!isNaN(parsed)) {
+    if (!isNaN(parsed) && parsed.toString() === time) {
       return parsed;
     }
 

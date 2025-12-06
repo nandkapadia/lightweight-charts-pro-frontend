@@ -1015,4 +1015,187 @@ describe("RangeSwitcherPrimitive - Lifecycle and Cleanup", () => {
   it("should always use pane 0 (chart-level)", () => {
     expect((primitive as any).getPaneId()).toBe(0);
   });
+
+  // Bug fix tests for Part 2 code review fixes
+  describe("Interval Leak Fix", () => {
+    it("should stop interval after initial setup completes", () => {
+      const mockChart = {
+        timeScale: vi.fn(() => ({
+          fitContent: vi.fn(),
+          getVisibleRange: vi.fn(() => ({ from: 1000, to: 2000 })),
+          setVisibleRange: vi.fn(),
+        })),
+      };
+      (primitive as any).chart = mockChart;
+      (primitive as any).mounted = true;
+
+      // Set up the interval
+      (primitive as any).setupDataChangeObserver();
+
+      // Verify interval exists
+      expect((primitive as any).dataChangeIntervalId).not.toBeNull();
+
+      // Simulate initial setup completion
+      (primitive as any).completeInitialSetup();
+
+      // Verify interval has been cleared (memory leak fixed)
+      expect((primitive as any).dataChangeIntervalId).toBeNull();
+      expect((primitive as any).initialVisibilitySetupComplete).toBe(true);
+    });
+
+    it("should not process data updates after initial setup", () => {
+      // Mark initial setup as complete
+      (primitive as any).initialVisibilitySetupComplete = true;
+      (primitive as any).mounted = true;
+
+      // Spy on updateRangeButtonVisibility
+      let updateCalled = false;
+      const originalUpdate = (
+        primitive as any
+      ).updateRangeButtonVisibility.bind(primitive);
+      (primitive as any).updateRangeButtonVisibility = () => {
+        updateCalled = true;
+        originalUpdate();
+      };
+
+      // Trigger data update
+      (primitive as any).handleDataUpdate();
+
+      // Verify update was NOT called because initial setup is complete
+      expect(updateCalled).toBe(false);
+
+      // Restore original method
+      (primitive as any).updateRangeButtonVisibility = originalUpdate;
+    });
+  });
+
+  describe("Date.now() Bug Fix - Last Bar Time", () => {
+    it("should use last bar time instead of Date.now() for fallback", () => {
+      const mockChart = {
+        timeScale: vi.fn(() => ({
+          fitContent: vi.fn(),
+          getVisibleRange: vi.fn(() => ({ from: 1000, to: 2000 })),
+          setVisibleRange: vi.fn(),
+        })),
+      };
+      const mockSeries = {
+        data: () => [
+          { time: 1705276800, value: 100 }, // 2024-01-15 00:00:00 UTC
+          { time: 1705318800, value: 105 }, // 2024-01-15 10:00:00 UTC (last bar)
+        ],
+      };
+
+      // Mock the chart's series map
+      const seriesMap = new Map();
+      seriesMap.set("series1", mockSeries);
+      (mockChart as any)._private__seriesMap = seriesMap;
+
+      (primitive as any).chart = mockChart;
+
+      // Get last bar time
+      const lastBarTime = (primitive as any).getLastBarTime();
+
+      // Should return the last bar time, not Date.now()
+      expect(lastBarTime).toBe(1705318800);
+    });
+
+    it("should return null when no series data available", () => {
+      const mockChart = {
+        timeScale: vi.fn(() => ({
+          fitContent: vi.fn(),
+          getVisibleRange: vi.fn(() => ({ from: 1000, to: 2000 })),
+          setVisibleRange: vi.fn(),
+        })),
+      };
+      (mockChart as any)._private__seriesMap = new Map();
+
+      (primitive as any).chart = mockChart;
+
+      const lastBarTime = (primitive as any).getLastBarTime();
+
+      expect(lastBarTime).toBeNull();
+    });
+
+    it("should handle series without data() method gracefully", () => {
+      const mockChart = {
+        timeScale: vi.fn(() => ({
+          fitContent: vi.fn(),
+          getVisibleRange: vi.fn(() => ({ from: 1000, to: 2000 })),
+          setVisibleRange: vi.fn(),
+        })),
+      };
+      const mockSeries = {}; // No data() method
+
+      const seriesMap = new Map();
+      seriesMap.set("series1", mockSeries);
+      (mockChart as any)._private__seriesMap = seriesMap;
+
+      (primitive as any).chart = mockChart;
+
+      const lastBarTime = (primitive as any).getLastBarTime();
+
+      expect(lastBarTime).toBeNull();
+    });
+
+    it("should find latest time across multiple series", () => {
+      const mockChart = {
+        timeScale: vi.fn(() => ({
+          fitContent: vi.fn(),
+          getVisibleRange: vi.fn(() => ({ from: 1000, to: 2000 })),
+          setVisibleRange: vi.fn(),
+        })),
+      };
+      const mockSeries1 = {
+        data: () => [
+          { time: 1705276800, value: 100 },
+          { time: 1705318800, value: 105 }, // Last in series1
+        ],
+      };
+      const mockSeries2 = {
+        data: () => [
+          { time: 1705276800, value: 200 },
+          { time: 1705362400, value: 205 }, // Last in series2 (newer!)
+        ],
+      };
+
+      const seriesMap = new Map();
+      seriesMap.set("series1", mockSeries1);
+      seriesMap.set("series2", mockSeries2);
+      (mockChart as any)._private__seriesMap = seriesMap;
+
+      (primitive as any).chart = mockChart;
+
+      const lastBarTime = (primitive as any).getLastBarTime();
+
+      // Should return the newest time across all series
+      expect(lastBarTime).toBe(1705362400);
+    });
+
+    it("should normalize time values when getting last bar time", () => {
+      const mockChart = {
+        timeScale: vi.fn(() => ({
+          fitContent: vi.fn(),
+          getVisibleRange: vi.fn(() => ({ from: 1000, to: 2000 })),
+          setVisibleRange: vi.fn(),
+        })),
+      };
+      const mockSeries = {
+        data: () => [
+          { time: "2024-01-15T00:00:00.000Z", value: 100 }, // ISO string
+          { time: 1705318800, value: 105 }, // Unix timestamp
+        ],
+      };
+
+      const seriesMap = new Map();
+      seriesMap.set("series1", mockSeries);
+      (mockChart as any)._private__seriesMap = seriesMap;
+
+      (primitive as any).chart = mockChart;
+
+      const lastBarTime = (primitive as any).getLastBarTime();
+
+      // Should return normalized timestamp (seconds)
+      expect(lastBarTime).toBe(1705318800);
+    });
+  });
 });

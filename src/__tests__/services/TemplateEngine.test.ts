@@ -427,7 +427,74 @@ describe("TemplateEngine", () => {
     });
   });
 
-  describe("Time Formatting", () => {
+  describe("Time Formatting - NO Timezone Conversion", () => {
+    it("should format Unix timestamp WITHOUT timezone conversion", () => {
+      const template = "$$time$$";
+      const context: TemplateContext = {
+        seriesData: {
+          time: 1705318800, // 2024-01-15 10:00:00 UTC
+        },
+      };
+
+      const result = engine.processTemplate(template, context);
+
+      // Should format as ISO 8601 UTC (ending with Z)
+      expect(result.content).toBe("2024-01-15T10:00:00.000Z");
+      expect(result.processedPlaceholders).toContain("$$time$$");
+    });
+
+    it("should treat ISO string as opaque value", () => {
+      const template = "$$time$$";
+      const isoString = "2024-01-15T10:00:00.000Z";
+      const context: TemplateContext = {
+        seriesData: {
+          time: isoString,
+        },
+      };
+
+      const result = engine.processTemplate(template, context);
+
+      // Should round-trip without conversion
+      expect(result.content).toBe(isoString);
+    });
+
+    it("should use custom formatter when provided", () => {
+      const template = "$$time$$";
+      const context: TemplateContext = {
+        seriesData: {
+          time: 1705318800,
+        },
+      };
+      const options: TemplateOptions = {
+        timeFormatter: (ts: number) => `Custom: ${ts}`,
+      };
+
+      const result = engine.processTemplate(template, context, options);
+
+      expect(result.content).toBe("Custom: 1705318800");
+    });
+
+    it("should allow user to specify their own timezone in formatter", () => {
+      const template = "$$time$$";
+      const context: TemplateContext = {
+        seriesData: {
+          time: 1705318800, // 2024-01-15 10:00:00 UTC
+        },
+      };
+      const options: TemplateOptions = {
+        timeFormatter: (ts: number) => {
+          const date = new Date(ts * 1000);
+          return date.toLocaleString("en-US", { timeZone: "America/New_York" });
+        },
+      };
+
+      const result = engine.processTemplate(template, context, options);
+
+      // Should respect user's timezone choice
+      expect(result.content).toMatch(/2024/);
+      expect(result.content).toMatch(/1\/15/);
+    });
+
     it("should format Unix timestamp in seconds", () => {
       const template = "$$time$$";
       const context: TemplateContext = {
