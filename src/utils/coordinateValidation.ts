@@ -10,20 +10,22 @@ import {
   BoundingBox,
   ScaleDimensions,
   // ContainerDimensions is used in type imports
-} from '../types/coordinates';
-import { DIMENSIONS, FALLBACKS } from '../config/positioningConfig';
-import { logger } from './logger';
+} from "../types/coordinates";
+import { DIMENSIONS, FALLBACKS } from "../config/positioningConfig";
+import { logger } from "./logger";
 
 /**
  * Validates complete chart coordinates
  */
-export function validateChartCoordinates(coordinates: ChartCoordinates): ValidationResult {
+export function validateChartCoordinates(
+  coordinates: ChartCoordinates,
+): ValidationResult {
   const errors: string[] = [];
   const warnings: string[] = [];
 
   // Validate container dimensions
   if (!coordinates.container) {
-    errors.push('Missing container dimensions');
+    errors.push("Missing container dimensions");
   } else {
     if (coordinates.container.width <= 0) {
       errors.push(`Invalid container width: ${coordinates.container.width}`);
@@ -33,32 +35,35 @@ export function validateChartCoordinates(coordinates: ChartCoordinates): Validat
     }
     if (coordinates.container.width < DIMENSIONS.chart.minWidth) {
       warnings.push(
-        `Container width (${coordinates.container.width}) is below recommended minimum (${DIMENSIONS.chart.minWidth})`
+        `Container width (${coordinates.container.width}) is below recommended minimum (${DIMENSIONS.chart.minWidth})`,
       );
     }
     if (coordinates.container.height < DIMENSIONS.chart.minHeight) {
       warnings.push(
-        `Container height (${coordinates.container.height}) is below recommended minimum (${DIMENSIONS.chart.minHeight})`
+        `Container height (${coordinates.container.height}) is below recommended minimum (${DIMENSIONS.chart.minHeight})`,
       );
     }
   }
 
   // Validate time scale
   if (!coordinates.timeScale) {
-    errors.push('Missing time scale dimensions');
+    errors.push("Missing time scale dimensions");
   } else {
-    const timeScaleErrors = validateScaleDimensions(coordinates.timeScale, 'timeScale');
+    const timeScaleErrors = validateScaleDimensions(
+      coordinates.timeScale,
+      "timeScale",
+    );
     errors.push(...timeScaleErrors.errors);
     warnings.push(...timeScaleErrors.warnings);
 
     if (coordinates.timeScale.height < DIMENSIONS.timeAxis.minHeight) {
       warnings.push(
-        `Time scale height (${coordinates.timeScale.height}) is below minimum (${DIMENSIONS.timeAxis.minHeight})`
+        `Time scale height (${coordinates.timeScale.height}) is below minimum (${DIMENSIONS.timeAxis.minHeight})`,
       );
     }
     if (coordinates.timeScale.height > DIMENSIONS.timeAxis.maxHeight) {
       warnings.push(
-        `Time scale height (${coordinates.timeScale.height}) exceeds maximum (${DIMENSIONS.timeAxis.maxHeight})`
+        `Time scale height (${coordinates.timeScale.height}) exceeds maximum (${DIMENSIONS.timeAxis.maxHeight})`,
       );
     }
   }
@@ -69,23 +74,29 @@ export function validateChartCoordinates(coordinates: ChartCoordinates): Validat
   if (priceScales) {
     // Handle test structure with nested priceScales object
     if (priceScales.right) {
-      const rightScaleErrors = validateScaleDimensions(priceScales.right, 'priceScaleRight');
+      const rightScaleErrors = validateScaleDimensions(
+        priceScales.right,
+        "priceScaleRight",
+      );
       errors.push(...rightScaleErrors.errors);
       warnings.push(...rightScaleErrors.warnings);
     }
     if (priceScales.left) {
-      const leftScaleErrors = validateScaleDimensions(priceScales.left, 'priceScaleLeft');
+      const leftScaleErrors = validateScaleDimensions(
+        priceScales.left,
+        "priceScaleLeft",
+      );
       errors.push(...leftScaleErrors.errors);
       warnings.push(...leftScaleErrors.warnings);
     }
   } else {
     // Handle standard structure with direct properties
     if (!coordinates.priceScaleLeft) {
-      warnings.push('Missing left price scale dimensions');
+      warnings.push("Missing left price scale dimensions");
     } else {
       const priceScaleErrors = validateScaleDimensions(
         coordinates.priceScaleLeft,
-        'priceScaleLeft'
+        "priceScaleLeft",
       );
       errors.push(...priceScaleErrors.errors);
       warnings.push(...priceScaleErrors.warnings);
@@ -94,7 +105,7 @@ export function validateChartCoordinates(coordinates: ChartCoordinates): Validat
     if (coordinates.priceScaleRight) {
       const priceScaleErrors = validateScaleDimensions(
         coordinates.priceScaleRight,
-        'priceScaleRight'
+        "priceScaleRight",
       );
       errors.push(...priceScaleErrors.errors);
       warnings.push(...priceScaleErrors.warnings);
@@ -103,11 +114,11 @@ export function validateChartCoordinates(coordinates: ChartCoordinates): Validat
 
   // Validate panes (handle both array and object structure)
   if (!coordinates.panes) {
-    errors.push('No panes defined');
+    errors.push("No panes defined");
   } else {
     if (Array.isArray(coordinates.panes)) {
       if (coordinates.panes.length === 0) {
-        errors.push('No panes defined');
+        errors.push("No panes defined");
       } else {
         coordinates.panes.forEach((pane, index) => {
           const paneErrors = validatePaneCoordinates(pane, index);
@@ -119,9 +130,9 @@ export function validateChartCoordinates(coordinates: ChartCoordinates): Validat
       // Handle object structure (like in tests)
       const paneKeys = Object.keys(coordinates.panes as any);
       if (paneKeys.length === 0) {
-        errors.push('No panes defined');
+        errors.push("No panes defined");
       } else {
-        paneKeys.forEach(key => {
+        paneKeys.forEach((key) => {
           const pane = (coordinates.panes as any)[key];
           const paneErrors = validatePaneCoordinates(pane, parseInt(key));
           errors.push(...paneErrors.errors);
@@ -133,16 +144,19 @@ export function validateChartCoordinates(coordinates: ChartCoordinates): Validat
 
   // Validate content area
   if (!coordinates.contentArea) {
-    errors.push('Missing content area dimensions');
+    errors.push("Missing content area dimensions");
   } else {
-    const contentErrors = validateBoundingBox(coordinates.contentArea, 'contentArea');
+    const contentErrors = validateBoundingBox(
+      coordinates.contentArea,
+      "contentArea",
+    );
     errors.push(...contentErrors.errors);
     warnings.push(...contentErrors.warnings);
   }
 
   // Check timestamp
   if (!coordinates.timestamp || coordinates.timestamp <= 0) {
-    warnings.push('Invalid or missing timestamp');
+    warnings.push("Invalid or missing timestamp");
   }
 
   return {
@@ -157,7 +171,7 @@ export function validateChartCoordinates(coordinates: ChartCoordinates): Validat
  */
 export function validateScaleDimensions(
   scale: ScaleDimensions | null,
-  name: string
+  name: string,
 ): ValidationResult {
   const errors: string[] = [];
   const warnings: string[] = [];
@@ -175,11 +189,11 @@ export function validateScaleDimensions(
     errors.push(`${name}: Invalid height (${scale.height})`);
   }
 
-  if (typeof scale.x === 'number' && scale.x < 0) {
+  if (typeof scale.x === "number" && scale.x < 0) {
     warnings.push(`${name}: Negative x position (${scale.x})`);
   }
 
-  if (typeof scale.y === 'number' && scale.y < 0) {
+  if (typeof scale.y === "number" && scale.y < 0) {
     warnings.push(`${name}: Negative y position (${scale.y})`);
   }
 
@@ -189,10 +203,13 @@ export function validateScaleDimensions(
 /**
  * Validates pane coordinates
  */
-export function validatePaneCoordinates(pane: PaneCoordinates, index?: number): ValidationResult {
+export function validatePaneCoordinates(
+  pane: PaneCoordinates,
+  index?: number,
+): ValidationResult {
   const errors: string[] = [];
   const warnings: string[] = [];
-  const prefix = index !== undefined ? `Pane ${index}: ` : '';
+  const prefix = index !== undefined ? `Pane ${index}: ` : "";
 
   if (!pane) {
     errors.push(`${prefix}Missing pane data`);
@@ -200,7 +217,7 @@ export function validatePaneCoordinates(pane: PaneCoordinates, index?: number): 
   }
 
   // Handle simplified test structure (just width, height, top, left)
-  if (typeof pane.width === 'number' && typeof pane.height === 'number') {
+  if (typeof pane.width === "number" && typeof pane.height === "number") {
     if (pane.width <= 0) {
       errors.push(`${prefix}Invalid width (${pane.width})`);
     }
@@ -208,17 +225,20 @@ export function validatePaneCoordinates(pane: PaneCoordinates, index?: number): 
       errors.push(`${prefix}Invalid height (${pane.height})`);
     }
     // Check for negative contentArea positioning
-    if (typeof pane.contentArea?.top === 'number' && pane.contentArea.top < 0) {
+    if (typeof pane.contentArea?.top === "number" && pane.contentArea.top < 0) {
       errors.push(`${prefix}Invalid top position (${pane.contentArea.top})`);
     }
-    if (typeof pane.contentArea?.left === 'number' && pane.contentArea.left < 0) {
+    if (
+      typeof pane.contentArea?.left === "number" &&
+      pane.contentArea.left < 0
+    ) {
       errors.push(`${prefix}Invalid left position (${pane.contentArea.left})`);
     }
     return { isValid: errors.length === 0, errors, warnings };
   }
 
   // Full validation for complete PaneCoordinates structure
-  if (typeof pane.paneId === 'number' && pane.paneId < 0) {
+  if (typeof pane.paneId === "number" && pane.paneId < 0) {
     errors.push(`${prefix}Invalid pane ID`);
   }
 
@@ -234,9 +254,9 @@ export function validatePaneCoordinates(pane: PaneCoordinates, index?: number): 
   } else if (pane.contentArea.width <= 0 || pane.contentArea.height <= 0) {
     errors.push(`${prefix}Invalid content area dimensions`);
   } else {
-    const contentErrors = validateBoundingBox(pane.contentArea, 'contentArea');
-    errors.push(...contentErrors.errors.map(e => `${prefix}${e}`));
-    warnings.push(...contentErrors.warnings.map(w => `${prefix}${w}`));
+    const contentErrors = validateBoundingBox(pane.contentArea, "contentArea");
+    errors.push(...contentErrors.errors.map((e) => `${prefix}${e}`));
+    warnings.push(...contentErrors.warnings.map((w) => `${prefix}${w}`));
   }
 
   if (pane.contentArea) {
@@ -256,7 +276,7 @@ export function validatePaneCoordinates(pane: PaneCoordinates, index?: number): 
  */
 export function validateBoundingBox(
   box: Partial<BoundingBox> | null,
-  name: string = 'BoundingBox'
+  name: string = "BoundingBox",
 ): ValidationResult {
   const errors: string[] = [];
   const warnings: string[] = [];
@@ -284,13 +304,19 @@ export function validateBoundingBox(
 
   // Check consistency between position and bounds
   if (box.x !== undefined && box.width !== undefined) {
-    if (box.right !== undefined && Math.abs(box.x + box.width - box.right) > 1) {
+    if (
+      box.right !== undefined &&
+      Math.abs(box.x + box.width - box.right) > 1
+    ) {
       warnings.push(`${name}: Inconsistent right bound`);
     }
   }
 
   if (box.y !== undefined && box.height !== undefined) {
-    if (box.bottom !== undefined && Math.abs(box.y + box.height - box.bottom) > 1) {
+    if (
+      box.bottom !== undefined &&
+      Math.abs(box.y + box.height - box.bottom) > 1
+    ) {
       warnings.push(`${name}: Inconsistent bottom bound`);
     }
   }
@@ -301,14 +327,18 @@ export function validateBoundingBox(
 /**
  * Sanitizes coordinates by applying fallbacks for invalid values
  */
-export function sanitizeCoordinates(coordinates: Partial<ChartCoordinates>): ChartCoordinates {
+export function sanitizeCoordinates(
+  coordinates: Partial<ChartCoordinates>,
+): ChartCoordinates {
   const now = Date.now();
 
   // Sanitize container dimensions
   const container = coordinates.container
     ? {
         width:
-          coordinates.container.width <= 0 ? FALLBACKS.containerWidth : coordinates.container.width,
+          coordinates.container.width <= 0
+            ? FALLBACKS.containerWidth
+            : coordinates.container.width,
         height:
           coordinates.container.height <= 0
             ? FALLBACKS.containerHeight
@@ -327,8 +357,13 @@ export function sanitizeCoordinates(coordinates: Partial<ChartCoordinates>): Cha
   const timeScale = coordinates.timeScale
     ? {
         x: coordinates.timeScale.x ?? 0,
-        y: coordinates.timeScale.y ?? container.height - FALLBACKS.timeScaleHeight,
-        width: coordinates.timeScale.width <= 0 ? container.width : coordinates.timeScale.width,
+        y:
+          coordinates.timeScale.y ??
+          container.height - FALLBACKS.timeScaleHeight,
+        width:
+          coordinates.timeScale.width <= 0
+            ? container.width
+            : coordinates.timeScale.width,
         height:
           coordinates.timeScale.height <= 0
             ? FALLBACKS.timeScaleHeight
@@ -342,7 +377,9 @@ export function sanitizeCoordinates(coordinates: Partial<ChartCoordinates>): Cha
       };
 
   // Determine if any fallbacks were applied
-  const needsValidation = validateChartCoordinates(coordinates as ChartCoordinates);
+  const needsValidation = validateChartCoordinates(
+    coordinates as ChartCoordinates,
+  );
   const appliedFallbacks = !needsValidation.isValid;
 
   return {
@@ -362,7 +399,7 @@ export function sanitizeCoordinates(coordinates: Partial<ChartCoordinates>): Cha
     },
     panes:
       Array.isArray(coordinates.panes) && coordinates.panes.length > 0
-        ? coordinates.panes.map(pane => ({
+        ? coordinates.panes.map((pane) => ({
             ...pane,
             x: pane.x < 0 ? 0 : pane.x,
             y: pane.y < 0 ? 0 : pane.y,
@@ -373,7 +410,9 @@ export function sanitizeCoordinates(coordinates: Partial<ChartCoordinates>): Cha
                   ...pane.contentArea,
                   top: pane.contentArea.top < 0 ? 0 : pane.contentArea.top,
                   left:
-                    pane.contentArea.left < 0 ? FALLBACKS.priceScaleWidth : pane.contentArea.left,
+                    pane.contentArea.left < 0
+                      ? FALLBACKS.priceScaleWidth
+                      : pane.contentArea.left,
                   width:
                     pane.contentArea.width <= 0
                       ? FALLBACKS.paneWidth - FALLBACKS.priceScaleWidth
@@ -428,7 +467,7 @@ export function createBoundingBox(
   x: number,
   y: number,
   width: number,
-  height: number
+  height: number,
 ): BoundingBox {
   return {
     x,
@@ -445,7 +484,10 @@ export function createBoundingBox(
 /**
  * Checks if coordinates are stale based on timestamp
  */
-export function areCoordinatesStale(coordinates: ChartCoordinates, maxAge: number = 5000): boolean {
+export function areCoordinatesStale(
+  coordinates: ChartCoordinates,
+  maxAge: number = 5000,
+): boolean {
   const now = Date.now();
   return now - coordinates.timestamp > maxAge;
 }
@@ -453,15 +495,26 @@ export function areCoordinatesStale(coordinates: ChartCoordinates, maxAge: numbe
 /**
  * Debug helper to log coordinate validation results
  */
-export function logValidationResult(result: ValidationResult, _context: string = ''): void {
-  if (process.env.NODE_ENV !== 'development') return;
+export function logValidationResult(
+  result: ValidationResult,
+  _context: string = "",
+): void {
+  if (process.env.NODE_ENV !== "development") return;
 
   if (!result.isValid) {
-    logger.error('Coordinate validation failed', 'CoordinateValidation', result.errors);
+    logger.error(
+      "Coordinate validation failed",
+      "CoordinateValidation",
+      result.errors,
+    );
   }
 
   if (result.warnings.length > 0) {
-    logger.warn('Coordinate validation warnings', 'CoordinateValidation', result.warnings);
+    logger.warn(
+      "Coordinate validation warnings",
+      "CoordinateValidation",
+      result.warnings,
+    );
   }
 }
 
@@ -485,6 +538,6 @@ export function getCoordinateDebugInfo(coordinates: ChartCoordinates) {
       `TimeScale: ${coordinates.timeScale?.width || 0}x${coordinates.timeScale?.height || 0}`,
       `Panes: ${Array.isArray(coordinates.panes) ? coordinates.panes.length : Object.keys(coordinates.panes || {}).length}`,
       `PriceScales: ${(coordinates.priceScaleLeft ? 1 : 0) + (coordinates.priceScaleRight ? 1 : 0)}`,
-    ].join(', '),
+    ].join(", "),
   };
 }

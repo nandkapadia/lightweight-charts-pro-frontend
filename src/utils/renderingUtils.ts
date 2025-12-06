@@ -11,8 +11,17 @@
  * - Visible range calculation for optimization
  */
 
-import { ISeriesApi, ITimeScaleApi, Time, Coordinate, SeriesType } from 'lightweight-charts';
-import { BitmapCoordinatesRenderingScope, CanvasRenderingTarget2D } from 'fancy-canvas';
+import {
+  ISeriesApi,
+  ITimeScaleApi,
+  Time,
+  Coordinate,
+  SeriesType,
+} from "lightweight-charts";
+import {
+  BitmapCoordinatesRenderingScope,
+  CanvasRenderingTarget2D,
+} from "fancy-canvas";
 
 // ============================================================================
 // Type Definitions
@@ -70,22 +79,28 @@ export interface VisibleRange {
  * @param config - Configuration specifying which fields to convert
  * @returns Array of renderer data points with x and y coordinates
  */
-export function convertToRendererCoordinates<T extends { time: Time; [key: string]: Time | number }>(
+export function convertToRendererCoordinates<
+  T extends { time: Time; [key: string]: Time | number },
+>(
   data: T[],
   timeScale: ITimeScaleApi<Time>,
   seriesMap: Record<string, ISeriesApi<SeriesType>>,
-  config: CoordinateConversionConfig
+  config: CoordinateConversionConfig,
 ): RendererDataPoint[] {
-  return data.map(item => {
+  return data.map((item) => {
     const timeValue = item[config.timeField] as Time;
     const result: RendererDataPoint = {
       x: timeScale.timeToCoordinate(timeValue) ?? -100,
     };
 
-    config.coordinateFields.forEach(field => {
+    config.coordinateFields.forEach((field) => {
       const series = seriesMap[field];
       const fieldValue = item[field];
-      if (series && fieldValue !== undefined && typeof fieldValue === 'number') {
+      if (
+        series &&
+        fieldValue !== undefined &&
+        typeof fieldValue === "number"
+      ) {
         result[`${field}Y`] = series.priceToCoordinate(fieldValue) ?? -100;
       }
     });
@@ -103,20 +118,26 @@ export function convertToRendererCoordinates<T extends { time: Time; [key: strin
  * @param lowerSeries - Lower line series API
  * @returns Array of coordinate points with x, upperY, lowerY
  */
-export function convertTwoLineCoordinates<T extends { time: Time; upper: number; lower: number }>(
+export function convertTwoLineCoordinates<
+  T extends { time: Time; upper: number; lower: number },
+>(
   data: T[],
   timeScale: ITimeScaleApi<Time>,
   upperSeries: ISeriesApi<SeriesType>,
-  lowerSeries: ISeriesApi<SeriesType>
+  lowerSeries: ISeriesApi<SeriesType>,
 ): Array<
-  { x: Coordinate | number; upperY: Coordinate | number; lowerY: Coordinate | number } & Partial<T>
+  {
+    x: Coordinate | number;
+    upperY: Coordinate | number;
+    lowerY: Coordinate | number;
+  } & Partial<T>
 > {
   // Safety check: ensure series are available
   if (!upperSeries || !lowerSeries || !timeScale) {
     return [];
   }
 
-  return data.map(item => ({
+  return data.map((item) => ({
     x: timeScale.timeToCoordinate(item.time) ?? -100,
     upperY: upperSeries.priceToCoordinate(item.upper) ?? -100,
     lowerY: lowerSeries.priceToCoordinate(item.lower) ?? -100,
@@ -141,7 +162,7 @@ export function convertThreeLineCoordinates<
   timeScale: ITimeScaleApi<Time>,
   upperSeries: ISeriesApi<SeriesType>,
   middleSeries: ISeriesApi<SeriesType>,
-  lowerSeries: ISeriesApi<SeriesType>
+  lowerSeries: ISeriesApi<SeriesType>,
 ): Array<{
   x: Coordinate | number;
   upperY: Coordinate | number;
@@ -153,7 +174,7 @@ export function convertThreeLineCoordinates<
     return [];
   }
 
-  return data.map(item => ({
+  return data.map((item) => ({
     x: timeScale.timeToCoordinate(item.time) ?? -100,
     upperY: upperSeries.priceToCoordinate(item.upper) ?? -100,
     middleY: middleSeries.priceToCoordinate(item.middle) ?? -100,
@@ -170,11 +191,13 @@ export function convertThreeLineCoordinates<
  * @param coordinateFields - Fields to convert
  * @returns Array of renderer data points (null for failed conversions)
  */
-export function batchConvertCoordinates<T extends { time: Time; [key: string]: Time | number }>(
+export function batchConvertCoordinates<
+  T extends { time: Time; [key: string]: Time | number },
+>(
   items: T[],
   timeScale: ITimeScaleApi<Time>,
   seriesMap: Record<string, ISeriesApi<SeriesType>>,
-  coordinateFields: string[]
+  coordinateFields: string[],
 ): Array<RendererDataPoint | null> {
   return items.map((item, _index) => {
     try {
@@ -188,7 +211,11 @@ export function batchConvertCoordinates<T extends { time: Time; [key: string]: T
       for (const field of coordinateFields) {
         const series = seriesMap[field];
         const fieldValue = item[field];
-        if (series && fieldValue !== undefined && typeof fieldValue === 'number') {
+        if (
+          series &&
+          fieldValue !== undefined &&
+          typeof fieldValue === "number"
+        ) {
           const coord = series.priceToCoordinate(fieldValue) ?? -100;
           if (isValidCoordinate(coord)) {
             result[`${field}Y`] = coord;
@@ -213,7 +240,9 @@ export function batchConvertCoordinates<T extends { time: Time; [key: string]: T
  * @param coord - Coordinate value to validate
  * @returns True if coordinate is valid for rendering
  */
-export function isValidCoordinate(coord: number | Coordinate | null | undefined): boolean {
+export function isValidCoordinate(
+  coord: number | Coordinate | null | undefined,
+): boolean {
   return coord !== null && coord !== undefined && coord > -100;
 }
 
@@ -228,8 +257,8 @@ export function isValidRenderPoint(point: RenderPoint): boolean {
     point !== null &&
     point.x !== null &&
     point.y !== null &&
-    typeof point.x === 'number' &&
-    typeof point.y === 'number' &&
+    typeof point.x === "number" &&
+    typeof point.y === "number" &&
     !isNaN(point.x) &&
     !isNaN(point.y)
   );
@@ -241,16 +270,18 @@ export function isValidRenderPoint(point: RenderPoint): boolean {
  * @param points - Array of points to filter
  * @returns Array of valid points only
  */
-export function filterValidRenderPoints<T extends RenderPoint>(points: T[]): T[] {
+export function filterValidRenderPoints<T extends RenderPoint>(
+  points: T[],
+): T[] {
   return points.filter(
-    point =>
+    (point) =>
       point &&
       point.x !== null &&
       point.y !== null &&
-      typeof point.x === 'number' &&
-      typeof point.y === 'number' &&
+      typeof point.x === "number" &&
+      typeof point.y === "number" &&
       !isNaN(point.x) &&
-      !isNaN(point.y)
+      !isNaN(point.y),
   );
 }
 
@@ -260,11 +291,15 @@ export function filterValidRenderPoints<T extends RenderPoint>(points: T[]): T[]
  * @param points - Array of renderer data points
  * @returns Array of valid coordinate points
  */
-export function filterValidCoordinates<T extends RendererDataPoint>(points: T[]): T[] {
+export function filterValidCoordinates<T extends RendererDataPoint>(
+  points: T[],
+): T[] {
   return points.filter(
-    point =>
+    (point) =>
       isValidCoordinate(point.x) &&
-      Object.keys(point).some(key => key !== 'x' && isValidCoordinate(point[key]))
+      Object.keys(point).some(
+        (key) => key !== "x" && isValidCoordinate(point[key]),
+      ),
   );
 }
 
@@ -279,9 +314,9 @@ export function filterValidCoordinates<T extends RendererDataPoint>(points: T[])
  * @param points - Array of points to analyze
  * @returns Visible range or null if no valid points
  */
-export function calculateVisibleRange<T extends { x: number | Coordinate | null }>(
-  points: T[]
-): VisibleRange | null {
+export function calculateVisibleRange<
+  T extends { x: number | Coordinate | null },
+>(points: T[]): VisibleRange | null {
   if (points.length === 0) return null;
 
   let from = 0;
@@ -289,7 +324,11 @@ export function calculateVisibleRange<T extends { x: number | Coordinate | null 
 
   // Find first valid point
   for (let i = 0; i < points.length; i++) {
-    if (points[i] && points[i].x !== null && isValidCoordinate(points[i].x as number)) {
+    if (
+      points[i] &&
+      points[i].x !== null &&
+      isValidCoordinate(points[i].x as number)
+    ) {
       from = i;
       break;
     }
@@ -297,7 +336,11 @@ export function calculateVisibleRange<T extends { x: number | Coordinate | null 
 
   // Find last valid point
   for (let i = points.length - 1; i >= 0; i--) {
-    if (points[i] && points[i].x !== null && isValidCoordinate(points[i].x as number)) {
+    if (
+      points[i] &&
+      points[i].x !== null &&
+      isValidCoordinate(points[i].x as number)
+    ) {
       to = i + 1;
       break;
     }
@@ -319,20 +362,22 @@ export function calculateVisibleRange<T extends { x: number | Coordinate | null 
  */
 export function setupCanvasContext(
   target: CanvasRenderingTarget2D,
-  zIndex?: number
+  zIndex?: number,
 ): (callback: (ctx: CanvasRenderingContext2D) => void) => void {
   return (callback: (ctx: CanvasRenderingContext2D) => void) => {
-    target.useBitmapCoordinateSpace((scope: BitmapCoordinatesRenderingScope) => {
-      const ctx = scope.context;
-      ctx.scale(scope.horizontalPixelRatio, scope.verticalPixelRatio);
+    target.useBitmapCoordinateSpace(
+      (scope: BitmapCoordinatesRenderingScope) => {
+        const ctx = scope.context;
+        ctx.scale(scope.horizontalPixelRatio, scope.verticalPixelRatio);
 
-      // Apply z-index if provided
-      if (typeof zIndex === 'number') {
-        ctx.globalCompositeOperation = 'source-over';
-      }
+        // Apply z-index if provided
+        if (typeof zIndex === "number") {
+          ctx.globalCompositeOperation = "source-over";
+        }
 
-      callback(ctx);
-    });
+        callback(ctx);
+      },
+    );
   };
 }
 
@@ -358,7 +403,10 @@ export function setupCanvasContext(
  */
 export function renderWithScaledCanvas(
   target: CanvasRenderingTarget2D,
-  callback: (ctx: CanvasRenderingContext2D, scope: BitmapCoordinatesRenderingScope) => void
+  callback: (
+    ctx: CanvasRenderingContext2D,
+    scope: BitmapCoordinatesRenderingScope,
+  ) => void,
 ): void {
   target.useBitmapCoordinateSpace((scope: BitmapCoordinatesRenderingScope) => {
     const ctx = scope.context;
@@ -385,7 +433,7 @@ export function createFillPath(
   ctx: CanvasRenderingContext2D,
   upperPoints: RenderPoint[],
   lowerPoints: RenderPoint[],
-  fillStyle?: string | CanvasGradient
+  fillStyle?: string | CanvasGradient,
 ): void {
   const validUpperPoints = filterValidRenderPoints(upperPoints);
   const validLowerPoints = filterValidRenderPoints(lowerPoints);
@@ -436,11 +484,13 @@ export function createGradientFillPath(
   ctx: CanvasRenderingContext2D,
   upperPoints: RenderPoint[],
   lowerPoints: RenderPoint[],
-  coloredPoints: ColoredRenderPoint[]
+  coloredPoints: ColoredRenderPoint[],
 ): void {
   const validUpperPoints = filterValidRenderPoints(upperPoints);
   const validLowerPoints = filterValidRenderPoints(lowerPoints);
-  const validColoredPoints = coloredPoints.filter(p => p.x !== null && p.y !== null && p.color);
+  const validColoredPoints = coloredPoints.filter(
+    (p) => p.x !== null && p.y !== null && p.color,
+  );
 
   if (
     validUpperPoints.length === 0 ||
@@ -479,7 +529,12 @@ export function createGradientFillPath(
   const firstPoint = validColoredPoints[0];
   const lastPoint = validColoredPoints[validColoredPoints.length - 1];
 
-  const gradient = ctx.createLinearGradient(firstPoint.x || 0, 0, lastPoint.x || 0, 0);
+  const gradient = ctx.createLinearGradient(
+    firstPoint.x || 0,
+    0,
+    lastPoint.x || 0,
+    0,
+  );
 
   // Add color stops based on data points
   for (let i = 0; i < validColoredPoints.length; i++) {
@@ -532,7 +587,7 @@ export interface LineStyleConfig {
  */
 export function applyLineDashPattern(
   ctx: CanvasRenderingContext2D,
-  lineStyle: LineStyle = LineStyle.Solid
+  lineStyle: LineStyle = LineStyle.Solid,
 ): void {
   switch (lineStyle) {
     case LineStyle.Solid:
@@ -561,7 +616,10 @@ export function applyLineDashPattern(
  * @param ctx - Canvas rendering context
  * @param config - Line style configuration
  */
-export function applyLineStyle(ctx: CanvasRenderingContext2D, config: LineStyleConfig): void {
+export function applyLineStyle(
+  ctx: CanvasRenderingContext2D,
+  config: LineStyleConfig,
+): void {
   ctx.strokeStyle = config.color;
   ctx.lineWidth = config.lineWidth;
 
@@ -596,9 +654,11 @@ export function drawContinuousLine(
     skipInvalid?: boolean;
     prevPoint?: RenderPoint; // Previous point for Y interpolation at start
     nextPoint?: RenderPoint; // Next point for Y interpolation at end
-  }
+  },
 ): void {
-  const validPoints = options?.skipInvalid ? filterValidRenderPoints(points) : points;
+  const validPoints = options?.skipInvalid
+    ? filterValidRenderPoints(points)
+    : points;
   if (validPoints.length === 0) return;
 
   ctx.save();
@@ -617,13 +677,17 @@ export function drawContinuousLine(
     startX = (firstPoint.x as number) - options.extendStart;
 
     // Interpolate Y if previous point is provided
-    if (options.prevPoint && options.prevPoint.x !== null && options.prevPoint.y !== null) {
+    if (
+      options.prevPoint &&
+      options.prevPoint.x !== null &&
+      options.prevPoint.y !== null
+    ) {
       startY = interpolateY(
         startX,
         options.prevPoint.x as number,
         options.prevPoint.y as number,
         firstPoint.x as number,
-        firstPoint.y as number
+        firstPoint.y as number,
       );
     }
   }
@@ -644,13 +708,17 @@ export function drawContinuousLine(
     let endY = lastPoint.y as number;
 
     // Interpolate Y if next point is provided
-    if (options.nextPoint && options.nextPoint.x !== null && options.nextPoint.y !== null) {
+    if (
+      options.nextPoint &&
+      options.nextPoint.x !== null &&
+      options.nextPoint.y !== null
+    ) {
       endY = interpolateY(
         endX,
         lastPoint.x as number,
         lastPoint.y as number,
         options.nextPoint.x as number,
-        options.nextPoint.y as number
+        options.nextPoint.y as number,
       );
     }
 
@@ -675,18 +743,21 @@ export function calculateBarWidthExtensions(
   firstPoint: RenderPoint,
   lastPoint: RenderPoint,
   barSpacing: number,
-  hRatio: number
+  hRatio: number,
 ): { extendStart: number; extendEnd: number } {
   const halfBarSpacing = barSpacing / 2;
 
   // Calculate start extension
   const firstXMedia = (firstPoint.x as number) / hRatio;
   const extendStart =
-    (firstPoint.x as number) - Math.round((firstXMedia - halfBarSpacing) * hRatio);
+    (firstPoint.x as number) -
+    Math.round((firstXMedia - halfBarSpacing) * hRatio);
 
   // Calculate end extension
   const lastXMedia = (lastPoint.x as number) / hRatio;
-  const extendEnd = Math.round((lastXMedia + halfBarSpacing) * hRatio) - (lastPoint.x as number);
+  const extendEnd =
+    Math.round((lastXMedia + halfBarSpacing) * hRatio) -
+    (lastPoint.x as number);
 
   return { extendStart, extendEnd };
 }
@@ -702,7 +773,13 @@ export function calculateBarWidthExtensions(
  * @param y2 - Y coordinate of second point
  * @returns Interpolated Y coordinate
  */
-export function interpolateY(x: number, x1: number, y1: number, x2: number, y2: number): number {
+export function interpolateY(
+  x: number,
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+): number {
   return y1 + ((y2 - y1) * (x - x1)) / (x2 - x1);
 }
 
@@ -718,11 +795,13 @@ export function drawSegmentedLine<T extends RenderPoint>(
   segments: Array<{
     points: T[];
     style: LineStyleConfig;
-  }>
+  }>,
 ): void {
   for (const segment of segments) {
     if (segment.points.length > 0) {
-      drawContinuousLine(ctx, segment.points, segment.style, { skipInvalid: true });
+      drawContinuousLine(ctx, segment.points, segment.style, {
+        skipInvalid: true,
+      });
     }
   }
 }
@@ -756,7 +835,7 @@ export function fillBetweenLines(
   ctx: CanvasRenderingContext2D,
   upperPoints: RenderPoint[],
   lowerPoints: RenderPoint[],
-  config: FillAreaConfig
+  config: FillAreaConfig,
 ): void {
   const validUpperPoints = filterValidRenderPoints(upperPoints);
   const validLowerPoints = filterValidRenderPoints(lowerPoints);
@@ -836,7 +915,7 @@ export function fillTrapezoidalSegments(
     y2Upper: number;
     y2Lower: number;
     fillStyle: string;
-  }>
+  }>,
 ): void {
   for (const seg of segments) {
     ctx.beginPath();
@@ -876,19 +955,19 @@ export function createHorizontalGradient(
   ctx: CanvasRenderingContext2D,
   startX: number,
   endX: number,
-  coloredPoints: ColoredRenderPoint[]
+  coloredPoints: ColoredRenderPoint[],
 ): CanvasGradient {
   const gradient = ctx.createLinearGradient(startX, 0, endX, 0);
 
   // Filter points with valid coordinates and colors
   const validPoints = coloredPoints
-    .filter(p => p.x !== null && p.color)
+    .filter((p) => p.x !== null && p.color)
     .sort((a, b) => (a.x as number) - (b.x as number));
 
   if (validPoints.length === 0) {
     // Fallback to simple gradient
-    gradient.addColorStop(0, 'rgba(0,0,0,0)');
-    gradient.addColorStop(1, 'rgba(0,0,0,0)');
+    gradient.addColorStop(0, "rgba(0,0,0,0)");
+    gradient.addColorStop(1, "rgba(0,0,0,0)");
     return gradient;
   }
 
@@ -916,7 +995,7 @@ export function createVerticalGradient(
   ctx: CanvasRenderingContext2D,
   startY: number,
   endY: number,
-  stops: GradientStop[]
+  stops: GradientStop[],
 ): CanvasGradient {
   const gradient = ctx.createLinearGradient(0, startY, 0, endY);
 
@@ -954,7 +1033,7 @@ export interface CanvasState {
  */
 export function withSavedState(
   ctx: CanvasRenderingContext2D,
-  callback: (ctx: CanvasRenderingContext2D) => void
+  callback: (ctx: CanvasRenderingContext2D) => void,
 ): void {
   ctx.save();
   try {
@@ -970,12 +1049,16 @@ export function withSavedState(
  * @param ctx - Canvas rendering context
  * @param state - State properties to apply
  */
-export function applyCanvasState(ctx: CanvasRenderingContext2D, state: CanvasState): void {
+export function applyCanvasState(
+  ctx: CanvasRenderingContext2D,
+  state: CanvasState,
+): void {
   if (state.fillStyle) ctx.fillStyle = state.fillStyle;
   if (state.strokeStyle) ctx.strokeStyle = state.strokeStyle;
   if (state.lineWidth !== undefined) ctx.lineWidth = state.lineWidth;
   if (state.globalAlpha !== undefined) ctx.globalAlpha = state.globalAlpha;
-  if (state.globalCompositeOperation) ctx.globalCompositeOperation = state.globalCompositeOperation;
+  if (state.globalCompositeOperation)
+    ctx.globalCompositeOperation = state.globalCompositeOperation;
   if (state.lineCap) ctx.lineCap = state.lineCap;
   if (state.lineJoin) ctx.lineJoin = state.lineJoin;
   if (state.lineDash) ctx.setLineDash(state.lineDash);
@@ -1006,7 +1089,10 @@ export interface RectangleConfig {
  * @param ctx - Canvas rendering context
  * @param config - Rectangle configuration
  */
-export function drawRectangle(ctx: CanvasRenderingContext2D, config: RectangleConfig): void {
+export function drawRectangle(
+  ctx: CanvasRenderingContext2D,
+  config: RectangleConfig,
+): void {
   ctx.save();
 
   // Draw fill
@@ -1049,7 +1135,7 @@ export function fillVerticalBand(
   x2: number,
   y1: number,
   y2: number,
-  fillStyle: string
+  fillStyle: string,
 ): void {
   ctx.fillStyle = fillStyle;
   const width = Math.max(1, x2 - x1);
@@ -1081,17 +1167,21 @@ export interface CoordinateBounds {
  */
 export function isValidCoordinateWithBounds(
   coord: number | Coordinate | null | undefined,
-  bounds?: CoordinateBounds
+  bounds?: CoordinateBounds,
 ): boolean {
   if (!isValidCoordinate(coord)) return false;
 
   const value = coord as number;
   const tolerance = bounds?.tolerance ?? 0;
 
-  if (bounds?.minX !== undefined && value < bounds.minX - tolerance) return false;
-  if (bounds?.maxX !== undefined && value > bounds.maxX + tolerance) return false;
-  if (bounds?.minY !== undefined && value < bounds.minY - tolerance) return false;
-  if (bounds?.maxY !== undefined && value > bounds.maxY + tolerance) return false;
+  if (bounds?.minX !== undefined && value < bounds.minX - tolerance)
+    return false;
+  if (bounds?.maxX !== undefined && value > bounds.maxX + tolerance)
+    return false;
+  if (bounds?.minY !== undefined && value < bounds.minY - tolerance)
+    return false;
+  if (bounds?.maxY !== undefined && value > bounds.maxY + tolerance)
+    return false;
 
   return true;
 }
@@ -1105,11 +1195,12 @@ export function isValidCoordinateWithBounds(
  */
 export function filterPointsByBounds<T extends RenderPoint>(
   points: T[],
-  bounds: CoordinateBounds
+  bounds: CoordinateBounds,
 ): T[] {
   return points.filter(
-    point =>
-      isValidCoordinateWithBounds(point.x, bounds) && isValidCoordinateWithBounds(point.y, bounds)
+    (point) =>
+      isValidCoordinateWithBounds(point.x, bounds) &&
+      isValidCoordinateWithBounds(point.y, bounds),
   );
 }
 
@@ -1137,7 +1228,7 @@ export interface EdgeExtensionConfig {
 export function calculateExtendedRange(
   firstPoint: RenderPoint,
   lastPoint: RenderPoint,
-  config: EdgeExtensionConfig
+  config: EdgeExtensionConfig,
 ): { startX: number; endX: number } {
   const halfBarWidth = config.barWidth / 2;
   const extension = config.extensionPixels ?? 50;

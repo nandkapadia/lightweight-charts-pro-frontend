@@ -30,10 +30,10 @@
  * ```
  */
 
-import { Singleton } from './SingletonBase';
+import { Singleton } from "./SingletonBase";
 
 // Production logging control
-const isDevelopment = process.env.NODE_ENV === 'development';
+const isDevelopment = process.env.NODE_ENV === "development";
 
 export const perfLog = {
   log: (..._: unknown[]) => {
@@ -62,7 +62,12 @@ export function perfLogFn<T>(_operationName: string, fn: () => T): T {
 export function deepCompare(objA: unknown, objB: unknown): boolean {
   if (objA === objB) return true;
 
-  if (typeof objA !== 'object' || objA === null || typeof objB !== 'object' || objB === null) {
+  if (
+    typeof objA !== "object" ||
+    objA === null ||
+    typeof objB !== "object" ||
+    objB === null
+  ) {
     return false;
   }
 
@@ -77,7 +82,7 @@ export function deepCompare(objA: unknown, objB: unknown): boolean {
     const valA = (objA as Record<string, unknown>)[key];
     const valB = (objB as Record<string, unknown>)[key];
 
-    if (typeof valA === 'object' && typeof valB === 'object') {
+    if (typeof valA === "object" && typeof valB === "object") {
       if (!deepCompare(valA, valB)) return false;
     } else if (valA !== valB) {
       return false;
@@ -110,13 +115,13 @@ export function getCachedDOMElement(selector: string): HTMLElement | null {
 export function getCachedDOMElementForTesting(
   id: string,
   cache: Map<string, HTMLElement>,
-  createFn: ((_id: string) => HTMLElement | null) | null
+  createFn: ((_id: string) => HTMLElement | null) | null,
 ): HTMLElement | null {
   if (cache.has(id)) {
     return cache.get(id) || null;
   }
 
-  if (!createFn || typeof createFn !== 'function') {
+  if (!createFn || typeof createFn !== "function") {
     return null;
   }
 
@@ -132,7 +137,7 @@ export function getCachedDOMElementForTesting(
 export function debounce<T extends (...args: any[]) => any>(
   func: T,
   wait: number,
-  immediate = false
+  immediate = false,
 ): (...args: Parameters<T>) => void {
   let timeout: ReturnType<typeof setTimeout> | null = null;
 
@@ -154,7 +159,7 @@ export function debounce<T extends (...args: any[]) => any>(
 // Throttle function for performance-critical operations
 export function throttle<T extends (...args: any[]) => any>(
   func: T,
-  limit: number
+  limit: number,
 ): (...args: Parameters<T>) => void {
   let inThrottle: boolean;
 
@@ -184,9 +189,11 @@ class LRUCache<K, V> {
       return undefined;
     }
     // Move to end (most recently used)
-    const value = this.cache.get(key)!;
-    this.cache.delete(key);
-    this.cache.set(key, value);
+    const value = this.cache.get(key);
+    if (value !== undefined) {
+      this.cache.delete(key);
+      this.cache.set(key, value);
+    }
     return value;
   }
 
@@ -237,7 +244,7 @@ class LRUCache<K, V> {
 export function memoize<T extends (...args: any[]) => any>(
   func: T,
   resolver?: (...args: Parameters<T>) => string,
-  maxCacheSize: number = 100
+  maxCacheSize: number = 100,
 ): T {
   const cache = new LRUCache<string, ReturnType<T>>(maxCacheSize);
 
@@ -257,12 +264,12 @@ export function memoize<T extends (...args: any[]) => any>(
 
 // Batch DOM updates for better performance
 export function batchDOMUpdates(updates: (() => void)[]): void {
-  if (typeof window !== 'undefined') {
+  if (typeof window !== "undefined") {
     requestAnimationFrame(() => {
-      updates.forEach(update => update());
+      updates.forEach((update) => update());
     });
   } else {
-    updates.forEach(update => update());
+    updates.forEach((update) => update());
   }
 }
 
@@ -277,7 +284,7 @@ export const getCachedDimensions = memoize(
       left: rect.left,
     };
   },
-  (element: HTMLElement) => `${element.offsetWidth}-${element.offsetHeight}`
+  (element: HTMLElement) => `${element.offsetWidth}-${element.offsetHeight}`,
 );
 
 // Performance monitoring utility
@@ -299,15 +306,20 @@ export class PerformanceMonitor {
 
       // Log slow operations in development
       if (isDevelopment && duration > 16) {
-        perfLog.warn(`Slow operation detected: ${name} took ${duration.toFixed(2)}ms`);
+        perfLog.warn(
+          `Slow operation detected: ${name} took ${duration.toFixed(2)}ms`,
+        );
       }
     };
   }
 
   getMetrics(
-    name?: string
+    name?: string,
   ): Record<string, { avg: number; min: number; max: number; count: number }> {
-    const result: Record<string, { avg: number; min: number; max: number; count: number }> = {};
+    const result: Record<
+      string,
+      { avg: number; min: number; max: number; count: number }
+    > = {};
 
     if (name) {
       const values = this.metrics.get(name);
@@ -344,7 +356,12 @@ export class PerformanceMonitor {
 export function shallowEqual(objA: unknown, objB: unknown): boolean {
   if (objA === objB) return true;
 
-  if (typeof objA !== 'object' || objA === null || typeof objB !== 'object' || objB === null) {
+  if (
+    typeof objA !== "object" ||
+    objA === null ||
+    typeof objB !== "object" ||
+    objB === null
+  ) {
     return false;
   }
 
@@ -356,7 +373,10 @@ export function shallowEqual(objA: unknown, objB: unknown): boolean {
   for (const key of keysA) {
     const recA = objA as Record<string, unknown>;
     const recB = objB as Record<string, unknown>;
-    if (!Object.prototype.hasOwnProperty.call(objB, key) || recA[key] !== recB[key]) {
+    if (
+      !Object.prototype.hasOwnProperty.call(objB, key) ||
+      recA[key] !== recB[key]
+    ) {
       return false;
     }
   }
@@ -380,7 +400,7 @@ export function shallowClone<T>(obj: T): T {
   if (Array.isArray(obj)) {
     return [...obj] as T;
   }
-  if (obj && typeof obj === 'object') {
+  if (obj && typeof obj === "object") {
     return { ...obj };
   }
   return obj;
@@ -389,10 +409,10 @@ export function shallowClone<T>(obj: T): T {
 // Intersection Observer for lazy loading
 export function createIntersectionObserver(
   callback: (_entries: IntersectionObserverEntry[]) => void,
-  options: IntersectionObserverInit = {}
+  options: IntersectionObserverInit = {},
 ): IntersectionObserver {
   return new IntersectionObserver(callback, {
-    rootMargin: '50px',
+    rootMargin: "50px",
     threshold: 0.1,
     ...options,
   });
@@ -426,7 +446,11 @@ export class EventManager {
     return id;
   }
 
-  addEventListener(element: EventTarget, event: string, listener: EventListener): void {
+  addEventListener(
+    element: EventTarget,
+    event: string,
+    listener: EventListener,
+  ): void {
     const elementId = this.getElementId(element);
     const key = `${elementId}-${event}`;
 
@@ -434,18 +458,24 @@ export class EventManager {
       this.listeners.set(key, []);
     }
 
-    const entries = this.listeners.get(key)!;
-    entries.push({ element, event, listener });
-    element.addEventListener(event, listener);
+    const entries = this.listeners.get(key);
+    if (entries) {
+      entries.push({ element, event, listener });
+      element.addEventListener(event, listener);
+    }
   }
 
-  removeEventListener(element: EventTarget, event: string, listener: EventListener): void {
+  removeEventListener(
+    element: EventTarget,
+    event: string,
+    listener: EventListener,
+  ): void {
     const elementId = this.getElementId(element);
     const key = `${elementId}-${event}`;
     const entries = this.listeners.get(key);
 
     if (entries) {
-      const index = entries.findIndex(e => e.listener === listener);
+      const index = entries.findIndex((e) => e.listener === listener);
       if (index !== -1) {
         entries.splice(index, 1);
         element.removeEventListener(event, listener);
@@ -457,7 +487,7 @@ export class EventManager {
   }
 
   removeAllListeners(): void {
-    this.listeners.forEach(entries => {
+    this.listeners.forEach((entries) => {
       entries.forEach(({ element, event, listener }) => {
         try {
           element.removeEventListener(event, listener);
@@ -489,7 +519,7 @@ export class EventManager {
       }
     });
 
-    keysToDelete.forEach(key => this.listeners.delete(key));
+    keysToDelete.forEach((key) => this.listeners.delete(key));
   }
 }
 
@@ -500,7 +530,9 @@ export const globalEventManager = new EventManager();
 export type StyleObject = Record<string, string | number | undefined>;
 
 // Simple style creation for testing
-export function createOptimizedStyles<T extends StyleObject | null | undefined>(styles: T): T extends null | undefined ? Record<string, never> : T {
+export function createOptimizedStyles<T extends StyleObject | null | undefined>(
+  styles: T,
+): T extends null | undefined ? Record<string, never> : T {
   if (styles === null || styles === undefined) {
     return {} as T extends null | undefined ? Record<string, never> : T;
   }
@@ -518,7 +550,7 @@ export interface ChartStyleOptions {
 /** Optimized styles result */
 export interface OptimizedStyles {
   container: {
-    position: 'relative';
+    position: "relative";
     border: string;
     borderRadius: string;
     padding: string;
@@ -532,7 +564,7 @@ export interface OptimizedStyles {
   chartContainer: {
     width: string;
     height: string;
-    position: 'relative';
+    position: "relative";
   };
 }
 
@@ -542,25 +574,25 @@ export const createOptimizedStylesAdvanced = memoize(
     width: number | null,
     height: number | null,
     shouldAutoSize: boolean,
-    chartOptions: ChartStyleOptions = {}
+    chartOptions: ChartStyleOptions = {},
   ): OptimizedStyles => {
     return {
       container: {
-        position: 'relative' as const,
-        border: 'none',
-        borderRadius: '0px',
-        padding: '0px',
+        position: "relative" as const,
+        border: "none",
+        borderRadius: "0px",
+        padding: "0px",
         width:
           shouldAutoSize || width === null
-            ? '100%'
-            : typeof width === 'number'
+            ? "100%"
+            : typeof width === "number"
               ? `${width}px`
-              : '100%',
+              : "100%",
         height: shouldAutoSize
-          ? '100%'
-          : typeof height === 'number'
+          ? "100%"
+          : typeof height === "number"
             ? `${height}px`
-            : '100%',
+            : "100%",
         minWidth: chartOptions.minWidth || (shouldAutoSize ? 200 : undefined),
         minHeight: chartOptions.minHeight || (shouldAutoSize ? 200 : undefined),
         maxWidth: chartOptions.maxWidth,
@@ -569,19 +601,19 @@ export const createOptimizedStylesAdvanced = memoize(
       chartContainer: {
         width:
           shouldAutoSize || width === null
-            ? '100%'
-            : typeof width === 'number'
+            ? "100%"
+            : typeof width === "number"
               ? `${width}px`
-              : '100%',
+              : "100%",
         height: shouldAutoSize
-          ? '100%'
-          : typeof height === 'number'
+          ? "100%"
+          : typeof height === "number"
             ? `${height}px`
-            : '100%',
-        position: 'relative' as const,
+            : "100%",
+        position: "relative" as const,
       },
     };
   },
   (width, height, shouldAutoSize, chartOptions) =>
-    `${width}-${height}-${shouldAutoSize}-${JSON.stringify(chartOptions)}`
+    `${width}-${height}-${shouldAutoSize}-${JSON.stringify(chartOptions)}`,
 );
