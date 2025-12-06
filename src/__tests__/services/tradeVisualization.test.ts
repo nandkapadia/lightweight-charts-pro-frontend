@@ -20,35 +20,30 @@ import {
   type TradeRectangleData,
 } from "../../services/tradeVisualization";
 import type { TradeConfig, TradeVisualizationOptions } from "../../types";
+import { ChartCoordinateService } from "../../services/ChartCoordinateService";
 
-// Mock ChartCoordinateService - must handle both require and import
-const mockCalculateOverlayPosition = vi.fn((time1, time2, price1, price2) => {
-  // Mock valid bounding box
+// Mock ChartCoordinateService - must be defined inline in factory to avoid hoisting issues
+vi.mock("../../services/ChartCoordinateService", () => {
+  const mockCalculateOverlayPosition = vi.fn((time1, time2, price1, price2) => {
+    // Mock valid bounding box
+    return {
+      x: 100,
+      y: 50,
+      width: 200,
+      height: 100,
+    };
+  });
+
+  const mockCoordinateService = {
+    calculateOverlayPosition: mockCalculateOverlayPosition,
+  };
+
   return {
-    x: 100,
-    y: 50,
-    width: 200,
-    height: 100,
+    ChartCoordinateService: {
+      getInstance: vi.fn(() => mockCoordinateService),
+    },
   };
 });
-
-const mockCoordinateService = {
-  calculateOverlayPosition: mockCalculateOverlayPosition,
-};
-
-const mockChartCoordinateService = {
-  getInstance: vi.fn(() => mockCoordinateService),
-};
-
-vi.mock("../../services/ChartCoordinateService", () => ({
-  ChartCoordinateService: mockChartCoordinateService,
-}));
-
-// Also mock for require() - vitest doesn't handle dynamic require mocks well
-// We'll need to use doMock or handle this differently
-vi.doMock("../services/ChartCoordinateService", () => ({
-  ChartCoordinateService: mockChartCoordinateService,
-}));
 
 // Mock chartReadyDetection
 vi.mock("../../utils/chartReadyDetection", () => ({
@@ -58,10 +53,17 @@ vi.mock("../../utils/chartReadyDetection", () => ({
 }));
 
 describe("Trade Visualization Service", () => {
+  // Get reference to the mocked service
+  const getMockService = () => {
+    const service = ChartCoordinateService.getInstance(null as any);
+    return service.calculateOverlayPosition as any;
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
     // Reset mock to default behavior
-    mockCalculateOverlayPosition.mockImplementation(() => ({
+    const mockFn = getMockService();
+    mockFn.mockImplementation(() => ({
       x: 100,
       y: 50,
       width: 200,
@@ -555,13 +557,13 @@ describe("Trade Visualization Service", () => {
       it("should normalize rectangle coordinates (min/max)", () => {
         const trades: TradeConfig[] = [
           {
-            entryTime: 1672617600, // Later time
-            entryPrice: 110, // Higher price
-            exitTime: 1672531200, // Earlier time
+            entryTime: 1672531200, // Earlier time (entry must be before exit)
+            entryPrice: 110, // Higher price (long trade, entered high, exited low = loss)
+            exitTime: 1672617600, // Later time
             exitPrice: 100, // Lower price
             quantity: 10,
             tradeType: "long",
-            isProfitable: true,
+            isProfitable: false, // Lost money on long
             id: "trade-1",
           },
         ];
@@ -570,10 +572,11 @@ describe("Trade Visualization Service", () => {
         const result = createTradeVisualElements(trades, options);
 
         const rect = result.rectangles[0];
-        expect(rect.time1).toBe(1672531200); // Min time
-        expect(rect.time2).toBe(1672617600); // Max time
-        expect(rect.price1).toBe(100); // Min price
-        expect(rect.price2).toBe(110); // Max price
+        // Coordinates should be normalized (min to max)
+        expect(rect.time1).toBe(1672531200); // Min time (entry)
+        expect(rect.time2).toBe(1672617600); // Max time (exit)
+        expect(rect.price1).toBe(100); // Min price (exit price is lower)
+        expect(rect.price2).toBe(110); // Max price (entry price is higher)
       });
 
       it("should skip trades with non-positive prices", () => {
@@ -1024,7 +1027,7 @@ describe("Trade Visualization Service", () => {
     });
 
     it.skip("should filter out failed conversions", () => {
-      mockCalculateOverlayPosition.mockReturnValueOnce(null as any);
+      getMockService().mockReturnValueOnce(null as any);
 
       const rectangles: TradeRectangleData[] = [
         {

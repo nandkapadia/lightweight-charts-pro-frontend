@@ -26,6 +26,7 @@ import {
   PropertyDescriptors,
   STANDARD_SERIES_PROPERTIES,
 } from "../core/UnifiedSeriesDescriptor";
+import { normalizeTime } from "../../utils/timeNormalization";
 
 /**
  * Sort and deduplicate data by time (required by lightweight-charts)
@@ -43,24 +44,21 @@ import {
  * @returns Sorted, deduplicated, and validated array of data points
  */
 function sortDataByTime(data: any[]): any[] {
-  // Helper to validate and parse time
+  // Helper to validate and parse time WITHOUT timezone conversion
   const parseTime = (item: any): number | null => {
-    if (typeof item.time === "number") {
-      return item.time;
+    if (!item.time) {
+      return null;
     }
-    if (typeof item.time === "string") {
-      // Check for valid date format (yyyy-mm-dd)
-      const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-      if (!dateRegex.test(item.time)) {
-        return null; // Invalid format
-      }
-      const timestamp = new Date(item.time).getTime();
-      if (isNaN(timestamp)) {
-        return null; // Invalid date
-      }
-      return timestamp / 1000;
+
+    // Detect millisecond timestamps and normalize to seconds
+    let timeValue = item.time;
+    if (typeof timeValue === "number" && timeValue > 4102444800) {
+      timeValue = timeValue / 1000;
     }
-    return null;
+
+    // Use centralized time normalization (NO timezone conversion)
+    const normalized = normalizeTime(timeValue);
+    return normalized !== null ? normalized : null;
   };
 
   // Helper to validate numeric values
