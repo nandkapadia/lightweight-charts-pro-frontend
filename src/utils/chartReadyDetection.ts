@@ -37,9 +37,15 @@
  * ```
  */
 
-import { IChartApi, ISeriesApi, UTCTimestamp, Logical, SeriesType } from 'lightweight-charts';
-import { ChartCoordinateService } from '../services/ChartCoordinateService';
-import { logger } from './logger';
+import {
+  IChartApi,
+  ISeriesApi,
+  UTCTimestamp,
+  Logical,
+  SeriesType,
+} from "lightweight-charts";
+import { ChartCoordinateService } from "../services/ChartCoordinateService";
+import { logger } from "./logger";
 
 /**
  * Utility class for detecting when charts are ready with multiple fallback methods.
@@ -59,13 +65,21 @@ export class ChartReadyDetector {
       minHeight?: number;
       maxAttempts?: number;
       baseDelay?: number;
-    } = {}
+    } = {},
   ): Promise<boolean> {
-    const { minWidth = 100, minHeight = 100, maxAttempts = 15, baseDelay = 200 } = options;
+    const {
+      minWidth = 100,
+      minHeight = 100,
+      maxAttempts = 15,
+      baseDelay = 200,
+    } = options;
 
     // Early return if chart or container is null
     if (!chart || !container) {
-      logger.warn('waitForChartReady called with null chart or container', 'ChartReadyDetector');
+      logger.warn(
+        "waitForChartReady called with null chart or container",
+        "ChartReadyDetector",
+      );
       return false;
     }
 
@@ -73,12 +87,15 @@ export class ChartReadyDetector {
     const chartRef = chart;
     const containerRef = container;
 
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       const checkReady = (attempts = 0) => {
         try {
           // Re-validate references haven't become stale
           if (!chartRef || !containerRef) {
-            logger.warn('Chart or container reference became invalid', 'ChartReadyDetector');
+            logger.warn(
+              "Chart or container reference became invalid",
+              "ChartReadyDetector",
+            );
             resolve(false);
             return;
           }
@@ -88,29 +105,35 @@ export class ChartReadyDetector {
             const chartElement = chartRef.chartElement();
             if (chartElement) {
               const chartRect = chartElement.getBoundingClientRect();
-              if (chartRect.width >= minWidth && chartRect.height >= minHeight) {
+              if (
+                chartRect.width >= minWidth &&
+                chartRect.height >= minHeight
+              ) {
                 resolve(true);
                 return;
               }
             }
           } catch (chartApiError) {
             logger.debug(
-              `Chart API method failed on attempt ${attempts}: ${chartApiError instanceof Error ? chartApiError.message : 'Unknown error'}`,
-              'ChartReadyDetector'
+              `Chart API method failed on attempt ${attempts}: ${chartApiError instanceof Error ? chartApiError.message : "Unknown error"}`,
+              "ChartReadyDetector",
             );
           }
 
           // Method 2: DOM fallback
           try {
             const containerRect = containerRef.getBoundingClientRect();
-            if (containerRect.width >= minWidth && containerRect.height >= minHeight) {
+            if (
+              containerRect.width >= minWidth &&
+              containerRect.height >= minHeight
+            ) {
               resolve(true);
               return;
             }
           } catch (domError) {
             logger.debug(
-              `DOM method failed on attempt ${attempts}: ${domError instanceof Error ? domError.message : 'Unknown error'}`,
-              'ChartReadyDetector'
+              `DOM method failed on attempt ${attempts}: ${domError instanceof Error ? domError.message : "Unknown error"}`,
+              "ChartReadyDetector",
             );
           }
 
@@ -120,14 +143,14 @@ export class ChartReadyDetector {
           } else {
             logger.warn(
               `Chart ready detection failed after ${maxAttempts} attempts`,
-              'ChartReadyDetector'
+              "ChartReadyDetector",
             );
             resolve(false);
           }
         } catch (error) {
           logger.error(
-            `Unexpected error in checkReady: ${error instanceof Error ? error.message : 'Unknown error'}`,
-            'ChartReadyDetector'
+            `Unexpected error in checkReady: ${error instanceof Error ? error.message : "Unknown error"}`,
+            "ChartReadyDetector",
           );
           if (attempts < maxAttempts) {
             const delay = baseDelay * Math.pow(1.5, attempts);
@@ -155,13 +178,22 @@ export class ChartReadyDetector {
       maxAttempts?: number;
       baseDelay?: number;
       requireData?: boolean;
-    } = {}
+    } = {},
   ): Promise<boolean> {
-    const { testTime, testPrice, maxAttempts = 30, baseDelay = 150, requireData = true } = options;
+    const {
+      testTime,
+      testPrice,
+      maxAttempts = 30,
+      baseDelay = 150,
+      requireData = true,
+    } = options;
 
     // Early return if chart or series is null
     if (!chart || !series) {
-      logger.warn('waitForChartReadyForPrimitives called with null chart or series', 'ChartReadyDetector');
+      logger.warn(
+        "waitForChartReadyForPrimitives called with null chart or series",
+        "ChartReadyDetector",
+      );
       return false;
     }
 
@@ -176,22 +208,23 @@ export class ChartReadyDetector {
         // Step 1: Use existing coordinate service to validate chart dimensions
         const chartElement = chartRef.chartElement();
         if (!chartElement) {
-          throw new Error('Chart element not found');
+          throw new Error("Chart element not found");
         }
 
-        const validatedDimensions = await coordinateService.getValidatedChartDimensions(
-          chartRef,
-          chartElement,
-          {
-            minWidth: 200,
-            minHeight: 200,
-            maxAttempts: 1, // We handle retries at this level
-            baseDelay: 0,
-          }
-        );
+        const validatedDimensions =
+          await coordinateService.getValidatedChartDimensions(
+            chartRef,
+            chartElement,
+            {
+              minWidth: 200,
+              minHeight: 200,
+              maxAttempts: 1, // We handle retries at this level
+              baseDelay: 0,
+            },
+          );
 
         if (!validatedDimensions) {
-          throw new Error('Chart dimensions validation failed');
+          throw new Error("Chart dimensions validation failed");
         }
 
         // Step 2: Validate time scale has visible range (data is loaded)
@@ -201,7 +234,7 @@ export class ChartReadyDetector {
 
         if (!visibleRange || !logicalRange) {
           throw new Error(
-            `Missing ranges - visible: ${!!visibleRange}, logical: ${!!logicalRange}`
+            `Missing ranges - visible: ${!!visibleRange}, logical: ${!!logicalRange}`,
           );
         }
 
@@ -209,7 +242,7 @@ export class ChartReadyDetector {
         if (requireData) {
           const seriesData = seriesRef.data();
           if (!seriesData || seriesData.length === 0) {
-            throw new Error('No series data');
+            throw new Error("No series data");
           }
         }
 
@@ -225,12 +258,16 @@ export class ChartReadyDetector {
               // Use middle data point for realistic testing
               const midIndex = Math.floor(seriesData.length / 2);
               // Cast through unknown first to avoid TypeScript strict check
-              const midPoint = seriesData[midIndex] as unknown as Record<string, unknown>;
+              const midPoint = seriesData[midIndex] as unknown as Record<
+                string,
+                unknown
+              >;
 
               if (timeForTest === undefined) {
                 timeForTest =
                   (midPoint?.time as UTCTimestamp) ||
-                  ((((visibleRange.from as number) + (visibleRange.to as number)) /
+                  ((((visibleRange.from as number) +
+                    (visibleRange.to as number)) /
                     2) as UTCTimestamp);
               }
 
@@ -244,16 +281,18 @@ export class ChartReadyDetector {
               }
             } else {
               // Fallback to visible range calculation
-              timeForTest = (((visibleRange.from as number) + (visibleRange.to as number)) /
+              timeForTest = (((visibleRange.from as number) +
+                (visibleRange.to as number)) /
                 2) as UTCTimestamp;
               priceForTest = 100;
             }
           } catch (dataError) {
             logger.debug(
-              `Failed to get series data for test: ${dataError instanceof Error ? dataError.message : 'Unknown error'}`,
-              'ChartReadyDetector'
+              `Failed to get series data for test: ${dataError instanceof Error ? dataError.message : "Unknown error"}`,
+              "ChartReadyDetector",
             );
-            timeForTest = (((visibleRange.from as number) + (visibleRange.to as number)) /
+            timeForTest = (((visibleRange.from as number) +
+              (visibleRange.to as number)) /
               2) as UTCTimestamp;
             priceForTest = 100;
           }
@@ -262,8 +301,13 @@ export class ChartReadyDetector {
         const logicalForTest = (logicalRange.from + logicalRange.to) / 2;
 
         const testX = timeScale.timeToCoordinate(timeForTest as UTCTimestamp);
-        const testLogicalX = timeScale.logicalToCoordinate(logicalForTest as Logical);
-        const testY = priceForTest !== undefined ? seriesRef.priceToCoordinate(priceForTest) : null;
+        const testLogicalX = timeScale.logicalToCoordinate(
+          logicalForTest as Logical,
+        );
+        const testY =
+          priceForTest !== undefined
+            ? seriesRef.priceToCoordinate(priceForTest)
+            : null;
 
         if (
           testX === null ||
@@ -274,7 +318,7 @@ export class ChartReadyDetector {
           !isFinite(testY)
         ) {
           throw new Error(
-            `Coordinate conversion failed - X: ${testX}, LogicalX: ${testLogicalX}, Y: ${testY}`
+            `Coordinate conversion failed - X: ${testX}, LogicalX: ${testLogicalX}, Y: ${testY}`,
           );
         }
 
@@ -282,22 +326,22 @@ export class ChartReadyDetector {
         return true;
       } catch (error) {
         logger.debug(
-          `Primitives readiness check attempt ${attempt + 1}/${maxAttempts} failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
-          'ChartReadyDetector'
+          `Primitives readiness check attempt ${attempt + 1}/${maxAttempts} failed: ${error instanceof Error ? error.message : "Unknown error"}`,
+          "ChartReadyDetector",
         );
       }
 
       // Wait before next attempt with exponential backoff
       if (attempt < maxAttempts - 1) {
         const delay = baseDelay * Math.pow(1.2, attempt) + Math.random() * 50;
-        await new Promise(resolve => setTimeout(resolve, delay));
+        await new Promise((resolve) => setTimeout(resolve, delay));
       }
     }
 
     // All attempts failed
     logger.warn(
       `Chart ready for primitives detection failed after ${maxAttempts} attempts`,
-      'ChartReadyDetector'
+      "ChartReadyDetector",
     );
 
     return false;
@@ -314,7 +358,7 @@ export class ChartReadyDetector {
       testTime?: UTCTimestamp;
       testPrice?: number;
       requireData?: boolean;
-    } = {}
+    } = {},
   ): boolean {
     const { testTime, testPrice, requireData = true } = options;
 
@@ -338,7 +382,13 @@ export class ChartReadyDetector {
         },
       };
 
-      if (!coordinateService.areChartDimensionsObjectValid(testDimensions, 200, 200)) {
+      if (
+        !coordinateService.areChartDimensionsObjectValid(
+          testDimensions,
+          200,
+          200,
+        )
+      ) {
         return false;
       }
 
@@ -359,19 +409,25 @@ export class ChartReadyDetector {
         const testX = timeScale.timeToCoordinate(testTime);
         const testY = series.priceToCoordinate(testPrice);
 
-        if (testX === null || testY === null || isNaN(testX) || isNaN(testY)) return false;
+        if (testX === null || testY === null || isNaN(testX) || isNaN(testY))
+          return false;
 
         // Check bounds using validated dimensions
         const chartRect = chartElement.getBoundingClientRect();
-        if (testX < 0 || testY < 0 || testX > chartRect.width || testY > chartRect.height)
+        if (
+          testX < 0 ||
+          testY < 0 ||
+          testX > chartRect.width ||
+          testY > chartRect.height
+        )
           return false;
       }
 
       return true;
     } catch (error) {
       logger.debug(
-        `isChartReadyForPrimitivesSync failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        'ChartReadyDetector'
+        `isChartReadyForPrimitivesSync failed: ${error instanceof Error ? error.message : "Unknown error"}`,
+        "ChartReadyDetector",
       );
       return false;
     }
@@ -384,7 +440,7 @@ export class ChartReadyDetector {
     chart: IChartApi | null,
     container: HTMLElement | null,
     minWidth: number = 100,
-    minHeight: number = 100
+    minHeight: number = 100,
   ): boolean {
     try {
       if (!chart || !container) return false;
@@ -400,26 +456,28 @@ export class ChartReadyDetector {
         }
       } catch (chartApiError) {
         logger.debug(
-          `Chart API method failed in isChartReadySync: ${chartApiError instanceof Error ? chartApiError.message : 'Unknown error'}`,
-          'ChartReadyDetector'
+          `Chart API method failed in isChartReadySync: ${chartApiError instanceof Error ? chartApiError.message : "Unknown error"}`,
+          "ChartReadyDetector",
         );
       }
 
       // Try DOM fallback
       try {
         const containerRect = container.getBoundingClientRect();
-        return containerRect.width >= minWidth && containerRect.height >= minHeight;
+        return (
+          containerRect.width >= minWidth && containerRect.height >= minHeight
+        );
       } catch (domError) {
         logger.debug(
-          `DOM method failed in isChartReadySync: ${domError instanceof Error ? domError.message : 'Unknown error'}`,
-          'ChartReadyDetector'
+          `DOM method failed in isChartReadySync: ${domError instanceof Error ? domError.message : "Unknown error"}`,
+          "ChartReadyDetector",
         );
         return false;
       }
     } catch (error) {
       logger.debug(
-        `isChartReadySync failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        'ChartReadyDetector'
+        `isChartReadySync failed: ${error instanceof Error ? error.message : "Unknown error"}`,
+        "ChartReadyDetector",
       );
       return false;
     }
@@ -434,20 +492,23 @@ export class ChartReadyDetector {
     options: {
       maxAttempts?: number;
       baseDelay?: number;
-    } = {}
+    } = {},
   ): Promise<Element | null> {
     const { maxAttempts = 10, baseDelay = 100 } = options;
 
     // Early return if container is null
     if (!container) {
-      logger.warn('waitForElementReady called with null container', 'ChartReadyDetector');
+      logger.warn(
+        "waitForElementReady called with null container",
+        "ChartReadyDetector",
+      );
       return null;
     }
 
     // Store reference to prevent race conditions
     const containerRef = container;
 
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       const checkElement = (attempts = 0) => {
         try {
           const element = containerRef.querySelector(selector);
@@ -462,14 +523,14 @@ export class ChartReadyDetector {
           } else {
             logger.debug(
               `Element "${selector}" not found after ${maxAttempts} attempts`,
-              'ChartReadyDetector'
+              "ChartReadyDetector",
             );
             resolve(null);
           }
         } catch (error) {
           logger.debug(
-            `Error in waitForElementReady attempt ${attempts}: ${error instanceof Error ? error.message : 'Unknown error'}`,
-            'ChartReadyDetector'
+            `Error in waitForElementReady attempt ${attempts}: ${error instanceof Error ? error.message : "Unknown error"}`,
+            "ChartReadyDetector",
           );
           if (attempts < maxAttempts) {
             const delay = baseDelay * Math.pow(1.5, attempts);
