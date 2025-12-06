@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0] - 2025-12-06
+
+### 🎉 Initial Release - Production Ready
+
+This is the initial production-ready release of @lightweight-charts-pro/core with comprehensive documentation, stability improvements, and critical timezone/performance fixes.
+
 ### 🔧 Fixed
 
 #### Critical Bug Fixes - Timezone and Performance
@@ -15,16 +21,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Times are displayed exactly as sent from backend/server
   - No automatic conversion to browser's local timezone
   - See [TIMEZONE.md](./TIMEZONE.md) for migration guide
+- **Fixed timezone drift in sortDataByTime** - Eliminated Date operations that could apply timezone conversion
+  - Now uses centralized `normalizeTime` utility for consistent handling
+- **Added millisecond timestamp detection** - Automatically converts millisecond timestamps to seconds
+  - Threshold of 4102444800 (Jan 1, 2100) to auto-detect format
+  - User-friendly API accepts both millisecond and second timestamps
 - **Fixed RangeSwitcher memory leak** - Interval now stops after initial setup completes
 - **Fixed RangeSwitcher Date.now() bug** - Now uses last bar time instead of current time for historical data
 - **Fixed marker alignment timezone issues** - Markers now snap correctly without timezone drift
+- **Optimized trade visualization performance** - Pre-sort chart times once instead of per-trade
+  - Reduced from O(n log n) per trade to O(n log n) once (~20x improvement for 100 trades)
+  - Changed `findNearestTime` to `extractSortedTimes` for clarity
 - **Optimized marker snapping performance** - Replaced O(n×m) linear scan with O(log n) binary search
   - 90x faster for typical workloads (100 markers × 10,000 bars)
   - Performance improvement: ~1,000,000 ops → ~11,300 ops
 
-### 📚 Documentation
+#### Type Safety Improvements
+- **Fixed TradeConfig type to match runtime behavior**
+  - Made `exitTime`, `exitPrice`, `isProfitable` optional (supports open trades)
+  - Added `trade_type` (snake_case) variant for backend compatibility
+  - Added fallback logic `exitPrice ?? entryPrice` for display when exit price unavailable
+  - Updated validation to handle optional exit fields correctly
 
-#### Timezone Handling
+### Added
+
+#### Documentation
+- **Complete JSDoc Coverage**: All 73 TypeScript files now have comprehensive Google-style JSDoc comments
+- **Enhanced README**: Added detailed usage examples, architecture overview, and API reference
 - **Added comprehensive timezone documentation** in README.md
 - **Created TIMEZONE.md** - Complete guide to timezone handling philosophy and patterns
   - Backend conversion patterns (Python, Node.js examples)
@@ -32,50 +55,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Migration guide from auto-conversion
   - Multiple timezone support patterns
   - Troubleshooting guide
-
-### ✅ Testing
-
-#### Comprehensive Test Coverage for Fixes
-- **Added timeNormalization.test.ts** - 57 tests covering:
-  - Time normalization without conversion
-  - Binary search performance verification
-  - ISO 8601 round-trip testing
-  - Edge cases and error handling
-- **Added markerAlignment.test.ts** - 35 tests covering:
-  - Marker snapping without timezone conversion
-  - Mixed time format handling
-  - Performance benchmarks (O(log n) verification)
-  - Accuracy and edge cases
-- **Enhanced RangeSwitcherPrimitive.test.ts** - Added 8 tests for:
-  - Interval leak fix verification
-  - Last bar time extraction
-  - Multiple series handling
-- **Enhanced TemplateEngine.test.ts** - Added 5 tests for:
-  - NO timezone conversion verification
-  - Custom formatter support
-  - ISO 8601 UTC formatting
-
-### 🔨 Internal
-
-#### Time Utilities
-- **Created timeNormalization.ts** - Centralized time handling utilities
-  - `normalizeTime()` - Normalize any time format WITHOUT conversion
-  - `formatTime()` - Format as ISO 8601 UTC by default
-  - `findNearestTimestamp()` - O(log n) binary search
-  - `createSortedTimeArray()` - Pre-sort for fast lookups
-  - Helper functions: `isBusinessDay()`, `ensureSecondsTimestamp()`, etc.
-
-## [0.1.0] - 2024-12-06
-
-### 🎉 Initial Release - Production Ready
-
-This is the initial production-ready release of @lightweight-charts-pro/core with comprehensive documentation and stability improvements.
-
-### Added
-
-#### Documentation
-- **Complete JSDoc Coverage**: All 73 TypeScript files now have comprehensive Google-style JSDoc comments
-- **Enhanced README**: Added detailed usage examples, architecture overview, and API reference
 - **CONTRIBUTING.md**: Comprehensive contribution guidelines with coding standards
 - **SECURITY.md**: Security policy and vulnerability reporting procedures
 - **.gitattributes**: Proper line ending and binary file handling
@@ -107,6 +86,12 @@ This is the initial production-ready release of @lightweight-charts-pro/core wit
   - Color utilities and signal color mapping
   - Coordinate validation and sanitization
   - Chart ready detection with exponential backoff
+  - **Time normalization utilities** (NO timezone conversion)
+    - `normalizeTime()` - Normalize any time format WITHOUT conversion
+    - `ensureSecondsTimestamp()` - Auto-detect and convert millisecond timestamps
+    - `formatTime()` - Format as ISO 8601 UTC by default
+    - `findNearestTimestamp()` - O(log n) binary search
+    - `createSortedTimeArray()` - Pre-sort for fast lookups
 
 ### Changed
 
@@ -117,8 +102,33 @@ This is the initial production-ready release of @lightweight-charts-pro/core wit
 - **Build System**: Multi-entry Vite build for tree-shaking optimization
 - **Type Safety**: 100% TypeScript strict mode compliance
 
-### Fixed
+### Testing
 
+#### Comprehensive Test Coverage
+- **Added timeNormalization.test.ts** - 59 tests covering:
+  - Time normalization without conversion
+  - Millisecond timestamp auto-detection
+  - Binary search performance verification
+  - ISO 8601 round-trip testing
+  - Edge cases and error handling
+- **Added markerAlignment.test.ts** - 35 tests covering:
+  - Marker snapping without timezone conversion
+  - Mixed time format handling
+  - Performance benchmarks (O(log n) verification)
+  - Accuracy and edge cases
+- **Enhanced RangeSwitcherPrimitive.test.ts** - Added 8 tests for:
+  - Interval leak fix verification
+  - Last bar time extraction
+  - Multiple series handling
+- **Enhanced TemplateEngine.test.ts** - Added 5 tests for:
+  - NO timezone conversion verification
+  - Custom formatter support
+  - ISO 8601 UTC formatting
+- **Enhanced validationUtils.test.ts** - Added tests for:
+  - Optional exit price validation
+  - Invalid exit price type detection
+  - Open trade handling with warnings
+- **Test Infrastructure**: 1248+ total tests with 47% coverage
 - **Browser Compatibility**: Custom EventEmitter replaces Node.js dependency
 - **ESLint Compliance**: All files pass with zero errors and warnings
 - **Non-null Assertions**: Removed all forbidden non-null assertions
