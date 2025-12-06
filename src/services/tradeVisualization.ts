@@ -43,6 +43,7 @@ import { UTCTimestamp, SeriesMarker, Time } from "lightweight-charts";
 import { TradeConfig, TradeVisualizationOptions } from "../types";
 import { TradeTemplateProcessor } from "./TradeTemplateProcessor";
 import { UniversalSpacing } from "../primitives/PrimitiveDefaults";
+import { ChartCoordinateService } from "./ChartCoordinateService";
 
 // ============================================================================
 // CRITICAL: Timezone-agnostic parsing functions
@@ -523,11 +524,7 @@ export function convertTradeRectanglesToPluginFormat(
     return [];
   }
 
-  // Import ChartCoordinateService dynamically to avoid circular dependencies
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const {
-    ChartCoordinateService,
-  } = require("../services/ChartCoordinateService");
+  // Use ChartCoordinateService for coordinate calculations
   const coordinateService = ChartCoordinateService.getInstance();
 
   return tradeRectangles
