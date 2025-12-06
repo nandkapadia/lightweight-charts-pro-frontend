@@ -50,14 +50,8 @@ function sortDataByTime(data: any[]): any[] {
       return null;
     }
 
-    // Detect millisecond timestamps and normalize to seconds
-    let timeValue = item.time;
-    if (typeof timeValue === "number" && timeValue > 4102444800) {
-      timeValue = timeValue / 1000;
-    }
-
-    // Use centralized time normalization (NO timezone conversion)
-    const normalized = normalizeTime(timeValue);
+    // Use centralized time normalization (handles milliseconds, NO timezone conversion)
+    const normalized = normalizeTime(item.time);
     return normalized !== null ? normalized : null;
   };
 

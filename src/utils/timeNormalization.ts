@@ -42,10 +42,14 @@ export interface TimeValidationResult {
  * DOES NOT apply timezone conversions - treats input as-is.
  *
  * Supported formats:
- * - Unix timestamp (number, in seconds)
+ * - Unix timestamp (number, in seconds or milliseconds - auto-detected)
  * - Unix timestamp string (numeric string)
  * - ISO 8601 string (e.g., "2024-01-15T10:00:00Z")
  * - BusinessDay object ({ year, month, day })
+ *
+ * Millisecond Detection:
+ * - Timestamps > 4102444800 (Jan 1, 2100) are treated as milliseconds
+ * - Automatically converts milliseconds to seconds
  *
  * @param time - Time value in any supported format
  * @returns Unix timestamp in seconds
@@ -53,16 +57,17 @@ export interface TimeValidationResult {
  *
  * @example
  * ```typescript
- * normalizeTime(1705318800)                    // => 1705318800
+ * normalizeTime(1705318800)                    // => 1705318800 (seconds)
+ * normalizeTime(1705318800000)                 // => 1705318800 (ms -> seconds)
  * normalizeTime("1705318800")                  // => 1705318800
  * normalizeTime("2024-01-15T10:00:00Z")        // => 1705318800
  * normalizeTime({ year: 2024, month: 1, day: 15 }) // => 1705276800
  * ```
  */
 export function normalizeTime(time: Time): number {
-  // Already a Unix timestamp (seconds)
+  // Numeric timestamp - check if it's in milliseconds
   if (typeof time === "number") {
-    return time;
+    return ensureSecondsTimestamp(time);
   }
 
   // String that's a numeric timestamp or ISO 8601 string
@@ -70,7 +75,8 @@ export function normalizeTime(time: Time): number {
     // Check if it's a pure numeric string first (must match entire string)
     const parsed = parseFloat(time);
     if (!isNaN(parsed) && parsed.toString() === time) {
-      return parsed;
+      // Check if the numeric string is in milliseconds
+      return ensureSecondsTimestamp(parsed);
     }
 
     // ISO 8601 string (e.g., "2024-01-15T10:00:00Z")

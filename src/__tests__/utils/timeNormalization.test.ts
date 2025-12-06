@@ -25,14 +25,26 @@ import {
 
 describe("timeNormalization", () => {
   describe("normalizeTime", () => {
-    it("should pass through Unix timestamp (number) unchanged", () => {
+    it("should pass through Unix timestamp (number) in seconds unchanged", () => {
       const timestamp = 1705318800; // 2024-01-15 10:00:00 UTC
       expect(normalizeTime(timestamp)).toBe(timestamp);
     });
 
-    it("should parse numeric string to timestamp", () => {
+    it("should convert millisecond timestamp to seconds", () => {
+      const milliseconds = 1705318800000; // 2024-01-15 10:00:00 UTC in ms
+      const seconds = 1705318800;
+      expect(normalizeTime(milliseconds)).toBe(seconds);
+    });
+
+    it("should parse numeric string in seconds to timestamp", () => {
       const timestamp = "1705318800";
       expect(normalizeTime(timestamp)).toBe(1705318800);
+    });
+
+    it("should convert numeric string in milliseconds to seconds", () => {
+      const milliseconds = "1705318800000";
+      const seconds = 1705318800;
+      expect(normalizeTime(milliseconds)).toBe(seconds);
     });
 
     it("should parse ISO 8601 string WITHOUT timezone conversion", () => {
