@@ -38,7 +38,7 @@
  * ```
  */
 
-import { logger } from './logger';
+import { logger } from "./logger";
 export class ResizeObserverManager {
   private observers = new Map<string, ResizeObserver>();
   private callbacks = new Map<
@@ -58,7 +58,7 @@ export class ResizeObserverManager {
     options: {
       throttleMs?: number;
       debounceMs?: number;
-    } = {}
+    } = {},
   ): void {
     // Remove existing observer if it exists
     this.removeObserver(id);
@@ -96,7 +96,7 @@ export class ResizeObserverManager {
     };
 
     try {
-      const observer = new ResizeObserver(entries => {
+      const observer = new ResizeObserver((entries) => {
         // Handle both single entry and array of entries
         if (entries.length === 1) {
           wrappedCallback(entries[0]);
@@ -110,7 +110,11 @@ export class ResizeObserverManager {
       this.callbacks.set(id, callback);
       this.targets.set(id, target);
     } catch (error) {
-      logger.error('ResizeObserver operation failed', 'ResizeObserverManager', error);
+      logger.error(
+        "ResizeObserver operation failed",
+        "ResizeObserverManager",
+        error,
+      );
     }
   }
 
@@ -133,7 +137,11 @@ export class ResizeObserverManager {
           this.timeouts.delete(id);
         }
       } catch (error) {
-        logger.error('ResizeObserver operation failed', 'ResizeObserverManager', error);
+        logger.error(
+          "ResizeObserver operation failed",
+          "ResizeObserverManager",
+          error,
+        );
       }
     }
   }
@@ -161,8 +169,8 @@ export class ResizeObserverManager {
         observer.disconnect();
       } catch (error) {
         logger.debug(
-          `Failed to disconnect observer ${id}: ${error instanceof Error ? error.message : 'Unknown error'}`,
-          'ResizeObserverManager'
+          `Failed to disconnect observer ${id}: ${error instanceof Error ? error.message : "Unknown error"}`,
+          "ResizeObserverManager",
         );
       }
     });
@@ -173,8 +181,8 @@ export class ResizeObserverManager {
         clearTimeout(timeout);
       } catch (error) {
         logger.debug(
-          `Failed to clear timeout for ${id}: ${error instanceof Error ? error.message : 'Unknown error'}`,
-          'ResizeObserverManager'
+          `Failed to clear timeout for ${id}: ${error instanceof Error ? error.message : "Unknown error"}`,
+          "ResizeObserverManager",
         );
       }
     });
@@ -204,8 +212,8 @@ export class ResizeObserverManager {
         observer.disconnect();
       } catch (error) {
         logger.debug(
-          `Failed to pause observer ${id}: ${error instanceof Error ? error.message : 'Unknown error'}`,
-          'ResizeObserverManager'
+          `Failed to pause observer ${id}: ${error instanceof Error ? error.message : "Unknown error"}`,
+          "ResizeObserverManager",
         );
       }
     });
@@ -226,15 +234,15 @@ export class ResizeObserverManager {
           // If the observer can't be reused (which happens after disconnect in some browsers),
           // we need to recreate it
           logger.debug(
-            `Failed to resume observer ${id}, recreating: ${error instanceof Error ? error.message : 'Unknown error'}`,
-            'ResizeObserverManager'
+            `Failed to resume observer ${id}, recreating: ${error instanceof Error ? error.message : "Unknown error"}`,
+            "ResizeObserverManager",
           );
 
           // Recreate the observer with the stored callback
           const callback = this.callbacks.get(id);
           if (callback) {
             try {
-              const newObserver = new ResizeObserver(entries => {
+              const newObserver = new ResizeObserver((entries) => {
                 if (entries.length === 1) {
                   callback(entries[0]);
                 } else {
@@ -245,8 +253,8 @@ export class ResizeObserverManager {
               this.observers.set(id, newObserver);
             } catch (recreateError) {
               logger.error(
-                `Failed to recreate observer ${id}: ${recreateError instanceof Error ? recreateError.message : 'Unknown error'}`,
-                'ResizeObserverManager'
+                `Failed to recreate observer ${id}: ${recreateError instanceof Error ? recreateError.message : "Unknown error"}`,
+                "ResizeObserverManager",
               );
             }
           }
