@@ -14,6 +14,9 @@ export * from "./layout";
 // Series types
 export * from "./SeriesTypes";
 
+// Validation types
+export * from "./validation";
+
 // Chart interfaces - selective export to avoid duplicates
 // The duplicated types (BoundingBox, ElementPosition, PaneCoordinates) are
 // exported from coordinates.ts which is the canonical source

@@ -1,9 +1,10 @@
 import { C as CornerLayoutManager, P as PrimitiveEventManager } from "../PrimitiveEventManager-DHN3p0kt.js";
 import { c as createSingleton, C as ChartCoordinateService, x as LegendDimensions, y as LegendColors, z as FormatDefaults, A as ContainerDefaults, E as CommonValues, G as TimeRangeSeconds, B as ButtonDimensions, H as ButtonSpacing, n as ButtonEffects, m as ButtonColors, I as DefaultRangeSwitcherConfig, l as logger } from "../SingletonBase-U-nNeQaU.js";
 import { J, K, O, N, w, R, U } from "../SingletonBase-U-nNeQaU.js";
-import { T as TemplateEngine, a as TradeTemplateProcessor } from "../TradeTemplateProcessor-8_VDoPqm.js";
+import { T as TemplateEngine, a as TradeTemplateProcessor } from "../TradeTemplateProcessor-DJ0neu6a.js";
 import { B, T } from "../TrendFillPrimitive-CYhR28d5.js";
 import { s as sanitizeHtml } from "../sanitization-C4wUVTJC.js";
+import { h as getLastTimestamp } from "../timeNormalization-BoM7CaIb.js";
 import { T as TooltipManager } from "../TooltipManager-BHAViL7r.js";
 import { BandPrimitive } from "../BandPrimitive-qwRQsolj.js";
 import { RibbonPrimitive } from "../RibbonPrimitive-CUS8OIAM.js";
@@ -1356,7 +1357,7 @@ class RangeSwitcherPrimitive extends BasePanePrimitive {
         if (currentRange && currentRange.to) {
           endTime = currentRange.to;
         } else {
-          endTime = Date.now() / 1e3;
+          endTime = this.getLastBarTime() ?? Date.now() / 1e3;
         }
         const fromTime = endTime - seconds;
         timeScale.setVisibleRange({
@@ -1365,6 +1366,37 @@ class RangeSwitcherPrimitive extends BasePanePrimitive {
         });
       }
     } catch {
+    }
+  }
+  /**
+   * Get the last bar time from all series in the chart
+   * @returns Last bar timestamp in seconds, or null if no data
+   */
+  getLastBarTime() {
+    if (!this.chart) return null;
+    try {
+      const seriesList = this.chart._private__seriesMap;
+      if (!seriesList) return null;
+      let latestTime = null;
+      for (const series of seriesList.values()) {
+        try {
+          const data = series.data();
+          if (data && data.length > 0) {
+            const lastPoint = data[data.length - 1];
+            if (lastPoint && lastPoint.time !== void 0) {
+              const timestamp = getLastTimestamp([lastPoint.time]);
+              if (timestamp !== void 0 && (latestTime === null || timestamp > latestTime)) {
+                latestTime = timestamp;
+              }
+            }
+          }
+        } catch {
+          continue;
+        }
+      }
+      return latestTime;
+    } catch {
+      return null;
     }
   }
   /**
@@ -1452,6 +1484,7 @@ class RangeSwitcherPrimitive extends BasePanePrimitive {
     if (this.mounted && !this.initialVisibilitySetupComplete) {
       this.invalidateDataTimespan();
       this.updateRangeButtonVisibility();
+      this.completeInitialSetup();
     }
   }
   /**
@@ -1492,10 +1525,21 @@ class RangeSwitcherPrimitive extends BasePanePrimitive {
         const currentTimespan = this.getDataTimespan();
         if (currentTimespan !== this.dataTimespan) {
           this.updateRangeButtonVisibility();
+          this.completeInitialSetup();
         }
       }
     };
     this.dataChangeIntervalId = setInterval(checkDataChanges, 1e3);
+  }
+  /**
+   * Mark initial visibility setup as complete and stop the interval
+   */
+  completeInitialSetup() {
+    this.initialVisibilitySetupComplete = true;
+    if (this.dataChangeIntervalId) {
+      clearInterval(this.dataChangeIntervalId);
+      this.dataChangeIntervalId = null;
+    }
   }
   // ===== Public API =====
   /**

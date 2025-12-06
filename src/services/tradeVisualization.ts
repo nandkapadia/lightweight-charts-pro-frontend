@@ -48,6 +48,8 @@ import {
   validateAndNormalizeTime,
   findNearestTimestamp,
 } from "../utils/timeNormalization";
+import { validateTrades } from "../utils/validationUtils";
+import { logger } from "../utils/logger";
 
 // ============================================================================
 // CRITICAL: Time normalization using centralized utilities
@@ -151,18 +153,31 @@ function createTradeRectangles(
 ): TradeRectangleData[] {
   const rectangles: TradeRectangleData[] = [];
 
-  // Enhanced validation using coordinate service
+  // Validate all trades upfront with error visibility
+  const validationResult = validateTrades(trades, {
+    onValidationError: (errors) => {
+      // Log validation errors for debugging
+      logger.warn(
+        `Trade validation errors (${errors.length} errors):`,
+        "tradeVisualization",
+        errors,
+      );
+    },
+    collectWarnings: true,
+  });
 
-  trades.forEach((trade, _index) => {
-    // Validate trade data - allow exitTime to be null for open trades
-    if (
-      !trade.entryTime ||
-      typeof trade.entryPrice !== "number" ||
-      typeof trade.exitPrice !== "number"
-    ) {
-      return;
-    }
+  // Log validation summary
+  if (validationResult.summary.invalidCount > 0) {
+    logger.warn(
+      `Filtered ${validationResult.summary.invalidCount} invalid trades. ` +
+        `Using ${validationResult.summary.validCount} valid trades.`,
+      "tradeVisualization",
+      validationResult.summary,
+    );
+  }
 
+  // Process only valid trades
+  validationResult.valid.forEach((trade, _index) => {
     // Parse entry time
     const time1 = parseTime(trade.entryTime);
     if (time1 === null) {
@@ -251,18 +266,30 @@ function createTradeMarkers(
 ): SeriesMarker<Time>[] {
   const markers: SeriesMarker<Time>[] = [];
 
-  // Enhanced validation using coordinate service
+  // Validate all trades upfront with error visibility
+  const validationResult = validateTrades(trades, {
+    onValidationError: (errors) => {
+      logger.warn(
+        `Marker creation validation errors (${errors.length} errors):`,
+        "tradeVisualization",
+        errors,
+      );
+    },
+    collectWarnings: true,
+  });
 
-  trades.forEach((trade, _index) => {
-    // Validate trade data - allow exitTime to be null for open trades
-    if (
-      !trade.entryTime ||
-      typeof trade.entryPrice !== "number" ||
-      typeof trade.exitPrice !== "number"
-    ) {
-      return;
-    }
+  // Log validation summary
+  if (validationResult.summary.invalidCount > 0) {
+    logger.warn(
+      `Filtered ${validationResult.summary.invalidCount} invalid trades for markers. ` +
+        `Creating markers for ${validationResult.summary.validCount} valid trades.`,
+      "tradeVisualization",
+      validationResult.summary,
+    );
+  }
 
+  // Process only valid trades
+  validationResult.valid.forEach((trade, _index) => {
     // Parse entry time
     const entryTime = parseTime(trade.entryTime);
     if (!entryTime) {

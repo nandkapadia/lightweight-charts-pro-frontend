@@ -4,8 +4,8 @@ const SingletonBase = require("../SingletonBase-gDO3BjT2.cjs");
 const PrimitiveEventManager = require("../PrimitiveEventManager-CiTRMx-T.cjs");
 const Disposable = require("../Disposable-CKqiosew.cjs");
 const errorHandler = require("../errorHandler-DNFrCBFd.cjs");
-const TradeTemplateProcessor = require("../TradeTemplateProcessor-hYBbKXpD.cjs");
-const tradeVisualization = require("../tradeVisualization-D9aVQTro.cjs");
+const TradeTemplateProcessor = require("../TradeTemplateProcessor-CJ6AmIWD.cjs");
+const tradeVisualization = require("../tradeVisualization-DjFWBfYW.cjs");
 class PaneCollapseManager extends Disposable.KeyedSingletonManager {
   constructor(chartApi, config = {}) {
     super();

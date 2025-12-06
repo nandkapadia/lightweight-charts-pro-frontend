@@ -7,11 +7,11 @@ const RibbonPrimitive = require("./RibbonPrimitive-ABhh7Uya.cjs");
 const GradientRibbonPrimitive = require("./GradientRibbonPrimitive-D3WbcxmW.cjs");
 const SignalPrimitive = require("./SignalPrimitive-iiJ-TEp1.cjs");
 const SingletonBase = require("./SingletonBase-gDO3BjT2.cjs");
-const UnifiedPropertyMapper = require("./UnifiedPropertyMapper-COUkGt3R.cjs");
+const UnifiedPropertyMapper = require("./UnifiedPropertyMapper-CB5XI8dJ.cjs");
 const PrimitiveEventManager = require("./PrimitiveEventManager-CiTRMx-T.cjs");
 const services_index = require("./services/index.cjs");
-const TradeTemplateProcessor = require("./TradeTemplateProcessor-hYBbKXpD.cjs");
-const tradeVisualization = require("./tradeVisualization-D9aVQTro.cjs");
+const TradeTemplateProcessor = require("./TradeTemplateProcessor-CJ6AmIWD.cjs");
+const tradeVisualization = require("./tradeVisualization-DjFWBfYW.cjs");
 const Disposable = require("./Disposable-CKqiosew.cjs");
 const chartReadyDetection = require("./chartReadyDetection-oGBjJ2lf.cjs");
 const performance = require("./performance-DwQQbRJJ.cjs");
@@ -22,6 +22,7 @@ const resizeObserverManager = require("./resizeObserverManager-CcAwXqTT.cjs");
 const trendFillSeriesPlugin = require("./trendFillSeriesPlugin-JLZvtmP-.cjs");
 const TooltipManager = require("./TooltipManager-Da0NSX91.cjs");
 const rectanglePlugin = require("./rectanglePlugin-DfVYn71c.cjs");
+const validationUtils = require("./validationUtils-RgaZ8C6t.cjs");
 function propertyTypeToSettingType(propertyType) {
   return propertyType;
 }
@@ -32,7 +33,11 @@ function getSeriesSettings(seriesType, primitive) {
     try {
       return primitive.constructor.getSettings();
     } catch (error) {
-      SingletonBase.logger.warn(`Error calling getSettings on ${seriesType}`, "seriesSettingsRegistry", error);
+      SingletonBase.logger.warn(
+        `Error calling getSettings on ${seriesType}`,
+        "seriesSettingsRegistry",
+        error
+      );
     }
   }
   const descriptor = UnifiedPropertyMapper.getSeriesDescriptor(mappedType);
@@ -188,5 +193,6 @@ exports.defaultSignalOptions = trendFillSeriesPlugin.defaultSignalOptions;
 exports.TooltipManager = TooltipManager.TooltipManager;
 exports.RectangleOverlayPlugin = rectanglePlugin.RectangleOverlayPlugin;
 exports.TooltipPlugin = rectanglePlugin.TooltipPlugin;
+exports.ValidationSeverity = validationUtils.ValidationSeverity;
 exports.getSeriesSettings = getSeriesSettings;
 //# sourceMappingURL=index.cjs.map

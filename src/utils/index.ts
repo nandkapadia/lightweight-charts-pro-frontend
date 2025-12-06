@@ -30,6 +30,7 @@ export * from "./signalColorUtils";
 // Validation utilities
 export * from "./coordinateValidation";
 export * from "./dataValidation";
+export * from "./validationUtils";
 
 // Rendering utilities
 export * from "./renderingUtils";

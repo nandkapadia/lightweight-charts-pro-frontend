@@ -177,6 +177,11 @@ export declare class RangeSwitcherPrimitive extends BasePanePrimitive<RangeSwitc
      */
     private applyRangeToChart;
     /**
+     * Get the last bar time from all series in the chart
+     * @returns Last bar timestamp in seconds, or null if no data
+     */
+    private getLastBarTime;
+    /**
      * Get the timespan of available data in seconds
      */
     private getDataTimespan;
@@ -218,6 +223,10 @@ export declare class RangeSwitcherPrimitive extends BasePanePrimitive<RangeSwitc
      * Set up observer to detect chart data changes
      */
     private setupDataChangeObserver;
+    /**
+     * Mark initial visibility setup as complete and stop the interval
+     */
+    private completeInitialSetup;
     /**
      * Add a new range
      */

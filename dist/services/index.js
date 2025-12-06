@@ -3,8 +3,8 @@ import { C } from "../SingletonBase-U-nNeQaU.js";
 import { C as C2, P } from "../PrimitiveEventManager-DHN3p0kt.js";
 import { K as KeyedSingletonManager, c as cleanupInstance } from "../Disposable-s5YYE-pO.js";
 import { h as handleError, E as ErrorSeverity } from "../errorHandler-DjpPYQWq.js";
-import { T, a } from "../TradeTemplateProcessor-8_VDoPqm.js";
-import { a as a2, b, c } from "../tradeVisualization-krm94H-H.js";
+import { T, a } from "../TradeTemplateProcessor-DJ0neu6a.js";
+import { a as a2, b, c } from "../tradeVisualization-4xAgQEzX.js";
 class PaneCollapseManager extends KeyedSingletonManager {
   constructor(chartApi, config = {}) {
     super();

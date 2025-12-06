@@ -1,5 +1,6 @@
 import { UTCTimestamp } from 'lightweight-charts';
 import { TemplateContext } from '../types/ChartInterfaces';
+import { TimeFormatter } from '../utils/timeNormalization';
 /**
  * Interface for series data used in template processing
  */
@@ -36,6 +37,26 @@ export interface TemplateOptions {
      * Whether to throw on missing placeholder data (default: false)
      */
     strict?: boolean;
+    /**
+     * Custom time formatter function.
+     * If not provided, timestamps are formatted as ISO 8601 UTC strings.
+     * NO timezone conversion is applied - times are displayed as-is.
+     *
+     * @example
+     * ```typescript
+     * // Display in user's local timezone
+     * timeFormatter: (ts) => new Date(ts * 1000).toLocaleString()
+     *
+     * // Display in specific timezone
+     * timeFormatter: (ts) => new Date(ts * 1000).toLocaleString('en-US', {
+     *   timeZone: 'America/New_York'
+     * })
+     *
+     * // Custom format
+     * timeFormatter: (ts) => `${new Date(ts * 1000).toISOString().slice(0, 10)}`
+     * ```
+     */
+    timeFormatter?: TimeFormatter;
 }
 /**
  * Template processing result
@@ -174,9 +195,15 @@ export declare class TemplateEngine {
      */
     private formatNumber;
     /**
-     * Format time value
+     * Format time value WITHOUT timezone conversion.
+     * Times are normalized to Unix timestamps and formatted as-is.
+     * No automatic timezone conversion is applied.
+     *
+     * @param time - Time value in any supported format
+     * @param formatter - Optional custom time formatter function
+     * @returns Formatted time string
      */
-    private formatTime;
+    private formatTimeValue;
     /**
      * Format date with custom format string
      */

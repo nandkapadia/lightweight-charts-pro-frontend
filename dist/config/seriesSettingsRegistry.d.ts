@@ -4,7 +4,7 @@
  * Descriptor-driven settings registry - derives settings from UnifiedSeriesDescriptor.
  * This replaces the old manual settings definitions.
  */
-export type SettingType = 'boolean' | 'number' | 'color' | 'line' | 'lineStyle' | 'lineWidth';
+export type SettingType = "boolean" | "number" | "color" | "line" | "lineStyle" | "lineWidth";
 export interface SeriesSettings {
     [propertyName: string]: SettingType;
 }

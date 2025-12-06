@@ -2,9 +2,10 @@
 Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 const PrimitiveEventManager = require("../PrimitiveEventManager-CiTRMx-T.cjs");
 const SingletonBase = require("../SingletonBase-gDO3BjT2.cjs");
-const TradeTemplateProcessor = require("../TradeTemplateProcessor-hYBbKXpD.cjs");
+const TradeTemplateProcessor = require("../TradeTemplateProcessor-CJ6AmIWD.cjs");
 const TrendFillPrimitive = require("../TrendFillPrimitive-KhsF2haK.cjs");
 const sanitization = require("../sanitization-DC4_oy5v.cjs");
+const timeNormalization = require("../timeNormalization-6HleXxTH.cjs");
 const TooltipManager = require("../TooltipManager-Da0NSX91.cjs");
 const BandPrimitive = require("../BandPrimitive-DbtRVbsg.cjs");
 const RibbonPrimitive = require("../RibbonPrimitive-ABhh7Uya.cjs");
@@ -1357,7 +1358,7 @@ class RangeSwitcherPrimitive extends BasePanePrimitive {
         if (currentRange && currentRange.to) {
           endTime = currentRange.to;
         } else {
-          endTime = Date.now() / 1e3;
+          endTime = this.getLastBarTime() ?? Date.now() / 1e3;
         }
         const fromTime = endTime - seconds;
         timeScale.setVisibleRange({
@@ -1366,6 +1367,37 @@ class RangeSwitcherPrimitive extends BasePanePrimitive {
         });
       }
     } catch {
+    }
+  }
+  /**
+   * Get the last bar time from all series in the chart
+   * @returns Last bar timestamp in seconds, or null if no data
+   */
+  getLastBarTime() {
+    if (!this.chart) return null;
+    try {
+      const seriesList = this.chart._private__seriesMap;
+      if (!seriesList) return null;
+      let latestTime = null;
+      for (const series of seriesList.values()) {
+        try {
+          const data = series.data();
+          if (data && data.length > 0) {
+            const lastPoint = data[data.length - 1];
+            if (lastPoint && lastPoint.time !== void 0) {
+              const timestamp = timeNormalization.getLastTimestamp([lastPoint.time]);
+              if (timestamp !== void 0 && (latestTime === null || timestamp > latestTime)) {
+                latestTime = timestamp;
+              }
+            }
+          }
+        } catch {
+          continue;
+        }
+      }
+      return latestTime;
+    } catch {
+      return null;
     }
   }
   /**
@@ -1453,6 +1485,7 @@ class RangeSwitcherPrimitive extends BasePanePrimitive {
     if (this.mounted && !this.initialVisibilitySetupComplete) {
       this.invalidateDataTimespan();
       this.updateRangeButtonVisibility();
+      this.completeInitialSetup();
     }
   }
   /**
@@ -1493,10 +1526,21 @@ class RangeSwitcherPrimitive extends BasePanePrimitive {
         const currentTimespan = this.getDataTimespan();
         if (currentTimespan !== this.dataTimespan) {
           this.updateRangeButtonVisibility();
+          this.completeInitialSetup();
         }
       }
     };
     this.dataChangeIntervalId = setInterval(checkDataChanges, 1e3);
+  }
+  /**
+   * Mark initial visibility setup as complete and stop the interval
+   */
+  completeInitialSetup() {
+    this.initialVisibilitySetupComplete = true;
+    if (this.dataChangeIntervalId) {
+      clearInterval(this.dataChangeIntervalId);
+      this.dataChangeIntervalId = null;
+    }
   }
   // ===== Public API =====
   /**

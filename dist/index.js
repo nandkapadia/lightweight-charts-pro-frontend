@@ -6,12 +6,12 @@ import { GradientRibbonPrimitive } from "./GradientRibbonPrimitive-D9eS6vkT.js";
 import { SignalPrimitive } from "./SignalPrimitive-BlYMaNR8.js";
 import { l as logger } from "./SingletonBase-U-nNeQaU.js";
 import { m, B as B2, n, u, C, D, F, L, M, a, S, T as T2, U, Z, i, b, h, c, k, q, r, o, j, d, p, s, g, v, t, f, e } from "./SingletonBase-U-nNeQaU.js";
-import { x as normalizeSeriesType, g as getSeriesDescriptor } from "./UnifiedPropertyMapper-Clv9GlEt.js";
-import { P, a as a2, S as S2, c as c2, f as f2, b as b2, d as d2, e as e2, i as i2, r as r2, u as u2, h as h2, j as j2, k as k2 } from "./UnifiedPropertyMapper-Clv9GlEt.js";
+import { x as normalizeSeriesType, g as getSeriesDescriptor } from "./UnifiedPropertyMapper-BdwJBMVZ.js";
+import { P, a as a2, S as S2, c as c2, f as f2, b as b2, d as d2, e as e2, i as i2, r as r2, u as u2, h as h2, j as j2, k as k2 } from "./UnifiedPropertyMapper-BdwJBMVZ.js";
 import { C as C2, P as P2 } from "./PrimitiveEventManager-DHN3p0kt.js";
 import { PaneCollapseManager, createAnnotationVisualElements } from "./services/index.js";
-import { T as T3, a as a3 } from "./TradeTemplateProcessor-8_VDoPqm.js";
-import { c as c3 } from "./tradeVisualization-krm94H-H.js";
+import { T as T3, a as a3 } from "./TradeTemplateProcessor-DJ0neu6a.js";
+import { c as c3 } from "./tradeVisualization-4xAgQEzX.js";
 import { K } from "./Disposable-s5YYE-pO.js";
 import { ChartReadyDetector } from "./chartReadyDetection-BHQW1Rce.js";
 import { Q, V, f as f3, e as e3, h as h3, b as b3, l, i as i3, d as d3, k as k3, g as g2, c as c4, m as m2, p as p2, s as s2, t as t2, v as v2, j as j3 } from "./performance-CrlOj4rV.js";
@@ -22,6 +22,7 @@ import { R } from "./resizeObserverManager-Cvxy9tba.js";
 import { S as S4, d as d6, c as c8, b as b6, a as a6, e as e5, f as f5, h as h6, g as g4 } from "./trendFillSeriesPlugin-Dh6Xr_7M.js";
 import { T as T4 } from "./TooltipManager-BHAViL7r.js";
 import { R as R2, T as T5 } from "./rectanglePlugin-BDSiVFjR.js";
+import { V as V2 } from "./validationUtils-C6PkWh3o.js";
 function propertyTypeToSettingType(propertyType) {
   return propertyType;
 }
@@ -32,7 +33,11 @@ function getSeriesSettings(seriesType, primitive) {
     try {
       return primitive.constructor.getSettings();
     } catch (error) {
-      logger.warn(`Error calling getSettings on ${seriesType}`, "seriesSettingsRegistry", error);
+      logger.warn(
+        `Error calling getSettings on ${seriesType}`,
+        "seriesSettingsRegistry",
+        error
+      );
     }
   }
   const descriptor = getSeriesDescriptor(mappedType);
@@ -101,6 +106,7 @@ export {
   T as TrendFillPrimitive,
   U as UniversalSpacing,
   V as ValidationConfigs,
+  V2 as ValidationSeverity,
   Z as Z_INDEX,
   i as areCoordinatesStale,
   f3 as asLineStyle,

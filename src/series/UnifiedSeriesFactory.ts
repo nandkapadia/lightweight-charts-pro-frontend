@@ -33,6 +33,7 @@ import {
   createSortedTimeArray,
   findNearestTimestamp,
 } from "../utils/timeNormalization";
+import { validateMarkers } from "../utils/validationUtils";
 import { CUSTOM_SERIES_DESCRIPTORS } from "./descriptors/customSeriesDescriptors";
 import { cleanLineStyleOptions } from "../utils/lineStyle";
 import { logger } from "../utils/logger";
@@ -714,6 +715,8 @@ export function createSeriesWithConfig(
  * - O(n log n) for sorting chart times once
  * - O(log n) binary search per marker
  *
+ * Now includes validation with error visibility for debugging.
+ *
  * @param markers - Array of markers to snap
  * @param chartData - Chart data for timestamp reference
  * @returns Array of markers with snapped timestamps
@@ -726,20 +729,45 @@ function applyTimestampSnapping(
     return markers;
   }
 
+  // Validate markers upfront with error visibility
+  const validationResult = validateMarkers(
+    markers as any[], // SeriesMarker is compatible with MarkerData
+    {
+      onValidationError: (errors) => {
+        logger.warn(
+          `Marker validation errors (${errors.length} errors):`,
+          "UnifiedSeriesFactory",
+          errors,
+        );
+      },
+      collectWarnings: true,
+    },
+  );
+
+  // Log validation summary if there were issues
+  if (validationResult.summary.invalidCount > 0) {
+    logger.warn(
+      `Filtered ${validationResult.summary.invalidCount} invalid markers. ` +
+        `Snapping ${validationResult.summary.validCount} valid markers.`,
+      "UnifiedSeriesFactory",
+      validationResult.summary,
+    );
+  }
+
   // Extract and normalize timestamps WITHOUT timezone conversion
   const chartTimes = chartData
     .map((item) => item.time)
     .filter((time): time is Time => time !== undefined && time !== null);
 
   if (chartTimes.length === 0) {
-    return markers;
+    return validationResult.valid as SeriesMarker<Time>[];
   }
 
   // Create sorted time array for O(log n) binary search
   const sortedTimes = createSortedTimeArray(chartTimes);
 
-  // Apply timestamp snapping to each marker using binary search
-  return markers.map((marker) => {
+  // Apply timestamp snapping to each VALID marker using binary search
+  return validationResult.valid.map((marker) => {
     if (!marker.time) {
       return marker;
     }
@@ -755,8 +783,14 @@ function applyTimestampSnapping(
         ...marker,
         time: nearestTime as Time,
       };
-    } catch {
-      // If normalization fails, return marker unchanged
+    } catch (error) {
+      // Log normalization failures
+      logger.warn(
+        `Failed to normalize marker time: ${marker.time}`,
+        "UnifiedSeriesFactory",
+        error,
+      );
+      // Return marker unchanged
       return marker;
     }
   }) as SeriesMarker<Time>[];
