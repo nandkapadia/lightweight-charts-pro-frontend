@@ -610,3 +610,11 @@ export function setupGlobalMocks(config: MockConfig = MockPresets.unit()) {
     return originalCreateElement.call(document, tagName);
   });
 }
+
+/**
+ * Convenience function to create a mock chart
+ * Alias for MockFactory.createChart() for easier test imports
+ */
+export function createMockChart(config: MockConfig = {}): IChartApi {
+  return MockFactory.createChart(config);
+}

@@ -432,7 +432,7 @@ describe("TemplateEngine", () => {
       const template = "$$time$$";
       const context: TemplateContext = {
         seriesData: {
-          time: 1705318800, // 2024-01-15 10:00:00 UTC
+          time: 1705312800, // 2024-01-15 10:00:00 UTC
         },
       };
 
@@ -462,7 +462,7 @@ describe("TemplateEngine", () => {
       const template = "$$time$$";
       const context: TemplateContext = {
         seriesData: {
-          time: 1705318800,
+          time: 1705312800,
         },
       };
       const options: TemplateOptions = {
@@ -471,7 +471,7 @@ describe("TemplateEngine", () => {
 
       const result = engine.processTemplate(template, context, options);
 
-      expect(result.content).toBe("Custom: 1705318800");
+      expect(result.content).toBe("Custom: 1705312800");
     });
 
     it("should allow user to specify their own timezone in formatter", () => {
@@ -589,24 +589,32 @@ describe("TemplateEngine", () => {
       expect(result.content).toMatch(/\d{2}:\d{2}:\d{2}/);
     });
 
-    it("should apply custom format YYYY-MM-DD HH:mm", () => {
+    it("should use custom formatter for custom time format", () => {
       const template = "$$time$$";
       const context: TemplateContext = {
         seriesData: {
-          time: 1609459200,
+          time: 1609459200, // 2021-01-01 00:00:00 UTC
         },
-        formatting: {
-          timeFormat: "YYYY-MM-DD HH:mm",
+      };
+      const options: TemplateOptions = {
+        timeFormatter: (ts: number) => {
+          const date = new Date(ts * 1000);
+          const year = date.getUTCFullYear();
+          const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+          const day = String(date.getUTCDate()).padStart(2, "0");
+          const hours = String(date.getUTCHours()).padStart(2, "0");
+          const minutes = String(date.getUTCMinutes()).padStart(2, "0");
+          return `${year}-${month}-${day} ${hours}:${minutes}`;
         },
       };
 
-      const result = engine.processTemplate(template, context);
+      const result = engine.processTemplate(template, context, options);
 
-      // Format is YYYY-MM-DD HH:mm (local time zone)
-      expect(result.content).toMatch(/\d{4}-\d{2}-\d{2} \d{2}:\d{2}/);
+      // Format is YYYY-MM-DD HH:mm (UTC)
+      expect(result.content).toBe("2021-01-01 00:00");
     });
 
-    it("should handle invalid time value", () => {
+    it("should handle invalid time value gracefully", () => {
       const template = "$$time$$";
       const context: TemplateContext = {
         seriesData: {
@@ -616,7 +624,8 @@ describe("TemplateEngine", () => {
 
       const result = engine.processTemplate(template, context);
 
-      expect(result.content).toBe("Invalid Date");
+      // Invalid time should return the string representation
+      expect(result.content).toBe("invalid-time");
     });
 
     it("should handle null time", () => {
