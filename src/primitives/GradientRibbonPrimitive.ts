@@ -43,17 +43,23 @@ import {
   IPrimitivePaneRenderer,
   Time,
   PrimitivePaneViewZOrder,
-} from 'lightweight-charts';
-import { BitmapCoordinatesRenderingScope, CanvasRenderingTarget2D } from 'fancy-canvas';
-import { getSolidColorFromFill } from '../utils/colorUtils';
-import { convertToCoordinates, drawMultiLine } from '../plugins/series/base/commonRendering';
+} from "lightweight-charts";
+import {
+  BitmapCoordinatesRenderingScope,
+  CanvasRenderingTarget2D,
+} from "fancy-canvas";
+import { getSolidColorFromFill } from "../utils/colorUtils";
+import {
+  convertToCoordinates,
+  drawMultiLine,
+} from "../plugins/series/base/commonRendering";
 import {
   BaseSeriesPrimitive,
   BaseSeriesPrimitiveOptions,
   BaseProcessedData,
   BaseSeriesPrimitivePaneView,
   BaseSeriesPrimitiveAxisView,
-} from './BaseSeriesPrimitive';
+} from "./BaseSeriesPrimitive";
 
 // ============================================================================
 // Data Interfaces
@@ -106,11 +112,15 @@ interface GradientRibbonProcessedData extends BaseProcessedData {
 /**
  * Interpolate between two hex colors
  */
-function interpolateColor(startColor: string, endColor: string, factor: number): string {
+function interpolateColor(
+  startColor: string,
+  endColor: string,
+  factor: number,
+): string {
   factor = Math.max(0, Math.min(1, factor));
 
   const parseHex = (hex: string) => {
-    const clean = hex.replace('#', '');
+    const clean = hex.replace("#", "");
     return {
       r: parseInt(clean.substr(0, 2), 16),
       g: parseInt(clean.substr(2, 2), 16),
@@ -126,7 +136,7 @@ function interpolateColor(startColor: string, endColor: string, factor: number):
     const g = Math.round(start.g + (end.g - start.g) * factor);
     const b = Math.round(start.b + (end.b - start.b) * factor);
 
-    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+    return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
   } catch {
     return startColor;
   }
@@ -141,7 +151,9 @@ class GradientRibbonPrimitivePaneView extends BaseSeriesPrimitivePaneView<
   GradientRibbonPrimitiveOptions
 > {
   renderer(): IPrimitivePaneRenderer {
-    return new GradientRibbonPrimitiveRenderer(this._source as GradientRibbonPrimitive);
+    return new GradientRibbonPrimitiveRenderer(
+      this._source as GradientRibbonPrimitive,
+    );
   }
 }
 
@@ -168,58 +180,63 @@ class GradientRibbonPrimitiveRenderer implements IPrimitivePaneRenderer {
    * that should appear on top of fills and other series
    */
   draw(target: CanvasRenderingTarget2D): void {
-    target.useBitmapCoordinateSpace((scope: BitmapCoordinatesRenderingScope) => {
-      const ctx = scope.context;
-      const hRatio = scope.horizontalPixelRatio;
-      const vRatio = scope.verticalPixelRatio;
+    target.useBitmapCoordinateSpace(
+      (scope: BitmapCoordinatesRenderingScope) => {
+        const ctx = scope.context;
+        const hRatio = scope.horizontalPixelRatio;
+        const vRatio = scope.verticalPixelRatio;
 
-      const data = this._source.getProcessedData();
-      const series = this._source.getAttachedSeries();
+        const data = this._source.getProcessedData();
+        const series = this._source.getAttachedSeries();
 
-      if (!series || data.length === 0) return;
+        if (!series || data.length === 0) return;
 
-      // Read options from attached series (single source of truth)
-      const options = (series as any).options();
-      if (!options || options.visible === false) return;
+        // Read options from attached series (single source of truth)
+        const options = (series as any).options();
+        if (!options || options.visible === false) return;
 
-      ctx.save();
+        ctx.save();
 
-      // Convert to screen coordinates
-      const chart = this._source.getChart();
-      const baseCoordinates = convertToCoordinates(data, chart, series, ['upper', 'lower']);
+        // Convert to screen coordinates
+        const chart = this._source.getChart();
+        const baseCoordinates = convertToCoordinates(data, chart, series, [
+          "upper",
+          "lower",
+        ]);
 
-      // Scale coordinates for lines
-      const scaledCoordsForLines = baseCoordinates.map(coord => ({
-        x: coord.x !== null ? coord.x * hRatio : null,
-        upper: coord.upper !== null ? coord.upper * vRatio : null,
-        lower: coord.lower !== null ? coord.lower * vRatio : null,
-      }));
+        // Scale coordinates for lines
+        const scaledCoordsForLines = baseCoordinates.map((coord) => ({
+          x: coord.x !== null ? coord.x * hRatio : null,
+          upper: coord.upper !== null ? coord.upper * vRatio : null,
+          lower: coord.lower !== null ? coord.lower * vRatio : null,
+        }));
 
-      // Draw lines (foreground)
-      if (options.upperLineVisible) {
-        drawMultiLine(
-          ctx,
-          scaledCoordsForLines,
-          'upper',
-          options.upperLineColor,
-          options.upperLineWidth * hRatio,
-          options.upperLineStyle
-        );
-      }
+        // Draw lines (foreground)
+        if (options.upperLineVisible) {
+          drawMultiLine(
+            ctx,
+            scaledCoordsForLines,
+            "upper",
+            options.upperLineColor,
+            options.upperLineWidth * hRatio,
+            options.upperLineStyle,
+          );
+        }
 
-      if (options.lowerLineVisible) {
-        drawMultiLine(
-          ctx,
-          scaledCoordsForLines,
-          'lower',
-          options.lowerLineColor,
-          options.lowerLineWidth * hRatio,
-          options.lowerLineStyle
-        );
-      }
+        if (options.lowerLineVisible) {
+          drawMultiLine(
+            ctx,
+            scaledCoordsForLines,
+            "lower",
+            options.lowerLineColor,
+            options.lowerLineWidth * hRatio,
+            options.lowerLineStyle,
+          );
+        }
 
-      ctx.restore();
-    });
+        ctx.restore();
+      },
+    );
   }
 
   /**
@@ -228,75 +245,82 @@ class GradientRibbonPrimitiveRenderer implements IPrimitivePaneRenderer {
    * that should appear behind lines and other series
    */
   drawBackground(target: CanvasRenderingTarget2D): void {
-    target.useBitmapCoordinateSpace((scope: BitmapCoordinatesRenderingScope) => {
-      const ctx = scope.context;
-      const hRatio = scope.horizontalPixelRatio;
-      const vRatio = scope.verticalPixelRatio;
+    target.useBitmapCoordinateSpace(
+      (scope: BitmapCoordinatesRenderingScope) => {
+        const ctx = scope.context;
+        const hRatio = scope.horizontalPixelRatio;
+        const vRatio = scope.verticalPixelRatio;
 
-      const data = this._source.getProcessedData();
-      const series = this._source.getAttachedSeries();
+        const data = this._source.getProcessedData();
+        const series = this._source.getAttachedSeries();
 
-      if (!series || data.length === 0) return;
+        if (!series || data.length === 0) return;
 
-      // Read options from attached series (single source of truth)
-      const options = (series as any).options();
-      if (!options || options.visible === false) return;
+        // Read options from attached series (single source of truth)
+        const options = (series as any).options();
+        if (!options || options.visible === false) return;
 
-      ctx.save();
+        ctx.save();
 
-      // Convert to screen coordinates
-      const chart = this._source.getChart();
-      const baseCoordinates = convertToCoordinates(data, chart, series, ['upper', 'lower']);
+        // Convert to screen coordinates
+        const chart = this._source.getChart();
+        const baseCoordinates = convertToCoordinates(data, chart, series, [
+          "upper",
+          "lower",
+        ]);
 
-      // Calculate fillColor at render time using current options
-      interface GradientCoordinate {
-        x: number | null;
-        upper: number | null;
-        lower: number | null;
-        fillColor: string;
-      }
-
-      const coordinates: GradientCoordinate[] = baseCoordinates.map((coord, idx) => {
-        const dataPoint = data[idx];
-        let fillColor = options.gradientStartColor; // Use gradient start as fallback
-
-        if (dataPoint) {
-          // Use explicit fill override if provided
-          if (dataPoint.fillOverride) {
-            fillColor = dataPoint.fillOverride;
-          } else {
-            // Always calculate from gradient factor (factor=0 gives gradientStartColor)
-            fillColor = interpolateColor(
-              options.gradientStartColor,
-              options.gradientEndColor,
-              dataPoint.gradientFactor
-            );
-          }
+        // Calculate fillColor at render time using current options
+        interface GradientCoordinate {
+          x: number | null;
+          upper: number | null;
+          lower: number | null;
+          fillColor: string;
         }
 
-        return {
-          x: coord.x,
-          upper: coord.upper,
-          lower: coord.lower,
-          fillColor,
-        };
-      });
+        const coordinates: GradientCoordinate[] = baseCoordinates.map(
+          (coord, idx) => {
+            const dataPoint = data[idx];
+            let fillColor = options.gradientStartColor; // Use gradient start as fallback
 
-      // Scale coordinates for fills (with fillColor)
-      const scaledCoordsForFills = coordinates.map(coord => ({
-        x: coord.x !== null ? coord.x * hRatio : null,
-        upper: coord.upper !== null ? coord.upper * vRatio : null,
-        lower: coord.lower !== null ? coord.lower * vRatio : null,
-        fillColor: coord.fillColor,
-      }));
+            if (dataPoint) {
+              // Use explicit fill override if provided
+              if (dataPoint.fillOverride) {
+                fillColor = dataPoint.fillOverride;
+              } else {
+                // Always calculate from gradient factor (factor=0 gives gradientStartColor)
+                fillColor = interpolateColor(
+                  options.gradientStartColor,
+                  options.gradientEndColor,
+                  dataPoint.gradientFactor,
+                );
+              }
+            }
 
-      // Draw gradient fill area (background)
-      if (options.fillVisible && scaledCoordsForFills.length > 1) {
-        this._drawGradientFill(ctx, scaledCoordsForFills, options);
-      }
+            return {
+              x: coord.x,
+              upper: coord.upper,
+              lower: coord.lower,
+              fillColor,
+            };
+          },
+        );
 
-      ctx.restore();
-    });
+        // Scale coordinates for fills (with fillColor)
+        const scaledCoordsForFills = coordinates.map((coord) => ({
+          x: coord.x !== null ? coord.x * hRatio : null,
+          upper: coord.upper !== null ? coord.upper * vRatio : null,
+          lower: coord.lower !== null ? coord.lower * vRatio : null,
+          fillColor: coord.fillColor,
+        }));
+
+        // Draw gradient fill area (background)
+        if (options.fillVisible && scaledCoordsForFills.length > 1) {
+          this._drawGradientFill(ctx, scaledCoordsForFills, options);
+        }
+
+        ctx.restore();
+      },
+    );
   }
 
   private _drawGradientFill(
@@ -307,10 +331,11 @@ class GradientRibbonPrimitiveRenderer implements IPrimitivePaneRenderer {
       lower: number | null;
       fillColor?: string;
     }>,
-    options: GradientRibbonPrimitiveOptions
+    options: GradientRibbonPrimitiveOptions,
   ): void {
     const validCoords = coordinates.filter(
-      coord => coord.x !== null && coord.upper !== null && coord.lower !== null
+      (coord) =>
+        coord.x !== null && coord.upper !== null && coord.lower !== null,
     );
 
     if (validCoords.length < 2) return;
@@ -382,12 +407,12 @@ class GradientRibbonUpperAxisView extends BaseSeriesPrimitiveAxisView<
 
   text(): string {
     const lastItem = this._getLastVisibleItem();
-    if (!lastItem) return '';
+    if (!lastItem) return "";
     return lastItem.upper.toFixed(2);
   }
 
   textColor(): string {
-    return '#FFFFFF';
+    return "#FFFFFF";
   }
 
   backColor(): string {
@@ -416,12 +441,12 @@ class GradientRibbonLowerAxisView extends BaseSeriesPrimitiveAxisView<
 
   text(): string {
     const lastItem = this._getLastVisibleItem();
-    if (!lastItem) return '';
+    if (!lastItem) return "";
     return lastItem.lower.toFixed(2);
   }
 
   textColor(): string {
-    return '#FFFFFF';
+    return "#FFFFFF";
   }
 
   backColor(): string {
@@ -454,12 +479,12 @@ export class GradientRibbonPrimitive extends BaseSeriesPrimitive<
    */
   static getSettings() {
     return {
-      upperLine: 'line' as const,
-      lowerLine: 'line' as const,
-      fillVisible: 'boolean' as const,
-      gradientStartColor: 'color' as const,
-      gradientEndColor: 'color' as const,
-      normalizeGradients: 'boolean' as const,
+      upperLine: "line" as const,
+      lowerLine: "line" as const,
+      fillVisible: "boolean" as const,
+      gradientStartColor: "color" as const,
+      gradientEndColor: "color" as const,
+      normalizeGradients: "boolean" as const,
     };
   }
 
@@ -480,8 +505,8 @@ export class GradientRibbonPrimitive extends BaseSeriesPrimitive<
 
     // Calculate gradient bounds if we have gradient data and normalization is enabled
     const gradientValues = rawData
-      .map(item => item.gradient)
-      .filter(val => val !== undefined && val !== null) as number[];
+      .map((item) => item.gradient)
+      .filter((val) => val !== undefined && val !== null) as number[];
 
     if (gradientValues.length > 0 && this._options.normalizeGradients) {
       minGradient = Math.min(...gradientValues);
@@ -493,8 +518,8 @@ export class GradientRibbonPrimitive extends BaseSeriesPrimitive<
     if (this._options.normalizeGradients && gradientValues.length === 0) {
       for (const item of rawData) {
         if (
-          typeof item.upper === 'number' &&
-          typeof item.lower === 'number' &&
+          typeof item.upper === "number" &&
+          typeof item.lower === "number" &&
           isFinite(item.upper) &&
           isFinite(item.lower)
         ) {
@@ -506,7 +531,7 @@ export class GradientRibbonPrimitive extends BaseSeriesPrimitive<
 
     // Process data - store gradient factor, not final color
     return rawData
-      .map(item => {
+      .map((item) => {
         const upper = item.upper;
         const lower = item.lower;
 
@@ -565,6 +590,6 @@ export class GradientRibbonPrimitive extends BaseSeriesPrimitive<
 
   // Optional: Custom z-order default
   protected _getDefaultZOrder(): PrimitivePaneViewZOrder {
-    return 'normal'; // Render in normal layer (in front of grid)
+    return "normal"; // Render in normal layer (in front of grid)
   }
 }

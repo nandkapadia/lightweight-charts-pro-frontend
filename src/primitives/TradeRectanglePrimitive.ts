@@ -34,13 +34,16 @@ import {
   Coordinate,
   UTCTimestamp,
   PrimitiveHoveredItem,
-} from 'lightweight-charts';
+} from "lightweight-charts";
 
 // Local Imports
-import { ChartCoordinateService } from '../services/ChartCoordinateService';
-import { logger } from '../utils/logger';
-import { TooltipManager } from '../plugins/chart/TooltipManager';
-import { TradeTemplateProcessor, TradeTemplateData } from '../services/TradeTemplateProcessor';
+import { ChartCoordinateService } from "../services/ChartCoordinateService";
+import { logger } from "../utils/logger";
+import { TooltipManager } from "../plugins/chart/TooltipManager";
+import {
+  TradeTemplateProcessor,
+  TradeTemplateData,
+} from "../services/TradeTemplateProcessor";
 
 /**
  * Trade rectangle data structure
@@ -178,7 +181,7 @@ class TradeRectangleRenderer implements IPrimitivePaneRenderer {
     fillColor: string,
     borderColor: string,
     borderWidth: number,
-    opacity: number
+    opacity: number,
   ) {
     this._x1 = x1;
     this._y1 = y1;
@@ -423,7 +426,7 @@ class TradeRectangleView implements IPrimitivePaneView {
       data.fillColor,
       data.borderColor,
       data.borderWidth,
-      data.opacity
+      data.opacity,
     );
   }
 }
@@ -508,7 +511,10 @@ export class TradeRectanglePrimitive implements ISeriesPrimitive {
    * @param {TradeRectangleData} data - Trade rectangle data with time/price bounds
    * @param {TradeRectangleTooltipOptions} [tooltipOptions] - Optional tooltip configuration
    */
-  constructor(data: TradeRectangleData, tooltipOptions?: TradeRectangleTooltipOptions) {
+  constructor(
+    data: TradeRectangleData,
+    tooltipOptions?: TradeRectangleTooltipOptions,
+  ) {
     // Store trade data
     this._data = data;
 
@@ -522,7 +528,7 @@ export class TradeRectanglePrimitive implements ISeriesPrimitive {
     this._tooltipOptions = {
       priority: 10,
       enabled: true,
-      customStyle: '',
+      customStyle: "",
       ...tooltipOptions,
     };
   }
@@ -583,11 +589,12 @@ export class TradeRectanglePrimitive implements ISeriesPrimitive {
       // Prepare template data from trade rectangle
       // All calculations should be done in backend; frontend just displays
       const templateData: TradeTemplateData = {
-        tradeType: this._data.tradeType || 'long',
+        tradeType: this._data.tradeType || "long",
         entryPrice: this._data.price1,
         exitPrice: this._data.price2,
         pnl: this._data.price2 - this._data.price1, // Simple price difference
-        pnlPercentage: ((this._data.price2 - this._data.price1) / this._data.price1) * 100,
+        pnlPercentage:
+          ((this._data.price2 - this._data.price1) / this._data.price1) * 100,
         quantity: this._data.quantity,
         notes: this._data.notes,
         tradeId: this._data.tradeId,
@@ -600,7 +607,7 @@ export class TradeRectanglePrimitive implements ISeriesPrimitive {
       // Process template with trade data
       const result = TradeTemplateProcessor.processTemplate(
         this._tooltipOptions.tooltipTemplate,
-        templateData
+        templateData,
       );
 
       return result.content;
@@ -615,12 +622,16 @@ export class TradeRectanglePrimitive implements ISeriesPrimitive {
 
     // Get profitability from backend data (required field)
     const isProfitable = this._data.isProfitable ?? false;
-    const side = isProfitable ? 'PROFIT' : 'LOSS';
-    const sideColor = isProfitable ? '#00ff88' : '#ff4444';
-    const pnlColor = isProfitable ? '#00ff88' : '#ff4444';
+    const side = isProfitable ? "PROFIT" : "LOSS";
+    const sideColor = isProfitable ? "#00ff88" : "#ff4444";
+    const pnlColor = isProfitable ? "#00ff88" : "#ff4444";
 
     // Get trade direction (supports multiple property names for backward compatibility)
-    const tradeDirection = (this._data.tradeType || this._data.trade_type || 'LONG').toUpperCase();
+    const tradeDirection = (
+      this._data.tradeType ||
+      this._data.trade_type ||
+      "LONG"
+    ).toUpperCase();
 
     return `
       <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
@@ -636,7 +647,7 @@ export class TradeRectanglePrimitive implements ISeriesPrimitive {
           <div>Entry: $${this._data.price1.toFixed(2)}</div>
           <div>Exit: $${this._data.price2.toFixed(2)}</div>
           <div style="color: ${pnlColor}; font-weight: bold;">
-            P&L: $${pnl >= 0 ? '+' : ''}${pnl.toFixed(2)} (${pnlPercent}%)
+            P&L: $${pnl >= 0 ? "+" : ""}${pnl.toFixed(2)} (${pnlPercent}%)
           </div>
         </div>
       </div>
@@ -670,7 +681,7 @@ export class TradeRectanglePrimitive implements ISeriesPrimitive {
     `;
 
     // Merge custom styles if provided
-    return baseStyle + (this._tooltipOptions.customStyle || '');
+    return baseStyle + (this._tooltipOptions.customStyle || "");
   }
 
   /**
@@ -731,11 +742,16 @@ export class TradeRectanglePrimitive implements ISeriesPrimitive {
       const expandedBottom = rectBottom + tolerance;
 
       // Step 6: Check if mouse coordinates fall within expanded bounds
-      if (x >= expandedLeft && x <= expandedRight && y >= expandedTop && y <= expandedBottom) {
+      if (
+        x >= expandedLeft &&
+        x <= expandedRight &&
+        y >= expandedTop &&
+        y <= expandedBottom
+      ) {
         // Hit detected - return hover item
         return {
-          externalId: this._data.tradeId || 'trade-rectangle',
-          zOrder: 'normal',
+          externalId: this._data.tradeId || "trade-rectangle",
+          zOrder: "normal",
         };
       }
 
@@ -777,7 +793,11 @@ export class TradeRectanglePrimitive implements ISeriesPrimitive {
 
     // Step 2: Validate crosshair point exists and has valid numeric coordinates
     // param.point may be undefined if crosshair is off the chart
-    if (!param.point || typeof param.point.x !== 'number' || typeof param.point.y !== 'number') {
+    if (
+      !param.point ||
+      typeof param.point.x !== "number" ||
+      typeof param.point.y !== "number"
+    ) {
       TooltipManager.getInstance().hideTooltip(this._primitiveId);
       return;
     }
@@ -795,7 +815,7 @@ export class TradeRectanglePrimitive implements ISeriesPrimitive {
           content: this.createTooltipContent(),
           style: this.createTooltipStyle(),
           position: param.point,
-          cssClasses: ['trade-tooltip'],
+          cssClasses: ["trade-tooltip"],
         });
       } else {
         // Step 4b: No hit - hide tooltip
@@ -804,7 +824,11 @@ export class TradeRectanglePrimitive implements ISeriesPrimitive {
     } catch (error) {
       // Step 5: Handle any errors during hit testing
       // Log for debugging but don't show errors to prevent flickering
-      logger.warn('Hit test error in crosshair handler', 'TradeRectanglePrimitive', error);
+      logger.warn(
+        "Hit test error in crosshair handler",
+        "TradeRectanglePrimitive",
+        error,
+      );
       TooltipManager.getInstance().hideTooltip(this._primitiveId);
     }
   }
@@ -846,7 +870,7 @@ export class TradeRectanglePrimitive implements ISeriesPrimitive {
     // Step 2: Register chart with coordinate service for consistency
     // This ensures all coordinate conversions use the same service
     const coordinateService = ChartCoordinateService.getInstance();
-    const chartId = chart.chartElement()?.id || 'default';
+    const chartId = chart.chartElement()?.id || "default";
     coordinateService.registerChart(chartId, chart);
 
     // Step 3: Subscribe to chart events for automatic coordinate updates
@@ -876,10 +900,16 @@ export class TradeRectanglePrimitive implements ISeriesPrimitive {
 
       // Step 3c: Subscribe to chart events
       // Store callbacks for cleanup in detached()
-      chart.timeScale().subscribeVisibleTimeRangeChange(this._timeScaleCallback);
+      chart
+        .timeScale()
+        .subscribeVisibleTimeRangeChange(this._timeScaleCallback);
       chart.subscribeCrosshairMove(this._crosshairCallback);
     } catch (error) {
-      logger.error('Failed to attach trade rectangle primitive', 'TradeRectanglePrimitive', error);
+      logger.error(
+        "Failed to attach trade rectangle primitive",
+        "TradeRectanglePrimitive",
+        error,
+      );
     }
 
     // Step 4: Request initial coordinate calculation
@@ -908,14 +938,16 @@ export class TradeRectanglePrimitive implements ISeriesPrimitive {
     // Step 2: Unsubscribe from time scale events (pan/zoom)
     if (this._chart && this._timeScaleCallback) {
       try {
-        this._chart.timeScale().unsubscribeVisibleTimeRangeChange(this._timeScaleCallback);
+        this._chart
+          .timeScale()
+          .unsubscribeVisibleTimeRangeChange(this._timeScaleCallback);
         this._timeScaleCallback = null;
       } catch (error) {
         // Log error but continue cleanup - don't let one failure stop the rest
         logger.error(
-          'Failed to unsubscribe from time scale events',
-          'TradeRectanglePrimitive',
-          error
+          "Failed to unsubscribe from time scale events",
+          "TradeRectanglePrimitive",
+          error,
         );
       }
     }
@@ -928,9 +960,9 @@ export class TradeRectanglePrimitive implements ISeriesPrimitive {
       } catch (error) {
         // Log error but continue cleanup
         logger.error(
-          'Failed to unsubscribe from crosshair events',
-          'TradeRectanglePrimitive',
-          error
+          "Failed to unsubscribe from crosshair events",
+          "TradeRectanglePrimitive",
+          error,
         );
       }
     }
@@ -1050,24 +1082,28 @@ export function createTradeRectanglePrimitives(
     label?: string;
   }>,
   chartData?: any[],
-  tooltipOptions?: TradeRectangleTooltipOptions
+  tooltipOptions?: TradeRectangleTooltipOptions,
 ): TradeRectanglePrimitive[] {
   const primitives: TradeRectanglePrimitive[] = [];
 
-  trades.forEach(trade => {
+  trades.forEach((trade) => {
     // Parse times
     let time1: UTCTimestamp;
     let time2: UTCTimestamp;
 
-    if (typeof trade.entryTime === 'string') {
-      time1 = Math.floor(new Date(trade.entryTime).getTime() / 1000) as UTCTimestamp;
+    if (typeof trade.entryTime === "string") {
+      time1 = Math.floor(
+        new Date(trade.entryTime).getTime() / 1000,
+      ) as UTCTimestamp;
     } else {
       time1 = trade.entryTime;
     }
 
     if (trade.exitTime) {
-      if (typeof trade.exitTime === 'string') {
-        time2 = Math.floor(new Date(trade.exitTime).getTime() / 1000) as UTCTimestamp;
+      if (typeof trade.exitTime === "string") {
+        time2 = Math.floor(
+          new Date(trade.exitTime).getTime() / 1000,
+        ) as UTCTimestamp;
       } else {
         time2 = trade.exitTime;
       }
@@ -1076,7 +1112,7 @@ export function createTradeRectanglePrimitives(
       const lastTime = chartData[chartData.length - 1]?.time;
       if (lastTime) {
         time2 =
-          typeof lastTime === 'string'
+          typeof lastTime === "string"
             ? (Math.floor(new Date(lastTime).getTime() / 1000) as UTCTimestamp)
             : lastTime;
       } else {
@@ -1091,8 +1127,8 @@ export function createTradeRectanglePrimitives(
       time2,
       price1: trade.entryPrice,
       price2: trade.exitPrice,
-      fillColor: trade.fillColor || 'rgba(0, 150, 136, 0.2)',
-      borderColor: trade.borderColor || 'rgb(0, 150, 136)',
+      fillColor: trade.fillColor || "rgba(0, 150, 136, 0.2)",
+      borderColor: trade.borderColor || "rgb(0, 150, 136)",
       borderWidth: trade.borderWidth || 1,
       opacity: trade.opacity || 0.2,
       label: trade.label,

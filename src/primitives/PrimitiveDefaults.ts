@@ -93,45 +93,45 @@ export const ButtonSpacing = {
   CONTAINER_PADDING: UniversalSpacing.EDGE_PADDING,
   CONTAINER_GAP: 2, // Reduced from 4 for more compact layout
   RANGE_CONTAINER_GAP: 2, // Reduced from 4 for tighter spacing
-  BUTTON_PADDING: '4px 12px', // Standard button padding (not affected by 6px widget margin rule)
-  RANGE_BUTTON_PADDING: '3px 8px', // More compact padding for range buttons
-  PANE_ACTION_PADDING: '0',
-  BUTTON_MARGIN: '0',
-  RANGE_BUTTON_MARGIN: '0 1px', // Reduced margin between buttons
+  BUTTON_PADDING: "4px 12px", // Standard button padding (not affected by 6px widget margin rule)
+  RANGE_BUTTON_PADDING: "3px 8px", // More compact padding for range buttons
+  PANE_ACTION_PADDING: "0",
+  BUTTON_MARGIN: "0",
+  RANGE_BUTTON_MARGIN: "0 1px", // Reduced margin between buttons
 } as const;
 
 /**
  * Button color constants
  */
 export const ButtonColors = {
-  DEFAULT_BACKGROUND: 'rgba(255, 255, 255, 0.1)',
-  DEFAULT_COLOR: '#666',
-  HOVER_BACKGROUND: 'rgba(255, 255, 255, 0.2)',
-  HOVER_COLOR: '#333',
-  PRESSED_BACKGROUND: '#007AFF',
-  PRESSED_COLOR: 'white',
-  DISABLED_BACKGROUND: 'rgba(128, 128, 128, 0.1)',
-  DISABLED_COLOR: '#999',
-  PANE_ACTION_BACKGROUND: 'rgba(255, 255, 255, 0.1)',
-  PANE_ACTION_COLOR: '#6b7280',
-  PANE_ACTION_HOVER_BACKGROUND: 'rgba(255, 255, 255, 1)',
-  PANE_ACTION_PRESSED_BACKGROUND: 'rgba(229, 231, 235, 1)',
-  PANE_ACTION_BORDER: '#d1d5db',
-  ACTION_BACKGROUND: '#007AFF',
-  ACTION_HOVER_BACKGROUND: '#0056CC',
+  DEFAULT_BACKGROUND: "rgba(255, 255, 255, 0.1)",
+  DEFAULT_COLOR: "#666",
+  HOVER_BACKGROUND: "rgba(255, 255, 255, 0.2)",
+  HOVER_COLOR: "#333",
+  PRESSED_BACKGROUND: "#007AFF",
+  PRESSED_COLOR: "white",
+  DISABLED_BACKGROUND: "rgba(128, 128, 128, 0.1)",
+  DISABLED_COLOR: "#999",
+  PANE_ACTION_BACKGROUND: "rgba(255, 255, 255, 0.1)",
+  PANE_ACTION_COLOR: "#6b7280",
+  PANE_ACTION_HOVER_BACKGROUND: "rgba(255, 255, 255, 1)",
+  PANE_ACTION_PRESSED_BACKGROUND: "rgba(229, 231, 235, 1)",
+  PANE_ACTION_BORDER: "#d1d5db",
+  ACTION_BACKGROUND: "#007AFF",
+  ACTION_HOVER_BACKGROUND: "#0056CC",
 } as const;
 
 /**
  * Button border and shadow constants
  */
 export const ButtonEffects = {
-  DEFAULT_BORDER: '1px solid rgba(255, 255, 255, 0.2)',
-  RANGE_BORDER: '1px solid rgba(0, 0, 0, 0.1)', // Subtle border for range buttons
-  DEFAULT_TRANSITION: 'all 0.2s ease',
-  HOVER_BOX_SHADOW: '0 2px 4px rgba(0, 0, 0, 0.1)',
-  RANGE_HOVER_BOX_SHADOW: '0 1px 3px rgba(0, 0, 0, 0.12)', // Subtle shadow for range buttons
-  PRESSED_BOX_SHADOW: 'inset 0 2px 4px rgba(0, 0, 0, 0.1)',
-  FOCUS_OUTLINE: '2px solid #007AFF',
+  DEFAULT_BORDER: "1px solid rgba(255, 255, 255, 0.2)",
+  RANGE_BORDER: "1px solid rgba(0, 0, 0, 0.1)", // Subtle border for range buttons
+  DEFAULT_TRANSITION: "all 0.2s ease",
+  HOVER_BOX_SHADOW: "0 2px 4px rgba(0, 0, 0, 0.1)",
+  RANGE_HOVER_BOX_SHADOW: "0 1px 3px rgba(0, 0, 0, 0.12)", // Subtle shadow for range buttons
+  PRESSED_BOX_SHADOW: "inset 0 2px 4px rgba(0, 0, 0, 0.1)",
+  FOCUS_OUTLINE: "2px solid #007AFF",
 } as const;
 
 // ===== Legend Styling Constants =====
@@ -163,10 +163,10 @@ export const LayoutSpacing = {
  * Legend color constants
  */
 export const LegendColors = {
-  DEFAULT_BACKGROUND: 'rgba(0, 0, 0, 0.8)',
-  DEFAULT_COLOR: 'white',
-  VOLUME_BACKGROUND: 'rgba(100, 100, 100, 0.8)',
-  BAND_BACKGROUND: 'rgba(0, 50, 100, 0.8)',
+  DEFAULT_BACKGROUND: "rgba(0, 0, 0, 0.8)",
+  DEFAULT_COLOR: "white",
+  VOLUME_BACKGROUND: "rgba(100, 100, 100, 0.8)",
+  BAND_BACKGROUND: "rgba(0, 50, 100, 0.8)",
   DEFAULT_OPACITY: 0.8,
 } as const;
 
@@ -178,9 +178,9 @@ export const LegendColors = {
 export const RangeSwitcherLayout = {
   CONTAINER_PADDING: 0, // No internal padding - edge margin is handled by positioning logic
   CONTAINER_GAP: ButtonSpacing.RANGE_CONTAINER_GAP, // Use the compact gap setting
-  FLEX_DIRECTION: 'row' as const,
-  ALIGN_ITEMS: 'center',
-  JUSTIFY_CONTENT: 'flex-end',
+  FLEX_DIRECTION: "row" as const,
+  ALIGN_ITEMS: "center",
+  JUSTIFY_CONTENT: "flex-end",
 } as const;
 
 // ===== Format Constants =====
@@ -189,10 +189,10 @@ export const RangeSwitcherLayout = {
  * Default format strings
  */
 export const FormatDefaults = {
-  VALUE_FORMAT: '.2f',
-  VOLUME_FORMAT: '.0f',
-  BAND_FORMAT: '.3f',
-  TIME_FORMAT: 'YYYY-MM-DD HH:mm:ss',
+  VALUE_FORMAT: ".2f",
+  VOLUME_FORMAT: ".0f",
+  BAND_FORMAT: ".3f",
+  TIME_FORMAT: "YYYY-MM-DD HH:mm:ss",
 } as const;
 
 // ===== Container Styling Constants =====
@@ -201,13 +201,13 @@ export const FormatDefaults = {
  * Base container styling
  */
 export const ContainerDefaults = {
-  BACKGROUND: 'transparent',
-  FONT_FAMILY: 'Arial, sans-serif',
-  FONT_WEIGHT: 'normal' as const,
-  TEXT_ALIGN: 'left' as const,
-  USER_SELECT: 'none',
-  POINTER_EVENTS: 'auto',
-  POSITION: 'absolute',
+  BACKGROUND: "transparent",
+  FONT_FAMILY: "Arial, sans-serif",
+  FONT_WEIGHT: "normal" as const,
+  TEXT_ALIGN: "left" as const,
+  USER_SELECT: "none",
+  POINTER_EVENTS: "auto",
+  POSITION: "absolute",
 } as const;
 
 // ===== Common UI Constants =====
@@ -216,17 +216,17 @@ export const ContainerDefaults = {
  * Common CSS values used across primitives
  */
 export const CommonValues = {
-  NONE: 'none',
-  AUTO: 'auto',
-  POINTER: 'pointer',
-  DEFAULT_CURSOR: 'default',
-  ZERO: '0',
-  FONT_WEIGHT_MEDIUM: '500',
-  FONT_WEIGHT_NORMAL: 'normal',
-  FONT_WEIGHT_BOLD: 'bold',
-  NOWRAP: 'nowrap',
-  HIDDEN: 'hidden',
-  ELLIPSIS: 'ellipsis',
+  NONE: "none",
+  AUTO: "auto",
+  POINTER: "pointer",
+  DEFAULT_CURSOR: "default",
+  ZERO: "0",
+  FONT_WEIGHT_MEDIUM: "500",
+  FONT_WEIGHT_NORMAL: "normal",
+  FONT_WEIGHT_BOLD: "bold",
+  NOWRAP: "nowrap",
+  HIDDEN: "hidden",
+  ELLIPSIS: "ellipsis",
 } as const;
 
 // ===== Animation and Transition Constants =====
@@ -235,9 +235,9 @@ export const CommonValues = {
  * Animation timing constants
  */
 export const AnimationTiming = {
-  DEFAULT_TRANSITION: 'all 0.2s ease',
-  FAST_TRANSITION: 'all 0.1s ease',
-  SLOW_TRANSITION: 'all 0.3s ease',
+  DEFAULT_TRANSITION: "all 0.2s ease",
+  FAST_TRANSITION: "all 0.1s ease",
+  SLOW_TRANSITION: "all 0.3s ease",
 } as const;
 
 // ===== Default Primitive Configurations =====

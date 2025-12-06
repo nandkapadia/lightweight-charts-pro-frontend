@@ -36,17 +36,28 @@
  * @see SignalSeries for the ICustomSeries implementation
  */
 
-import { IChartApi, IPrimitivePaneRenderer, PrimitivePaneViewZOrder, Time } from 'lightweight-charts';
-import { BitmapCoordinatesRenderingScope, CanvasRenderingTarget2D } from 'fancy-canvas';
-import { isTransparent } from '../utils/colorUtils';
-import { SignalColorCalculator } from '../utils/signalColorUtils';
-import { timeToCoordinate, getBarSpacing } from '../plugins/series/base/commonRendering';
+import {
+  IChartApi,
+  IPrimitivePaneRenderer,
+  PrimitivePaneViewZOrder,
+  Time,
+} from "lightweight-charts";
+import {
+  BitmapCoordinatesRenderingScope,
+  CanvasRenderingTarget2D,
+} from "fancy-canvas";
+import { isTransparent } from "../utils/colorUtils";
+import { SignalColorCalculator } from "../utils/signalColorUtils";
+import {
+  timeToCoordinate,
+  getBarSpacing,
+} from "../plugins/series/base/commonRendering";
 import {
   BaseSeriesPrimitive,
   BaseSeriesPrimitiveOptions,
   BaseProcessedData,
   BaseSeriesPrimitivePaneView,
-} from './BaseSeriesPrimitive';
+} from "./BaseSeriesPrimitive";
 
 // ============================================================================
 // Data Interfaces
@@ -91,7 +102,7 @@ class SignalPrimitivePaneView extends BaseSeriesPrimitivePaneView<
   }
 
   zOrder(): PrimitivePaneViewZOrder {
-    return 'bottom'; // Render at bottom (behind everything)
+    return "bottom"; // Render at bottom (behind everything)
   }
 }
 
@@ -118,7 +129,7 @@ class SignalPrimitiveRenderer implements IPrimitivePaneRenderer {
    * Handles both boolean (true/false) and numeric (0/1) values
    */
   private _checkForNonBooleanValues(data: SignalProcessedData[]): boolean {
-    const values = data.map(item => item.value);
+    const values = data.map((item) => item.value);
     return SignalColorCalculator.checkForNonBooleanValues(values);
   }
 
@@ -136,67 +147,80 @@ class SignalPrimitiveRenderer implements IPrimitivePaneRenderer {
    * that should appear behind all other series
    */
   drawBackground(target: CanvasRenderingTarget2D): void {
-    target.useBitmapCoordinateSpace((scope: BitmapCoordinatesRenderingScope) => {
-      const data = this._source.getProcessedData();
-      const series = this._source.getAttachedSeries();
+    target.useBitmapCoordinateSpace(
+      (scope: BitmapCoordinatesRenderingScope) => {
+        const data = this._source.getProcessedData();
+        const series = this._source.getAttachedSeries();
 
-      if (!series || data.length === 0) return;
+        if (!series || data.length === 0) return;
 
-      // Read options from attached series (single source of truth)
-      // Note: ISeriesApi.options() returns SeriesOptionsCommon but we need SignalPrimitiveOptions
-      const options = series.options() as unknown as SignalPrimitiveOptions;
-      if (!options || options.visible === false) return;
+        // Read options from attached series (single source of truth)
+        // Note: ISeriesApi.options() returns SeriesOptionsCommon but we need SignalPrimitiveOptions
+        const options = series.options() as unknown as SignalPrimitiveOptions;
+        if (!options || options.visible === false) return;
 
-      // Check if data contains non-boolean values (values other than 0 or 1)
-      this._hasNonBooleanValues = this._checkForNonBooleanValues(data);
+        // Check if data contains non-boolean values (values other than 0 or 1)
+        this._hasNonBooleanValues = this._checkForNonBooleanValues(data);
 
-      const chart = this._source.getChart();
-      const barSpacing = getBarSpacing(chart);
-      const halfBarSpacing = barSpacing / 2;
-      const chartHeight = scope.bitmapSize.height;
-      const ctx = scope.context;
+        const chart = this._source.getChart();
+        const barSpacing = getBarSpacing(chart);
+        const halfBarSpacing = barSpacing / 2;
+        const chartHeight = scope.bitmapSize.height;
+        const ctx = scope.context;
 
-      ctx.save();
+        ctx.save();
 
-      // Draw each signal as a vertical band
-      for (const item of data) {
-        // Get X coordinate
-        const x = timeToCoordinate(item.time, chart);
-        if (x === null) continue;
+        // Draw each signal as a vertical band
+        for (const item of data) {
+          // Get X coordinate
+          const x = timeToCoordinate(item.time, chart);
+          if (x === null) continue;
 
-        // Convert boolean to number if needed (handled in _processData, but double-check)
-        let value = item.value;
-        if (typeof value === 'boolean') {
-          value = value ? 1 : 0;
+          // Convert boolean to number if needed (handled in _processData, but double-check)
+          let value = item.value;
+          if (typeof value === "boolean") {
+            value = value ? 1 : 0;
+          }
+
+          // Determine color
+          let color = item.color;
+          if (!color) {
+            color = this.getColorForValue(value, options);
+          }
+
+          // Skip transparent colors
+          if (isTransparent(color)) {
+            continue;
+          }
+
+          // Calculate band boundaries in bitmap coordinates
+          const xScaled = x * scope.horizontalPixelRatio;
+          const startX = Math.floor(
+            xScaled - halfBarSpacing * scope.horizontalPixelRatio,
+          );
+          const endX = Math.floor(
+            xScaled + halfBarSpacing * scope.horizontalPixelRatio,
+          );
+
+          // Draw vertical band spanning full chart height
+          ctx.fillStyle = color;
+          ctx.fillRect(startX, 0, endX - startX, chartHeight);
         }
 
-        // Determine color
-        let color = item.color;
-        if (!color) {
-          color = this.getColorForValue(value, options);
-        }
-
-        // Skip transparent colors
-        if (isTransparent(color)) {
-          continue;
-        }
-
-        // Calculate band boundaries in bitmap coordinates
-        const xScaled = x * scope.horizontalPixelRatio;
-        const startX = Math.floor(xScaled - halfBarSpacing * scope.horizontalPixelRatio);
-        const endX = Math.floor(xScaled + halfBarSpacing * scope.horizontalPixelRatio);
-
-        // Draw vertical band spanning full chart height
-        ctx.fillStyle = color;
-        ctx.fillRect(startX, 0, endX - startX, chartHeight);
-      }
-
-      ctx.restore();
-    });
+        ctx.restore();
+      },
+    );
   }
 
-  private getColorForValue(value: number, options: SignalPrimitiveOptions): string {
-    return SignalColorCalculator.getColorForValue(value, options, this._hasNonBooleanValues);
+  private getColorForValue(
+    value: number,
+    options: SignalPrimitiveOptions,
+  ): string {
+    return SignalColorCalculator.getColorForValue(
+      value,
+      options,
+      this._hasNonBooleanValues,
+    );
   }
 }
 
@@ -226,9 +250,9 @@ export class SignalPrimitive extends BaseSeriesPrimitive<
    */
   static getSettings() {
     return {
-      neutralColor: 'color' as const,
-      signalColor: 'color' as const,
-      alertColor: 'color' as const,
+      neutralColor: "color" as const,
+      signalColor: "color" as const,
+      alertColor: "color" as const,
     };
   }
 
@@ -239,19 +263,24 @@ export class SignalPrimitive extends BaseSeriesPrimitive<
   }
 
   // Required: Process raw data
-  protected _processData(rawData: SignalPrimitiveData[]): SignalProcessedData[] {
-    return rawData.flatMap(item => {
+  protected _processData(
+    rawData: SignalPrimitiveData[],
+  ): SignalProcessedData[] {
+    return rawData.flatMap((item) => {
       let value = item.value ?? 0;
 
       // Convert boolean to number (true -> 1, false -> 0)
       // This allows Python users to use bool values naturally
-      if (typeof value === 'boolean') {
+      if (typeof value === "boolean") {
         value = value ? 1 : 0;
       }
 
       // Validate data
       if (isNaN(value)) {
-        console.warn(`[SignalPrimitive] Invalid signal value at time ${item.time}:`, item.value);
+        console.warn(
+          `[SignalPrimitive] Invalid signal value at time ${item.time}:`,
+          item.value,
+        );
         return [];
       }
 
@@ -269,6 +298,6 @@ export class SignalPrimitive extends BaseSeriesPrimitive<
 
   // Optional: Custom z-order default
   protected _getDefaultZOrder(): PrimitivePaneViewZOrder {
-    return 'bottom'; // Render at bottom (behind everything)
+    return "bottom"; // Render at bottom (behind everything)
   }
 }

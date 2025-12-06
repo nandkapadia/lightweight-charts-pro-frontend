@@ -57,15 +57,18 @@ import {
   Time,
   ISeriesApi,
   SeriesType,
-} from 'lightweight-charts';
-import { BitmapCoordinatesRenderingScope, CanvasRenderingTarget2D } from 'fancy-canvas';
-import { getSolidColorFromFill } from '../utils/colorUtils';
+} from "lightweight-charts";
+import {
+  BitmapCoordinatesRenderingScope,
+  CanvasRenderingTarget2D,
+} from "fancy-canvas";
+import { getSolidColorFromFill } from "../utils/colorUtils";
 import {
   BaseSeriesPrimitive,
   BaseSeriesPrimitiveOptions,
   BaseSeriesPrimitivePaneView,
-} from './BaseSeriesPrimitive';
-import { interpolateY } from '../utils/renderingUtils';
+} from "./BaseSeriesPrimitive";
+import { interpolateY } from "../utils/renderingUtils";
 
 // ============================================================================
 // Data Interfaces
@@ -210,7 +213,7 @@ interface TrendFillViewData {
  */
 function parseTime(time: string | number): UTCTimestamp {
   try {
-    if (typeof time === 'number') {
+    if (typeof time === "number") {
       // Convert milliseconds to seconds if needed
       if (time > 1000000000000) {
         return Math.floor(time / 1000) as UTCTimestamp;
@@ -218,7 +221,7 @@ function parseTime(time: string | number): UTCTimestamp {
       return Math.floor(time) as UTCTimestamp;
     }
 
-    if (typeof time === 'string') {
+    if (typeof time === "string") {
       const timestamp = parseInt(time, 10);
       if (!isNaN(timestamp)) {
         if (timestamp > 1000000000000) {
@@ -263,46 +266,54 @@ class TrendFillPrimitiveRenderer implements IPrimitivePaneRenderer {
    * that should appear on top of fills and other series
    */
   draw(target: CanvasRenderingTarget2D): void {
-    target.useBitmapCoordinateSpace((scope: BitmapCoordinatesRenderingScope) => {
-      const ctx = scope.context;
+    target.useBitmapCoordinateSpace(
+      (scope: BitmapCoordinatesRenderingScope) => {
+        const ctx = scope.context;
 
-      // Check if primitive should be visible based on series options
-      if (this._viewData.series) {
-        const seriesOptions = this._viewData.series.options();
-        if (seriesOptions && seriesOptions.visible === false) return;
-      }
+        // Check if primitive should be visible based on series options
+        if (this._viewData.series) {
+          const seriesOptions = this._viewData.series.options();
+          if (seriesOptions && seriesOptions.visible === false) return;
+        }
 
-      // DON'T scale context - multiply coordinates by pixel ratio instead
-      const hRatio = scope.horizontalPixelRatio;
-      const vRatio = scope.verticalPixelRatio;
+        // DON'T scale context - multiply coordinates by pixel ratio instead
+        const hRatio = scope.horizontalPixelRatio;
+        const vRatio = scope.verticalPixelRatio;
 
-      ctx.save();
+        ctx.save();
 
-      // Read visibility flags from series options (flat properties)
-      // Cast to TrendFillPrimitiveOptions since series.options() returns standard options
-      const series = this._viewData.series;
-      const seriesOptions = series
-        ? (series.options() as unknown as TrendFillPrimitiveOptions)
-        : null;
-      const uptrendLineVisible =
-        seriesOptions?.uptrendLineVisible ?? this._viewData.options.uptrendLineVisible ?? true;
-      const downtrendLineVisible =
-        seriesOptions?.downtrendLineVisible ?? this._viewData.options.downtrendLineVisible ?? true;
-      const baseLineVisible =
-        seriesOptions?.baseLineVisible ?? this._viewData.options.baseLineVisible ?? false;
+        // Read visibility flags from series options (flat properties)
+        // Cast to TrendFillPrimitiveOptions since series.options() returns standard options
+        const series = this._viewData.series;
+        const seriesOptions = series
+          ? (series.options() as unknown as TrendFillPrimitiveOptions)
+          : null;
+        const uptrendLineVisible =
+          seriesOptions?.uptrendLineVisible ??
+          this._viewData.options.uptrendLineVisible ??
+          true;
+        const downtrendLineVisible =
+          seriesOptions?.downtrendLineVisible ??
+          this._viewData.options.downtrendLineVisible ??
+          true;
+        const baseLineVisible =
+          seriesOptions?.baseLineVisible ??
+          this._viewData.options.baseLineVisible ??
+          false;
 
-      // Draw trend lines (foreground) - skip if both are invisible
-      if (uptrendLineVisible || downtrendLineVisible) {
-        this._drawTrendLines(ctx, hRatio, vRatio);
-      }
+        // Draw trend lines (foreground) - skip if both are invisible
+        if (uptrendLineVisible || downtrendLineVisible) {
+          this._drawTrendLines(ctx, hRatio, vRatio);
+        }
 
-      // Draw base line (foreground)
-      if (baseLineVisible) {
-        this._drawBaseLines(ctx, hRatio, vRatio);
-      }
+        // Draw base line (foreground)
+        if (baseLineVisible) {
+          this._drawBaseLines(ctx, hRatio, vRatio);
+        }
 
-      ctx.restore();
-    });
+        ctx.restore();
+      },
+    );
   }
 
   /**
@@ -311,44 +322,51 @@ class TrendFillPrimitiveRenderer implements IPrimitivePaneRenderer {
    * that should appear behind lines and other series
    */
   drawBackground(target: CanvasRenderingTarget2D): void {
-    target.useBitmapCoordinateSpace((scope: BitmapCoordinatesRenderingScope) => {
-      const ctx = scope.context;
+    target.useBitmapCoordinateSpace(
+      (scope: BitmapCoordinatesRenderingScope) => {
+        const ctx = scope.context;
 
-      // Check if primitive should be visible based on series options
-      if (this._viewData.series) {
-        const seriesOptions = this._viewData.series.options();
-        if (seriesOptions && seriesOptions.visible === false) return;
-      }
+        // Check if primitive should be visible based on series options
+        if (this._viewData.series) {
+          const seriesOptions = this._viewData.series.options();
+          if (seriesOptions && seriesOptions.visible === false) return;
+        }
 
-      // DON'T scale context - multiply coordinates by pixel ratio instead
-      const hRatio = scope.horizontalPixelRatio;
-      const vRatio = scope.verticalPixelRatio;
+        // DON'T scale context - multiply coordinates by pixel ratio instead
+        const hRatio = scope.horizontalPixelRatio;
+        const vRatio = scope.verticalPixelRatio;
 
-      ctx.save();
+        ctx.save();
 
-      // Read fillVisible from series options
-      // Cast to TrendFillPrimitiveOptions since series.options() returns standard options
-      const series = this._viewData.series;
-      const seriesOptions = series
-        ? (series.options() as unknown as TrendFillPrimitiveOptions)
-        : null;
-      const fillVisible = seriesOptions?.fillVisible ?? true;
+        // Read fillVisible from series options
+        // Cast to TrendFillPrimitiveOptions since series.options() returns standard options
+        const series = this._viewData.series;
+        const seriesOptions = series
+          ? (series.options() as unknown as TrendFillPrimitiveOptions)
+          : null;
+        const fillVisible = seriesOptions?.fillVisible ?? true;
 
-      // Draw fills (background)
-      if (fillVisible) {
-        this._drawTrendFills(ctx, hRatio, vRatio);
-      }
+        // Draw fills (background)
+        if (fillVisible) {
+          this._drawTrendFills(ctx, hRatio, vRatio);
+        }
 
-      ctx.restore();
-    });
+        ctx.restore();
+      },
+    );
   }
 
   /**
    * Draw filled areas between trend and base lines
    * Groups consecutive bars with same trend direction into continuous fills
    */
-  private _drawTrendFills(ctx: CanvasRenderingContext2D, hRatio: number, vRatio: number): void {
-    const { items, visibleRange, useHalfBarWidth, barSpacing } = this._viewData.data;
+  private _drawTrendFills(
+    ctx: CanvasRenderingContext2D,
+    hRatio: number,
+    vRatio: number,
+  ): void {
+    const { items, visibleRange, useHalfBarWidth, barSpacing } =
+      this._viewData.data;
 
     if (items.length === 0 || visibleRange === null) {
       return;
@@ -363,11 +381,11 @@ class TrendFillPrimitiveRenderer implements IPrimitivePaneRenderer {
     const uptrendColor =
       seriesOptions?.uptrendFillColor ||
       this._viewData.options.uptrendFillColor ||
-      'rgba(76, 175, 80, 0.3)';
+      "rgba(76, 175, 80, 0.3)";
     const downtrendColor =
       seriesOptions?.downtrendFillColor ||
       this._viewData.options.downtrendFillColor ||
-      'rgba(244, 67, 54, 0.3)';
+      "rgba(244, 67, 54, 0.3)";
 
     // Calculate pixel-perfect bar-width extension
     // Uses TradingView's pixel-perfect formula instead of naive (barSpacing * hRatio) / 2
@@ -458,7 +476,11 @@ class TrendFillPrimitiveRenderer implements IPrimitivePaneRenderer {
     };
 
     // Track transition data for next group
-    let transitionData: { x: number; trendLineY: number; baseLineY: number } | null = null;
+    let transitionData: {
+      x: number;
+      trendLineY: number;
+      baseLineY: number;
+    } | null = null;
 
     // Iterate through visible bars and group them
     for (let i = visibleRange.from; i < visibleRange.to; i++) {
@@ -515,12 +537,18 @@ class TrendFillPrimitiveRenderer implements IPrimitivePaneRenderer {
           currentX,
           currentTrendY,
           nextX,
-          nextTrendY
+          nextTrendY,
         );
 
         const currentBaseY = bar.baseLineY ?? 0;
         const nextBaseY = nextBar.baseLineY ?? 0;
-        const transitionBaseY = interpolateY(transitionX, currentX, currentBaseY, nextX, nextBaseY);
+        const transitionBaseY = interpolateY(
+          transitionX,
+          currentX,
+          currentBaseY,
+          nextX,
+          nextBaseY,
+        );
 
         // Store transition data for ending current group
         // Extend current trend to interpolated midpoint
@@ -556,7 +584,11 @@ class TrendFillPrimitiveRenderer implements IPrimitivePaneRenderer {
    * - Uses Path2D for efficient rendering
    * - Supports different line widths and styles for uptrend vs downtrend
    */
-  private _drawTrendLines(ctx: CanvasRenderingContext2D, hRatio: number, vRatio: number): void {
+  private _drawTrendLines(
+    ctx: CanvasRenderingContext2D,
+    hRatio: number,
+    vRatio: number,
+  ): void {
     const { items, visibleRange } = this._viewData.data;
 
     if (items.length === 0 || visibleRange === null) {
@@ -572,30 +604,46 @@ class TrendFillPrimitiveRenderer implements IPrimitivePaneRenderer {
 
     // Read flat line properties from series options
     const uptrendLineColor =
-      seriesOptions?.uptrendLineColor ?? this._viewData.options.uptrendLineColor ?? '#4CAF50';
+      seriesOptions?.uptrendLineColor ??
+      this._viewData.options.uptrendLineColor ??
+      "#4CAF50";
     const uptrendLineWidth =
-      seriesOptions?.uptrendLineWidth ?? this._viewData.options.uptrendLineWidth ?? 2;
+      seriesOptions?.uptrendLineWidth ??
+      this._viewData.options.uptrendLineWidth ??
+      2;
     const uptrendLineStyle =
-      seriesOptions?.uptrendLineStyle ?? this._viewData.options.uptrendLineStyle ?? 0;
+      seriesOptions?.uptrendLineStyle ??
+      this._viewData.options.uptrendLineStyle ??
+      0;
     const uptrendLineVisible =
-      seriesOptions?.uptrendLineVisible ?? this._viewData.options.uptrendLineVisible ?? true;
+      seriesOptions?.uptrendLineVisible ??
+      this._viewData.options.uptrendLineVisible ??
+      true;
 
     const downtrendLineColor =
-      seriesOptions?.downtrendLineColor ?? this._viewData.options.downtrendLineColor ?? '#F44336';
+      seriesOptions?.downtrendLineColor ??
+      this._viewData.options.downtrendLineColor ??
+      "#F44336";
     const downtrendLineWidth =
-      seriesOptions?.downtrendLineWidth ?? this._viewData.options.downtrendLineWidth ?? 2;
+      seriesOptions?.downtrendLineWidth ??
+      this._viewData.options.downtrendLineWidth ??
+      2;
     const downtrendLineStyle =
-      seriesOptions?.downtrendLineStyle ?? this._viewData.options.downtrendLineStyle ?? 0;
+      seriesOptions?.downtrendLineStyle ??
+      this._viewData.options.downtrendLineStyle ??
+      0;
     const downtrendLineVisible =
-      seriesOptions?.downtrendLineVisible ?? this._viewData.options.downtrendLineVisible ?? true;
+      seriesOptions?.downtrendLineVisible ??
+      this._viewData.options.downtrendLineVisible ??
+      true;
 
     // Skip drawing if lines are not visible
     if (!uptrendLineVisible && !downtrendLineVisible) {
       return;
     }
 
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
 
     // Group by trend direction and draw
     let currentDirection: number | null = null;
@@ -616,7 +664,9 @@ class TrendFillPrimitiveRenderer implements IPrimitivePaneRenderer {
           const lineColor = isUptrend ? uptrendLineColor : downtrendLineColor;
           const lineWidth = isUptrend ? uptrendLineWidth : downtrendLineWidth;
           const lineStyle = isUptrend ? uptrendLineStyle : downtrendLineStyle;
-          const lineVisible = isUptrend ? uptrendLineVisible : downtrendLineVisible;
+          const lineVisible = isUptrend
+            ? uptrendLineVisible
+            : downtrendLineVisible;
 
           if (lineVisible) {
             ctx.strokeStyle = lineColor;
@@ -655,7 +705,11 @@ class TrendFillPrimitiveRenderer implements IPrimitivePaneRenderer {
    * Draw base lines
    * Base line is drawn as a continuous line (no direction-based coloring)
    */
-  private _drawBaseLines(ctx: CanvasRenderingContext2D, hRatio: number, vRatio: number): void {
+  private _drawBaseLines(
+    ctx: CanvasRenderingContext2D,
+    hRatio: number,
+    vRatio: number,
+  ): void {
     const { items, visibleRange } = this._viewData.data;
 
     if (items.length === 0 || visibleRange === null) {
@@ -669,12 +723,16 @@ class TrendFillPrimitiveRenderer implements IPrimitivePaneRenderer {
       ? (series.options() as unknown as TrendFillPrimitiveOptions)
       : null;
     const baseLineColor =
-      seriesOptions?.baseLineColor ?? this._viewData.options.baseLineColor ?? '#666666';
-    const baseLineWidth = seriesOptions?.baseLineWidth ?? this._viewData.options.baseLineWidth ?? 1;
-    const baseLineStyle = seriesOptions?.baseLineStyle ?? this._viewData.options.baseLineStyle ?? 1;
+      seriesOptions?.baseLineColor ??
+      this._viewData.options.baseLineColor ??
+      "#666666";
+    const baseLineWidth =
+      seriesOptions?.baseLineWidth ?? this._viewData.options.baseLineWidth ?? 1;
+    const baseLineStyle =
+      seriesOptions?.baseLineStyle ?? this._viewData.options.baseLineStyle ?? 1;
 
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
     ctx.lineWidth = baseLineWidth * hRatio;
     ctx.strokeStyle = baseLineColor;
     this._setLineStyle(ctx, baseLineStyle);
@@ -706,7 +764,10 @@ class TrendFillPrimitiveRenderer implements IPrimitivePaneRenderer {
   /**
    * Apply line dash pattern
    */
-  private _setLineStyle(ctx: CanvasRenderingContext2D, lineStyle: number): void {
+  private _setLineStyle(
+    ctx: CanvasRenderingContext2D,
+    lineStyle: number,
+  ): void {
     switch (lineStyle) {
       case 0:
         ctx.setLineDash([]);
@@ -726,7 +787,11 @@ class TrendFillPrimitiveRenderer implements IPrimitivePaneRenderer {
    * Validate coordinates
    */
   private _isValidCoordinates(item: TrendFillRenderData): boolean {
-    if (item.x === null || item.baseLineY === null || item.trendLineY === null) {
+    if (
+      item.x === null ||
+      item.baseLineY === null ||
+      item.trendLineY === null
+    ) {
       return false;
     }
 
@@ -791,7 +856,8 @@ class TrendFillPrimitiveView extends BaseSeriesPrimitivePaneView<
     // Read options from attached series (single source of truth)
     // Note: ISeriesApi.options() returns SeriesOptionsCommon but we need TrendFillPrimitiveOptions
     // which is a superset with additional custom properties
-    const seriesOptions = attachedSeries.options() as unknown as TrendFillPrimitiveOptions;
+    const seriesOptions =
+      attachedSeries.options() as unknown as TrendFillPrimitiveOptions;
     this._data.options = seriesOptions;
     this._data.series = attachedSeries;
 
@@ -812,7 +878,8 @@ class TrendFillPrimitiveView extends BaseSeriesPrimitivePaneView<
       }
       const extendedChart = chart as unknown as ChartModelInternal;
       if (extendedChart._model?.timeScale?.barSpacing) {
-        this._data.data.barSpacing = extendedChart._model.timeScale.barSpacing();
+        this._data.data.barSpacing =
+          extendedChart._model.timeScale.barSpacing();
       } else {
         this._data.data.barSpacing = 6; // Default
       }
@@ -822,7 +889,11 @@ class TrendFillPrimitiveView extends BaseSeriesPrimitivePaneView<
 
     // Convert coordinates
     const items = this._source.getProcessedData();
-    const convertedItems = this._batchConvertCoordinates(items, timeScale, attachedSeries);
+    const convertedItems = this._batchConvertCoordinates(
+      items,
+      timeScale,
+      attachedSeries,
+    );
 
     this._data.data.visibleRange = this._calculateVisibleRange(convertedItems);
     this._data.data.items = convertedItems;
@@ -832,14 +903,14 @@ class TrendFillPrimitiveView extends BaseSeriesPrimitivePaneView<
   private _batchConvertCoordinates(
     items: TrendFillItem[],
     timeScale: ITimeScaleApi<Time>,
-    attachedSeries: ISeriesApi<SeriesType>
+    attachedSeries: ISeriesApi<SeriesType>,
   ): TrendFillRenderData[] {
     if (!timeScale || !attachedSeries) {
       return [];
     }
 
     return items
-      .map(item => {
+      .map((item) => {
         try {
           const x = timeScale.timeToCoordinate(item.time);
           const baseLineY = attachedSeries.priceToCoordinate(item.baseLine);
@@ -863,11 +934,11 @@ class TrendFillPrimitiveView extends BaseSeriesPrimitivePaneView<
           return null;
         }
       })
-      .filter(item => item !== null) as TrendFillRenderData[];
+      .filter((item) => item !== null) as TrendFillRenderData[];
   }
 
   private _calculateVisibleRange(
-    items: TrendFillRenderData[]
+    items: TrendFillRenderData[],
   ): { from: number; to: number } | null {
     if (items.length === 0) return null;
     return { from: 0, to: items.length };
@@ -879,7 +950,7 @@ class TrendFillPrimitiveView extends BaseSeriesPrimitivePaneView<
 
   zIndex(): number {
     const zIndex = this._source.getOptions().zIndex;
-    if (typeof zIndex === 'number' && zIndex >= 0) {
+    if (typeof zIndex === "number" && zIndex >= 0) {
       return zIndex;
     }
     return 0; // Default to normal layer (in front of grid)
@@ -935,7 +1006,7 @@ class TrendFillPriceAxisView implements ISeriesPrimitiveAxisView {
   text(): string {
     const lastItem = this._getLastVisibleItem();
     if (!lastItem) {
-      return '';
+      return "";
     }
 
     // Format the trend line value
@@ -948,7 +1019,7 @@ class TrendFillPriceAxisView implements ISeriesPrimitiveAxisView {
    */
   textColor(): string {
     // Always use white text for contrast
-    return '#FFFFFF';
+    return "#FFFFFF";
   }
 
   /**
@@ -959,7 +1030,7 @@ class TrendFillPriceAxisView implements ISeriesPrimitiveAxisView {
   backColor(): string {
     const lastItem = this._getLastVisibleItem();
     if (!lastItem) {
-      return 'transparent';
+      return "transparent";
     }
 
     // Read colors from series options (single source of truth)
@@ -974,9 +1045,11 @@ class TrendFillPriceAxisView implements ISeriesPrimitiveAxisView {
 
     // Get colors from series options, fallback to primitive options
     const uptrendColor =
-      seriesOptions?.uptrendFillColor || this._source.getOptions().uptrendFillColor;
+      seriesOptions?.uptrendFillColor ||
+      this._source.getOptions().uptrendFillColor;
     const downtrendColor =
-      seriesOptions?.downtrendFillColor || this._source.getOptions().downtrendFillColor;
+      seriesOptions?.downtrendFillColor ||
+      this._source.getOptions().downtrendFillColor;
 
     // Use solid color based on trend direction (remove transparency for axis label)
     const fillColor = isUptrend ? uptrendColor : downtrendColor;
@@ -1012,11 +1085,14 @@ class TrendFillPriceAxisView implements ISeriesPrimitiveAxisView {
       ? (attachedSeries.options() as unknown as TrendFillPrimitiveOptions)
       : null;
 
-    const fillVisible = seriesOptions?.fillVisible ?? options.fillVisible ?? true;
+    const fillVisible =
+      seriesOptions?.fillVisible ?? options.fillVisible ?? true;
     const uptrendLineVisible =
       seriesOptions?.uptrendLineVisible ?? options.uptrendLineVisible ?? true;
     const downtrendLineVisible =
-      seriesOptions?.downtrendLineVisible ?? options.downtrendLineVisible ?? true;
+      seriesOptions?.downtrendLineVisible ??
+      options.downtrendLineVisible ??
+      true;
 
     if (!fillVisible && !uptrendLineVisible && !downtrendLineVisible) {
       // All visual elements are hidden - primitive is completely invisible
@@ -1112,33 +1188,33 @@ export class TrendFillPrimitive extends BaseSeriesPrimitive<
     chart: IChartApi,
     options: TrendFillPrimitiveOptions = {
       // Fill options
-      uptrendFillColor: 'rgba(76, 175, 80, 0.3)',
-      downtrendFillColor: 'rgba(244, 67, 54, 0.3)',
+      uptrendFillColor: "rgba(76, 175, 80, 0.3)",
+      downtrendFillColor: "rgba(244, 67, 54, 0.3)",
       fillVisible: true,
 
       // Uptrend line options (flat)
-      uptrendLineColor: '#4CAF50', // Green for uptrend
+      uptrendLineColor: "#4CAF50", // Green for uptrend
       uptrendLineWidth: 2,
       uptrendLineStyle: 0,
       uptrendLineVisible: true,
 
       // Downtrend line options (flat)
-      downtrendLineColor: '#F44336', // Red for downtrend
+      downtrendLineColor: "#F44336", // Red for downtrend
       downtrendLineWidth: 2,
       downtrendLineStyle: 0,
       downtrendLineVisible: true,
 
       // Base line options (flat)
-      baseLineColor: '#666666',
+      baseLineColor: "#666666",
       baseLineWidth: 1,
       baseLineStyle: 1,
       baseLineVisible: false,
 
       visible: true,
-      priceScaleId: 'right',
+      priceScaleId: "right",
       useHalfBarWidth: true, // Enable to fill full bar width without gaps
       zIndex: 0, // Default to normal layer (in front of grid)
-    }
+    },
   ) {
     super(chart, options);
   }
@@ -1158,7 +1234,7 @@ export class TrendFillPrimitive extends BaseSeriesPrimitive<
 
   // Optional: Custom z-order default
   protected _getDefaultZOrder(): PrimitivePaneViewZOrder {
-    return 'normal'; // Render in normal layer (in front of grid)
+    return "normal"; // Render in normal layer (in front of grid)
   }
 
   setData(data: TrendFillPrimitiveData[]): void {
@@ -1259,8 +1335,8 @@ export class TrendFillPrimitive extends BaseSeriesPrimitive<
   updateAllViews(): void {
     super.updateAllViews();
     // Also update the pane views directly for compatibility
-    this._paneViews.forEach(pv => {
-      if ('update' in pv && typeof pv.update === 'function') {
+    this._paneViews.forEach((pv) => {
+      if ("update" in pv && typeof pv.update === "function") {
         pv.update();
       }
     });

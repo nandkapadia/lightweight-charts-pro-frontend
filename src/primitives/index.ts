@@ -6,30 +6,38 @@
  */
 
 // Base primitives
-export { BasePanePrimitive, PrimitivePriority } from './BasePanePrimitive';
-export type { BasePrimitiveConfig } from './BasePanePrimitive';
-export { BaseSeriesPrimitive } from './BaseSeriesPrimitive';
+export { BasePanePrimitive, PrimitivePriority } from "./BasePanePrimitive";
+export type { BasePrimitiveConfig } from "./BasePanePrimitive";
+export { BaseSeriesPrimitive } from "./BaseSeriesPrimitive";
 
 // UI primitives
-export { LegendPrimitive, createLegendPrimitive, DefaultLegendConfigs } from './LegendPrimitive';
+export {
+  LegendPrimitive,
+  createLegendPrimitive,
+  DefaultLegendConfigs,
+} from "./LegendPrimitive";
 export {
   RangeSwitcherPrimitive,
   createRangeSwitcherPrimitive,
   DefaultRangeConfigs,
   TimeRange,
-} from './RangeSwitcherPrimitive';
-export type { RangeConfig } from './RangeSwitcherPrimitive';
-export { TradeRectanglePrimitive } from './TradeRectanglePrimitive';
+} from "./RangeSwitcherPrimitive";
+export type { RangeConfig } from "./RangeSwitcherPrimitive";
+export { TradeRectanglePrimitive } from "./TradeRectanglePrimitive";
 // Note: ButtonPanelPrimitive requires React and is in the React frontend package
 
 // Custom series primitives
-export { BandPrimitive } from './BandPrimitive';
-export { RibbonPrimitive } from './RibbonPrimitive';
-export { GradientRibbonPrimitive } from './GradientRibbonPrimitive';
-export { SignalPrimitive } from './SignalPrimitive';
-export { TrendFillPrimitive } from './TrendFillPrimitive';
+export { BandPrimitive } from "./BandPrimitive";
+export { RibbonPrimitive } from "./RibbonPrimitive";
+export { GradientRibbonPrimitive } from "./GradientRibbonPrimitive";
+export { SignalPrimitive } from "./SignalPrimitive";
+export { TrendFillPrimitive } from "./TrendFillPrimitive";
 
 // Primitive utilities
-export { PrimitiveStylingUtils } from './PrimitiveStylingUtils';
-export type { BaseStyleConfig, TypographyConfig, BorderConfig } from './PrimitiveStylingUtils';
-export * from './PrimitiveDefaults';
+export { PrimitiveStylingUtils } from "./PrimitiveStylingUtils";
+export type {
+  BaseStyleConfig,
+  TypographyConfig,
+  BorderConfig,
+} from "./PrimitiveStylingUtils";
+export * from "./PrimitiveDefaults";

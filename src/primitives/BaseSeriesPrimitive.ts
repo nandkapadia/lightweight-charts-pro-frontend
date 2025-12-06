@@ -25,8 +25,8 @@ import {
   ISeriesApi,
   Time,
   PrimitivePaneViewZOrder,
-} from 'lightweight-charts';
-import { getSolidColorFromFill } from '../utils/colorUtils';
+} from "lightweight-charts";
+import { getSolidColorFromFill } from "../utils/colorUtils";
 
 /**
  * Base interface for series primitive options
@@ -64,9 +64,9 @@ export interface BaseSeriesPrimitiveSource<TData extends BaseProcessedData> {
  * - Common view management patterns
  */
 export abstract class BaseSeriesPrimitive<
-    TData extends BaseProcessedData,
-    TOptions extends BaseSeriesPrimitiveOptions,
-  >
+  TData extends BaseProcessedData,
+  TOptions extends BaseSeriesPrimitiveOptions,
+>
   implements ISeriesPrimitive<Time>, BaseSeriesPrimitiveSource<TData>
 {
   protected _chart: IChartApi;
@@ -101,7 +101,7 @@ export abstract class BaseSeriesPrimitive<
    * Subclasses can override to provide custom defaults
    */
   protected _getDefaultZOrder(): PrimitivePaneViewZOrder {
-    return 'normal'; // Default: render in normal layer (in front of grid)
+    return "normal"; // Default: render in normal layer (in front of grid)
   }
 
   // ===== ISeriesPrimitive Implementation =====
@@ -145,9 +145,9 @@ export abstract class BaseSeriesPrimitive<
    * Standardized implementation - subclasses can override for custom behavior
    */
   updateAllViews(): void {
-    this._paneViews.forEach(pv => {
+    this._paneViews.forEach((pv) => {
       // @ts-expect-error - update() is an optional method on custom pane views
-      if (typeof pv.update === 'function') {
+      if (typeof pv.update === "function") {
         // @ts-expect-error - update() is an optional method on custom pane views
         pv.update();
       }
@@ -257,10 +257,10 @@ export abstract class BaseSeriesPrimitive<
   protected _getZOrder(): PrimitivePaneViewZOrder {
     const zIndex = this._options.zIndex;
 
-    if (typeof zIndex === 'number') {
-      if (zIndex < 0) return 'bottom';
-      if (zIndex >= 1000) return 'top';
-      return 'normal';
+    if (typeof zIndex === "number") {
+      if (zIndex < 0) return "bottom";
+      if (zIndex >= 1000) return "top";
+      return "normal";
     }
 
     return this._getDefaultZOrder();
@@ -274,8 +274,7 @@ export abstract class BaseSeriesPrimitive<
 export abstract class BaseSeriesPrimitivePaneView<
   TData extends BaseProcessedData,
   TOptions extends BaseSeriesPrimitiveOptions,
-> implements IPrimitivePaneView
-{
+> implements IPrimitivePaneView {
   protected _source: BaseSeriesPrimitive<TData, TOptions>;
 
   constructor(source: BaseSeriesPrimitive<TData, TOptions>) {
@@ -313,8 +312,7 @@ export abstract class BaseSeriesPrimitivePaneView<
 export abstract class BaseSeriesPrimitiveAxisView<
   TData extends BaseProcessedData,
   TOptions extends BaseSeriesPrimitiveOptions,
-> implements ISeriesPrimitiveAxisView
-{
+> implements ISeriesPrimitiveAxisView {
   protected _source: BaseSeriesPrimitive<TData, TOptions>;
 
   constructor(source: BaseSeriesPrimitive<TData, TOptions>) {
@@ -338,7 +336,7 @@ export abstract class BaseSeriesPrimitiveAxisView<
    * Standardized implementation - subclasses can override
    */
   textColor(): string {
-    return '#FFFFFF'; // Default: white for contrast
+    return "#FFFFFF"; // Default: white for contrast
   }
 
   /**
@@ -465,9 +463,9 @@ export function createPrimitiveAxisView<
   TOptions extends BaseSeriesPrimitiveOptions,
 >(
   field: string,
-  colorField: string
+  colorField: string,
 ): new (
-  source: BaseSeriesPrimitive<TData, TOptions>
+  source: BaseSeriesPrimitive<TData, TOptions>,
 ) => BaseSeriesPrimitiveAxisView<TData, TOptions> {
   // Return an anonymous class that extends BaseSeriesPrimitiveAxisView
   return class extends BaseSeriesPrimitiveAxisView<TData, TOptions> {
@@ -494,11 +492,11 @@ export function createPrimitiveAxisView<
      */
     text(): string {
       const lastItem = this._getLastVisibleItem();
-      if (!lastItem) return '';
+      if (!lastItem) return "";
 
       // Access the field value from the data item
       const fieldValue = (lastItem as any)[field];
-      if (fieldValue === null || fieldValue === undefined) return '';
+      if (fieldValue === null || fieldValue === undefined) return "";
 
       return fieldValue.toFixed(2);
     }

@@ -71,7 +71,7 @@ export interface TypographyConfig {
   fontSize?: number;
   fontFamily?: string;
   fontWeight?: string | number;
-  textAlign?: 'left' | 'center' | 'right';
+  textAlign?: "left" | "center" | "right";
   lineHeight?: number | string;
   letterSpacing?: number | string;
 }
@@ -100,7 +100,7 @@ export interface BorderConfig {
   borderRadius?: number;
   borderWidth?: number;
   borderColor?: string;
-  borderStyle?: 'solid' | 'dashed' | 'dotted' | 'none';
+  borderStyle?: "solid" | "dashed" | "dotted" | "none";
 }
 
 /**
@@ -121,7 +121,7 @@ export class PrimitiveStylingUtils {
   static applyBaseStyles(
     element: HTMLElement,
     styles: BaseStyleConfig,
-    defaults: BaseStyleConfig = {}
+    defaults: BaseStyleConfig = {},
   ): void {
     const style = element.style;
     const config = { ...defaults, ...styles };
@@ -138,10 +138,16 @@ export class PrimitiveStylingUtils {
 
     // Layout
     if (config.padding !== undefined) {
-      style.padding = typeof config.padding === 'number' ? `${config.padding}px` : config.padding;
+      style.padding =
+        typeof config.padding === "number"
+          ? `${config.padding}px`
+          : config.padding;
     }
     if (config.margin !== undefined) {
-      style.margin = typeof config.margin === 'number' ? `${config.margin}px` : config.margin;
+      style.margin =
+        typeof config.margin === "number"
+          ? `${config.margin}px`
+          : config.margin;
     }
 
     // Border and shape
@@ -164,7 +170,7 @@ export class PrimitiveStylingUtils {
   static applyTypography(
     element: HTMLElement,
     typography: TypographyConfig,
-    defaults: TypographyConfig = {}
+    defaults: TypographyConfig = {},
   ): void {
     const style = element.style;
     const config = { ...defaults, ...typography };
@@ -175,11 +181,13 @@ export class PrimitiveStylingUtils {
     if (config.textAlign) style.textAlign = config.textAlign;
     if (config.lineHeight) {
       style.lineHeight =
-        typeof config.lineHeight === 'number' ? config.lineHeight.toString() : config.lineHeight;
+        typeof config.lineHeight === "number"
+          ? config.lineHeight.toString()
+          : config.lineHeight;
     }
     if (config.letterSpacing) {
       style.letterSpacing =
-        typeof config.letterSpacing === 'number'
+        typeof config.letterSpacing === "number"
           ? `${config.letterSpacing}px`
           : config.letterSpacing;
     }
@@ -191,25 +199,35 @@ export class PrimitiveStylingUtils {
   static applyLayout(
     element: HTMLElement,
     layout: LayoutConfig,
-    defaults: LayoutConfig = {}
+    defaults: LayoutConfig = {},
   ): void {
     const style = element.style;
     const config = { ...defaults, ...layout };
 
     // Dimensions
     if (config.width !== undefined) {
-      style.width = typeof config.width === 'number' ? `${config.width}px` : config.width;
+      style.width =
+        typeof config.width === "number" ? `${config.width}px` : config.width;
     }
     if (config.height !== undefined) {
-      style.height = typeof config.height === 'number' ? `${config.height}px` : config.height;
+      style.height =
+        typeof config.height === "number"
+          ? `${config.height}px`
+          : config.height;
     }
 
     // Spacing
     if (config.padding !== undefined) {
-      style.padding = typeof config.padding === 'number' ? `${config.padding}px` : config.padding;
+      style.padding =
+        typeof config.padding === "number"
+          ? `${config.padding}px`
+          : config.padding;
     }
     if (config.margin !== undefined) {
-      style.margin = typeof config.margin === 'number' ? `${config.margin}px` : config.margin;
+      style.margin =
+        typeof config.margin === "number"
+          ? `${config.margin}px`
+          : config.margin;
     }
 
     // Display and positioning
@@ -218,16 +236,22 @@ export class PrimitiveStylingUtils {
 
     // Position values
     if (config.top !== undefined) {
-      style.top = typeof config.top === 'number' ? `${config.top}px` : config.top;
+      style.top =
+        typeof config.top === "number" ? `${config.top}px` : config.top;
     }
     if (config.right !== undefined) {
-      style.right = typeof config.right === 'number' ? `${config.right}px` : config.right;
+      style.right =
+        typeof config.right === "number" ? `${config.right}px` : config.right;
     }
     if (config.bottom !== undefined) {
-      style.bottom = typeof config.bottom === 'number' ? `${config.bottom}px` : config.bottom;
+      style.bottom =
+        typeof config.bottom === "number"
+          ? `${config.bottom}px`
+          : config.bottom;
     }
     if (config.left !== undefined) {
-      style.left = typeof config.left === 'number' ? `${config.left}px` : config.left;
+      style.left =
+        typeof config.left === "number" ? `${config.left}px` : config.left;
     }
   }
 
@@ -237,7 +261,7 @@ export class PrimitiveStylingUtils {
   static applyBorder(
     element: HTMLElement,
     border: BorderConfig,
-    defaults: BorderConfig = {}
+    defaults: BorderConfig = {},
   ): void {
     const style = element.style;
     const config = { ...defaults, ...border };
@@ -255,7 +279,7 @@ export class PrimitiveStylingUtils {
   static applyShadow(
     element: HTMLElement,
     shadow: ShadowConfig,
-    defaults: ShadowConfig = {}
+    defaults: ShadowConfig = {},
   ): void {
     const style = element.style;
     const config = { ...defaults, ...shadow };
@@ -271,13 +295,13 @@ export class PrimitiveStylingUtils {
     element: HTMLElement,
     baseStyles: BaseStyleConfig,
     stateStyles: BaseStyleConfig,
-    state: 'default' | 'hover' | 'active' | 'disabled' = 'default'
+    state: "default" | "hover" | "active" | "disabled" = "default",
   ): void {
     // Apply base styles first
     this.applyBaseStyles(element, baseStyles);
 
     // Apply state-specific overrides
-    if (state !== 'default') {
+    if (state !== "default") {
       this.applyBaseStyles(element, stateStyles);
     }
 
@@ -285,23 +309,23 @@ export class PrimitiveStylingUtils {
     const style = element.style;
 
     // Common interaction styling
-    style.userSelect = 'none';
-    style.outline = 'none';
+    style.userSelect = "none";
+    style.outline = "none";
 
     // State-specific cursor and pointer events
     switch (state) {
-      case 'disabled':
-        style.cursor = 'not-allowed';
-        style.pointerEvents = 'auto'; // Still allow events for accessibility
+      case "disabled":
+        style.cursor = "not-allowed";
+        style.pointerEvents = "auto"; // Still allow events for accessibility
         break;
-      case 'hover':
-      case 'active':
-        style.cursor = stateStyles.cursor || baseStyles.cursor || 'pointer';
-        style.pointerEvents = 'auto';
+      case "hover":
+      case "active":
+        style.cursor = stateStyles.cursor || baseStyles.cursor || "pointer";
+        style.pointerEvents = "auto";
         break;
       default:
-        style.cursor = baseStyles.cursor || 'default';
-        style.pointerEvents = 'auto';
+        style.cursor = baseStyles.cursor || "default";
+        style.pointerEvents = "auto";
         break;
     }
   }
@@ -314,10 +338,10 @@ export class PrimitiveStylingUtils {
 
     // Basic validation - check if color looks like a valid CSS color
     if (
-      color.startsWith('#') ||
-      color.startsWith('rgb') ||
-      color.startsWith('hsl') ||
-      color.includes('var(') ||
+      color.startsWith("#") ||
+      color.startsWith("rgb") ||
+      color.startsWith("hsl") ||
+      color.includes("var(") ||
       /^[a-zA-Z]+$/.test(color)
     ) {
       return color;
@@ -331,12 +355,12 @@ export class PrimitiveStylingUtils {
    */
   static normalizeNumericValue(
     value: number | string | undefined,
-    unit: string = 'px',
-    fallback: number = 0
+    unit: string = "px",
+    fallback: number = 0,
   ): string {
     if (value === undefined) return `${fallback}${unit}`;
-    if (typeof value === 'number') return `${value}${unit}`;
-    if (typeof value === 'string') return value;
+    if (typeof value === "number") return `${value}${unit}`;
+    if (typeof value === "string") return value;
     return `${fallback}${unit}`;
   }
 
@@ -345,13 +369,13 @@ export class PrimitiveStylingUtils {
    */
   static createFlexContainer(
     element: HTMLElement,
-    direction: 'row' | 'column' = 'row',
-    align: string = 'center',
-    justify: string = 'center',
-    gap?: number
+    direction: "row" | "column" = "row",
+    align: string = "center",
+    justify: string = "center",
+    gap?: number,
   ): void {
     const style = element.style;
-    style.display = 'flex';
+    style.display = "flex";
     style.flexDirection = direction;
     style.alignItems = align;
     style.justifyContent = justify;
@@ -366,11 +390,13 @@ export class PrimitiveStylingUtils {
    */
   static applyTransition(
     element: HTMLElement,
-    properties: string[] = ['all'],
-    duration: string = '0.2s',
-    timing: string = 'ease'
+    properties: string[] = ["all"],
+    duration: string = "0.2s",
+    timing: string = "ease",
   ): void {
-    const transitionValue = properties.map(prop => `${prop} ${duration} ${timing}`).join(', ');
+    const transitionValue = properties
+      .map((prop) => `${prop} ${duration} ${timing}`)
+      .join(", ");
     element.style.transition = transitionValue;
   }
 
@@ -395,27 +421,28 @@ export class PrimitiveStylingUtils {
       left?: number;
       zIndex?: number;
     },
-    setAbsolute: boolean = true
+    setAbsolute: boolean = true,
   ): void {
     const style = element.style;
 
     // Set position mode
     if (setAbsolute) {
-      style.position = 'absolute';
+      style.position = "absolute";
     }
 
     // Reset all position values first to prevent conflicts
-    style.top = '';
-    style.right = '';
-    style.bottom = '';
-    style.left = '';
+    style.top = "";
+    style.right = "";
+    style.bottom = "";
+    style.left = "";
 
     // Apply provided position values
     if (position.top !== undefined) style.top = `${position.top}px`;
     if (position.right !== undefined) style.right = `${position.right}px`;
     if (position.bottom !== undefined) style.bottom = `${position.bottom}px`;
     if (position.left !== undefined) style.left = `${position.left}px`;
-    if (position.zIndex !== undefined) style.zIndex = position.zIndex.toString();
+    if (position.zIndex !== undefined)
+      style.zIndex = position.zIndex.toString();
   }
 
   /**
@@ -426,47 +453,50 @@ export class PrimitiveStylingUtils {
    */
   static resetPosition(element: HTMLElement): void {
     const style = element.style;
-    style.top = 'auto';
-    style.left = 'auto';
-    style.right = 'auto';
-    style.bottom = 'auto';
+    style.top = "auto";
+    style.left = "auto";
+    style.right = "auto";
+    style.bottom = "auto";
   }
 
-  static resetStyles(element: HTMLElement, preserveLayout: boolean = false): void {
+  static resetStyles(
+    element: HTMLElement,
+    preserveLayout: boolean = false,
+  ): void {
     const style = element.style;
 
     // Reset appearance
-    style.backgroundColor = '';
-    style.color = '';
-    style.border = '';
-    style.borderRadius = '';
-    style.boxShadow = '';
-    style.textShadow = '';
-    style.opacity = '';
-    style.cursor = '';
-    style.transition = '';
+    style.backgroundColor = "";
+    style.color = "";
+    style.border = "";
+    style.borderRadius = "";
+    style.boxShadow = "";
+    style.textShadow = "";
+    style.opacity = "";
+    style.cursor = "";
+    style.transition = "";
 
     // Reset typography
-    style.fontSize = '';
-    style.fontFamily = '';
-    style.fontWeight = '';
-    style.textAlign = '';
-    style.lineHeight = '';
-    style.letterSpacing = '';
+    style.fontSize = "";
+    style.fontFamily = "";
+    style.fontWeight = "";
+    style.textAlign = "";
+    style.lineHeight = "";
+    style.letterSpacing = "";
 
     if (!preserveLayout) {
       // Reset layout
-      style.width = '';
-      style.height = '';
-      style.padding = '';
-      style.margin = '';
-      style.display = '';
-      style.position = '';
-      style.top = '';
-      style.right = '';
-      style.bottom = '';
-      style.left = '';
-      style.zIndex = '';
+      style.width = "";
+      style.height = "";
+      style.padding = "";
+      style.margin = "";
+      style.display = "";
+      style.position = "";
+      style.top = "";
+      style.right = "";
+      style.bottom = "";
+      style.left = "";
+      style.zIndex = "";
     }
   }
 }

@@ -42,15 +42,28 @@
  * ```
  */
 
-import { IChartApi, ISeriesApi, IPanePrimitive, Time } from 'lightweight-charts';
-import { CornerLayoutManager } from '../services/CornerLayoutManager';
-import { ChartCoordinateService } from '../services/ChartCoordinateService';
-import { TemplateEngine, TemplateResult } from '../services/TemplateEngine';
-import { TemplateContext } from '../types/ChartInterfaces';
-import { PrimitiveEventManager, EventSubscription } from '../services/PrimitiveEventManager';
-import { Corner, Position, IPositionableWidget, WidgetDimensions } from '../types/layout';
-import { createSingleton } from '../utils/SingletonBase';
-import { PrimitiveStylingUtils } from './PrimitiveStylingUtils';
+import {
+  IChartApi,
+  ISeriesApi,
+  IPanePrimitive,
+  Time,
+} from "lightweight-charts";
+import { CornerLayoutManager } from "../services/CornerLayoutManager";
+import { ChartCoordinateService } from "../services/ChartCoordinateService";
+import { TemplateEngine, TemplateResult } from "../services/TemplateEngine";
+import { TemplateContext } from "../types/ChartInterfaces";
+import {
+  PrimitiveEventManager,
+  EventSubscription,
+} from "../services/PrimitiveEventManager";
+import {
+  Corner,
+  Position,
+  IPositionableWidget,
+  WidgetDimensions,
+} from "../types/layout";
+import { createSingleton } from "../utils/SingletonBase";
+import { PrimitiveStylingUtils } from "./PrimitiveStylingUtils";
 
 /**
  * Base configuration for all pane primitives
@@ -104,7 +117,9 @@ export interface TemplateData {
  *
  * Following DRY principles with single source of truth architecture
  */
-export abstract class BasePanePrimitive<TConfig extends BasePrimitiveConfig = BasePrimitiveConfig>
+export abstract class BasePanePrimitive<
+  TConfig extends BasePrimitiveConfig = BasePrimitiveConfig,
+>
   implements IPanePrimitive<Time>, IPositionableWidget
 {
   // IPanePrimitive implementation
@@ -133,7 +148,7 @@ export abstract class BasePanePrimitive<TConfig extends BasePrimitiveConfig = Ba
       this._coordinateService = createSingleton(ChartCoordinateService);
     }
     if (!this._coordinateService) {
-      throw new Error('Failed to initialize ChartCoordinateService');
+      throw new Error("Failed to initialize ChartCoordinateService");
     }
     return this._coordinateService;
   }
@@ -146,7 +161,7 @@ export abstract class BasePanePrimitive<TConfig extends BasePrimitiveConfig = Ba
       this._templateEngine = createSingleton(TemplateEngine);
     }
     if (!this._templateEngine) {
-      throw new Error('Failed to initialize TemplateEngine');
+      throw new Error("Failed to initialize TemplateEngine");
     }
     return this._templateEngine;
   }
@@ -167,7 +182,7 @@ export abstract class BasePanePrimitive<TConfig extends BasePrimitiveConfig = Ba
   constructor(id: string, config: TConfig) {
     this.id = id;
     this.config = { ...config };
-    this.corner = config.corner ?? 'top-left';
+    this.corner = config.corner ?? "top-left";
     this.priority = config.priority ?? 50;
     this.visible = config.visible !== false;
     // Services are now lazy-loaded via getters to avoid module loading order issues
@@ -237,7 +252,12 @@ export abstract class BasePanePrimitive<TConfig extends BasePrimitiveConfig = Ba
     this.mounted = false;
   }
 
-  private lastPaneCoords: { x: number; y: number; width: number; height: number } | null = null;
+  private lastPaneCoords: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  } | null = null;
 
   /**
    * IPanePrimitive interface - integrates with chart's rendering pipeline
@@ -253,7 +273,10 @@ export abstract class BasePanePrimitive<TConfig extends BasePrimitiveConfig = Ba
             if (!this.chart || !this.mounted) return;
 
             const paneId = this.getPaneId();
-            const newCoords = this.coordinateService.getPaneCoordinates(this.chart, paneId);
+            const newCoords = this.coordinateService.getPaneCoordinates(
+              this.chart,
+              paneId,
+            );
 
             if (!newCoords) return;
 
@@ -336,9 +359,9 @@ export abstract class BasePanePrimitive<TConfig extends BasePrimitiveConfig = Ba
       const originalVisibility = this.containerElement.style.visibility;
       const originalPosition = this.containerElement.style.position;
 
-      this.containerElement.style.display = 'block';
-      this.containerElement.style.visibility = 'hidden';
-      this.containerElement.style.position = 'absolute';
+      this.containerElement.style.display = "block";
+      this.containerElement.style.visibility = "hidden";
+      this.containerElement.style.position = "absolute";
 
       width = this.containerElement.offsetWidth || width;
       height = this.containerElement.offsetHeight || height;
@@ -394,7 +417,10 @@ export abstract class BasePanePrimitive<TConfig extends BasePrimitiveConfig = Ba
     this.layoutManager.setChartApi(this.chart);
 
     // Setup coordinate service integration
-    this.coordinateService.setupLayoutManagerIntegration(this.chart, this.layoutManager);
+    this.coordinateService.setupLayoutManagerIntegration(
+      this.chart,
+      this.layoutManager,
+    );
   }
 
   /**
@@ -409,7 +435,7 @@ export abstract class BasePanePrimitive<TConfig extends BasePrimitiveConfig = Ba
    * Get the chart ID for this primitive
    */
   protected getChartId(): string {
-    return this.chart?.chartElement()?.id || 'default';
+    return this.chart?.chartElement()?.id || "default";
   }
 
   // ===== Container Management =====
@@ -432,7 +458,7 @@ export abstract class BasePanePrimitive<TConfig extends BasePrimitiveConfig = Ba
     }
 
     // Create container
-    this.containerElement = document.createElement('div');
+    this.containerElement = document.createElement("div");
     this.containerElement.id = `${this.id}-container`;
     this.containerElement.className = `primitive-container ${this.getContainerClassName()}`;
 
@@ -469,14 +495,14 @@ export abstract class BasePanePrimitive<TConfig extends BasePrimitiveConfig = Ba
     if (!this.containerElement) return;
 
     const style = this.containerElement.style;
-    style.position = 'absolute';
-    style.pointerEvents = 'auto';
-    style.userSelect = 'none';
+    style.position = "absolute";
+    style.pointerEvents = "auto";
+    style.userSelect = "none";
 
     // Apply config styling
     if (this.config.style) {
       const configStyle = this.config.style;
-      const isLegend = this.id.includes('legend');
+      const isLegend = this.id.includes("legend");
 
       // For legends, don't apply background to container - let content handle it
       if (configStyle.backgroundColor && !isLegend) {
@@ -487,11 +513,12 @@ export abstract class BasePanePrimitive<TConfig extends BasePrimitiveConfig = Ba
       if (configStyle.fontFamily) style.fontFamily = configStyle.fontFamily;
       if (configStyle.borderRadius && !isLegend)
         style.borderRadius = `${configStyle.borderRadius}px`;
-      if (configStyle.padding && !isLegend) style.padding = `${configStyle.padding}px`;
+      if (configStyle.padding && !isLegend)
+        style.padding = `${configStyle.padding}px`;
 
       // For legends, force margin to 0 since spacing is handled by layout manager
       if (isLegend) {
-        style.margin = '0';
+        style.margin = "0";
       } else if (configStyle.margin) {
         style.margin = `${configStyle.margin}px`;
       }
@@ -499,8 +526,8 @@ export abstract class BasePanePrimitive<TConfig extends BasePrimitiveConfig = Ba
 
       // Ensure container is transparent for legends
       if (isLegend) {
-        style.backgroundColor = 'transparent';
-        style.color = 'inherit';
+        style.backgroundColor = "transparent";
+        style.color = "inherit";
       }
     }
   }
@@ -551,7 +578,10 @@ export abstract class BasePanePrimitive<TConfig extends BasePrimitiveConfig = Ba
       customData: this.templateData,
     };
 
-    this.lastTemplateResult = this.templateEngine.processTemplate(template, context);
+    this.lastTemplateResult = this.templateEngine.processTemplate(
+      template,
+      context,
+    );
 
     // Check for errors but fail silently in production
     if (this.lastTemplateResult.hasErrors) {
@@ -592,9 +622,12 @@ export abstract class BasePanePrimitive<TConfig extends BasePrimitiveConfig = Ba
   private setupDefaultEventSubscriptions(): void {
     if (!this.eventManager) return;
 
-    const crosshairSub = this.eventManager.subscribe('crosshairMove', event => {
-      this.handleCrosshairMove(event);
-    });
+    const crosshairSub = this.eventManager.subscribe(
+      "crosshairMove",
+      (event) => {
+        this.handleCrosshairMove(event);
+      },
+    );
     this.eventSubscriptions.push(crosshairSub);
 
     this.setupCustomEventSubscriptions();
@@ -604,7 +637,7 @@ export abstract class BasePanePrimitive<TConfig extends BasePrimitiveConfig = Ba
    * Cleanup event subscriptions
    */
   private cleanupEventSubscriptions(): void {
-    this.eventSubscriptions.forEach(sub => sub.unsubscribe());
+    this.eventSubscriptions.forEach((sub) => sub.unsubscribe());
     this.eventSubscriptions = [];
   }
 
@@ -624,8 +657,8 @@ export abstract class BasePanePrimitive<TConfig extends BasePrimitiveConfig = Ba
           seriesData: seriesValue,
           formatting: this.config.style
             ? {
-                valueFormat: '.2f', // Default format, can be overridden
-                timeFormat: 'YYYY-MM-DD HH:mm:ss',
+                valueFormat: ".2f", // Default format, can be overridden
+                timeFormat: "YYYY-MM-DD HH:mm:ss",
               }
             : undefined,
         });
@@ -661,7 +694,7 @@ export abstract class BasePanePrimitive<TConfig extends BasePrimitiveConfig = Ba
 
       // Update container visibility
       if (this.containerElement) {
-        this.containerElement.style.display = visible ? 'block' : 'none';
+        this.containerElement.style.display = visible ? "block" : "none";
       }
 
       // Update layout manager
@@ -860,8 +893,8 @@ export const PrimitivePriority = {
  * Primitive type identifiers
  */
 export const PrimitiveType = {
-  LEGEND: 'legend',
-  RANGE_SWITCHER: 'range-switcher',
-  BUTTON: 'button',
-  CUSTOM: 'custom',
+  LEGEND: "legend",
+  RANGE_SWITCHER: "range-switcher",
+  BUTTON: "button",
+  CUSTOM: "custom",
 } as const;

@@ -37,21 +37,25 @@
  * ```
  */
 
-import { BasePanePrimitive, BasePrimitiveConfig, PrimitivePriority } from './BasePanePrimitive';
+import {
+  BasePanePrimitive,
+  BasePrimitiveConfig,
+  PrimitivePriority,
+} from "./BasePanePrimitive";
 import {
   LegendColors,
   LegendDimensions,
   FormatDefaults,
   ContainerDefaults,
   CommonValues,
-} from './PrimitiveDefaults';
+} from "./PrimitiveDefaults";
 import {
   PrimitiveStylingUtils,
   BaseStyleConfig,
   TypographyConfig,
   BorderConfig,
-} from './PrimitiveStylingUtils';
-import { sanitizeHtml } from '../utils/sanitization';
+} from "./PrimitiveStylingUtils";
+import { sanitizeHtml } from "../utils/sanitization";
 
 /**
  * Configuration for LegendPrimitive
@@ -80,16 +84,16 @@ export interface LegendPrimitiveConfig extends BasePrimitiveConfig {
   /**
    * Legend styling
    */
-  style?: BasePrimitiveConfig['style'] & {
+  style?: BasePrimitiveConfig["style"] & {
     /**
      * Text alignment
      */
-    textAlign?: 'left' | 'center' | 'right';
+    textAlign?: "left" | "center" | "right";
 
     /**
      * Font weight
      */
-    fontWeight?: 'normal' | 'bold' | 'lighter' | number;
+    fontWeight?: "normal" | "bold" | "lighter" | number;
 
     /**
      * Text shadow
@@ -107,7 +111,7 @@ export interface LegendPrimitiveConfig extends BasePrimitiveConfig {
     border?: {
       width?: number;
       color?: string;
-      style?: 'solid' | 'dashed' | 'dotted';
+      style?: "solid" | "dashed" | "dotted";
     };
   };
 }
@@ -173,7 +177,7 @@ export class LegendPrimitive extends BasePanePrimitive<LegendPrimitiveConfig> {
    * Get the template string for this legend
    */
   protected getTemplate(): string {
-    return this.config.text || '$$value$$';
+    return this.config.text || "$$value$$";
   }
 
   /**
@@ -185,12 +189,14 @@ export class LegendPrimitive extends BasePanePrimitive<LegendPrimitiveConfig> {
     const content = this.getProcessedContent();
 
     // Create or update legend element
-    let legendElement = this.containerElement.querySelector('.legend-content') as HTMLElement;
+    let legendElement = this.containerElement.querySelector(
+      ".legend-content",
+    ) as HTMLElement;
     if (!legendElement) {
-      legendElement = document.createElement('div');
-      legendElement.className = 'legend-content';
-      legendElement.setAttribute('role', 'img');
-      legendElement.setAttribute('aria-label', 'Chart legend');
+      legendElement = document.createElement("div");
+      legendElement.className = "legend-content";
+      legendElement.setAttribute("role", "img");
+      legendElement.setAttribute("aria-label", "Chart legend");
       this.containerElement.appendChild(legendElement);
     }
 
@@ -232,7 +238,7 @@ export class LegendPrimitive extends BasePanePrimitive<LegendPrimitiveConfig> {
         if (config.backgroundOpacity !== undefined) {
           baseStyles.backgroundColor = this.adjustColorOpacity(
             config.backgroundColor,
-            config.backgroundOpacity
+            config.backgroundOpacity,
           );
         } else {
           baseStyles.backgroundColor = config.backgroundColor;
@@ -256,16 +262,20 @@ export class LegendPrimitive extends BasePanePrimitive<LegendPrimitiveConfig> {
 
       // Force background and text color with !important to override any external styles
       if (baseStyles.backgroundColor) {
-        element.style.setProperty('background-color', baseStyles.backgroundColor, 'important');
+        element.style.setProperty(
+          "background-color",
+          baseStyles.backgroundColor,
+          "important",
+        );
       }
       if (baseStyles.color) {
-        element.style.setProperty('color', baseStyles.color, 'important');
+        element.style.setProperty("color", baseStyles.color, "important");
       }
 
       // Remove padding since inner content (span) handles its own padding
-      element.style.setProperty('padding', '0', 'important');
+      element.style.setProperty("padding", "0", "important");
       // Explicitly remove any margins since spacing is handled by layout manager
-      element.style.setProperty('margin', '0', 'important');
+      element.style.setProperty("margin", "0", "important");
 
       // Apply legend-specific layout constraints
       const style = element.style;
@@ -277,8 +287,8 @@ export class LegendPrimitive extends BasePanePrimitive<LegendPrimitiveConfig> {
       style.maxWidth = `${LegendDimensions.MAX_WIDTH}px`;
 
       // Ensure no browser defaults add extra spacing
-      style.lineHeight = '1';
-      style.boxSizing = 'border-box';
+      style.lineHeight = "1";
+      style.boxSizing = "border-box";
 
       // Apply text shadow directly since it's not handled by baseStyles
       if (config.textShadow) {
@@ -292,16 +302,16 @@ export class LegendPrimitive extends BasePanePrimitive<LegendPrimitiveConfig> {
    */
   private adjustColorOpacity(color: string, opacity: number): string {
     // Simple rgba conversion for common color formats
-    if (color.startsWith('rgba(')) {
+    if (color.startsWith("rgba(")) {
       return color.replace(/rgba\(([^)]+)\)/, (match, values) => {
-        const parts = values.split(',').map((s: string) => s.trim());
+        const parts = values.split(",").map((s: string) => s.trim());
         return `rgba(${parts[0]}, ${parts[1]}, ${parts[2]}, ${opacity})`;
       });
-    } else if (color.startsWith('rgb(')) {
+    } else if (color.startsWith("rgb(")) {
       return color.replace(/rgb\(([^)]+)\)/, (match, values) => {
         return `rgba(${values}, ${opacity})`;
       });
-    } else if (color.startsWith('#')) {
+    } else if (color.startsWith("#")) {
       // Convert hex to rgba
       const r = parseInt(color.slice(1, 3), 16);
       const g = parseInt(color.slice(3, 5), 16);
@@ -317,7 +327,7 @@ export class LegendPrimitive extends BasePanePrimitive<LegendPrimitiveConfig> {
    * Get CSS class name for the container
    */
   protected getContainerClassName(): string {
-    return 'legend-primitive';
+    return "legend-primitive";
   }
 
   /**
@@ -339,9 +349,12 @@ export class LegendPrimitive extends BasePanePrimitive<LegendPrimitiveConfig> {
     if (!this.eventManager) return;
 
     // Subscribe to crosshair moves for real-time value updates
-    const crosshairSub = this.eventManager.subscribe('crosshairMove', event => {
-      this.updateLegendFromCrosshair(event);
-    });
+    const crosshairSub = this.eventManager.subscribe(
+      "crosshairMove",
+      (event) => {
+        this.updateLegendFromCrosshair(event);
+      },
+    );
     this.eventSubscriptions.push(crosshairSub);
   }
 
@@ -434,7 +447,7 @@ export class LegendPrimitive extends BasePanePrimitive<LegendPrimitiveConfig> {
  */
 export function createLegendPrimitive(
   id: string,
-  config: Partial<LegendPrimitiveConfig> & { text: string; corner: any }
+  config: Partial<LegendPrimitiveConfig> & { text: string; corner: any },
 ): LegendPrimitive {
   return new LegendPrimitive(id, config as LegendPrimitiveConfig);
 }
@@ -447,7 +460,7 @@ export const DefaultLegendConfigs = {
    * Simple value legend
    */
   simple: {
-    text: '$$value$$',
+    text: "$$value$$",
     valueFormat: FormatDefaults.VALUE_FORMAT,
     style: {
       backgroundColor: LegendColors.DEFAULT_BACKGROUND,
@@ -461,7 +474,7 @@ export const DefaultLegendConfigs = {
    * OHLC candlestick legend
    */
   ohlc: {
-    text: 'O: $$open$$ H: $$high$$ L: $$low$$ C: $$close$$',
+    text: "O: $$open$$ H: $$high$$ L: $$low$$ C: $$close$$",
     valueFormat: FormatDefaults.VALUE_FORMAT,
     style: {
       backgroundColor: LegendColors.DEFAULT_BACKGROUND,
@@ -476,7 +489,7 @@ export const DefaultLegendConfigs = {
    * Volume legend
    */
   volume: {
-    text: 'Vol: $$volume$$',
+    text: "Vol: $$volume$$",
     valueFormat: FormatDefaults.VOLUME_FORMAT,
     style: {
       backgroundColor: LegendColors.VOLUME_BACKGROUND,
@@ -490,7 +503,7 @@ export const DefaultLegendConfigs = {
    * Band/ribbon legend
    */
   band: {
-    text: 'U: $$upper$$ M: $$middle$$ L: $$lower$$',
+    text: "U: $$upper$$ M: $$middle$$ L: $$lower$$",
     valueFormat: FormatDefaults.BAND_FORMAT,
     style: {
       backgroundColor: LegendColors.BAND_BACKGROUND,
