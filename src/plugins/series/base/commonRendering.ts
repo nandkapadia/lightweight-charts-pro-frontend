@@ -16,7 +16,7 @@ import {
   IChartApi,
   CustomData,
   CustomSeriesWhitespaceData,
-} from 'lightweight-charts';
+} from "lightweight-charts";
 
 // ============================================================================
 // Coordinate Types
@@ -57,7 +57,10 @@ export function timeToCoordinate(time: Time, chart: IChartApi): number | null {
  * @param series - Series instance
  * @returns Y coordinate or null if conversion fails
  */
-export function priceToCoordinate(price: number, series: ISeriesApi<any>): number | null {
+export function priceToCoordinate(
+  price: number,
+  series: ISeriesApi<any>,
+): number | null {
   return series.priceToCoordinate(price);
 }
 
@@ -67,13 +70,15 @@ export function priceToCoordinate(price: number, series: ISeriesApi<any>): numbe
  * @param point - Coordinate point to validate
  * @returns True if all coordinates are non-null
  */
-export function isValidCoordinate(point: CoordinatePoint | MultiCoordinatePoint): boolean {
+export function isValidCoordinate(
+  point: CoordinatePoint | MultiCoordinatePoint,
+): boolean {
   if (point.x === null) return false;
 
   // Check all numeric properties
   for (const key in point) {
     const value = (point as Record<string, number | null>)[key];
-    if (key !== 'x' && value === null) {
+    if (key !== "x" && value === null) {
       return false;
     }
   }
@@ -103,7 +108,7 @@ export function drawLine(
   lineWidth: number,
   lineStyle: number = 0,
   startIndex?: number,
-  endIndex?: number
+  endIndex?: number,
 ): void {
   if (coordinates.length === 0) return;
 
@@ -128,7 +133,7 @@ export function drawLine(
 
   // Check if range has any nulls (Primitive mode) or all valid (Custom Series mode)
   const rangeCoords = coordinates.slice(start, end);
-  const hasNulls = rangeCoords.some(c => c.x == null || c.y == null);
+  const hasNulls = rangeCoords.some((c) => c.x == null || c.y == null);
 
   if (hasNulls) {
     // Primitive mode: Detect and draw valid segments
@@ -165,7 +170,7 @@ function drawLineSegment(
   ctx: CanvasRenderingContext2D,
   coordinates: CoordinatePoint[] | Array<{ x: number; y: number }>,
   startIdx: number,
-  endIdx: number
+  endIdx: number,
 ): void {
   if (endIdx < startIdx) return;
 
@@ -206,9 +211,9 @@ export function drawMultiLine(
   lineWidth: number,
   lineStyle: number = 0,
   startIndex?: number,
-  endIndex?: number
+  endIndex?: number,
 ): void {
-  const lineCoords: CoordinatePoint[] = coordinates.map(coord => ({
+  const lineCoords: CoordinatePoint[] = coordinates.map((coord) => ({
     x: coord.x as number | null,
     y: coord[lineKey] as number | null,
   }));
@@ -238,7 +243,7 @@ export function drawFillArea(
   lowerKey: string,
   fillColor: string,
   startIndex?: number,
-  endIndex?: number
+  endIndex?: number,
 ): void {
   if (coordinates.length === 0) return;
 
@@ -252,7 +257,9 @@ export function drawFillArea(
 
   // Check if range has any nulls (Primitive mode) or all valid (Custom Series mode)
   const rangeCoords = coordinates.slice(start, end);
-  const hasNulls = rangeCoords.some(c => c.x == null || c[upperKey] == null || c[lowerKey] == null);
+  const hasNulls = rangeCoords.some(
+    (c) => c.x == null || c[upperKey] == null || c[lowerKey] == null,
+  );
 
   if (hasNulls) {
     // Primitive mode: Detect and draw valid segments
@@ -260,7 +267,10 @@ export function drawFillArea(
 
     for (let i = start; i < end; i++) {
       const coord = coordinates[i];
-      const isValid = coord.x !== null && coord[upperKey] !== null && coord[lowerKey] !== null;
+      const isValid =
+        coord.x !== null &&
+        coord[upperKey] !== null &&
+        coord[lowerKey] !== null;
 
       if (isValid) {
         if (segmentStart === -1) segmentStart = i;
@@ -291,7 +301,7 @@ function drawSegment(
   startIdx: number,
   endIdx: number,
   upperKey: string,
-  lowerKey: string
+  lowerKey: string,
 ): void {
   if (endIdx - startIdx < 1) return;
 
@@ -328,20 +338,23 @@ function drawSegment(
  * @param valueKeys - Keys for price values (e.g., ['upper', 'lower'])
  * @returns Array of multi-coordinate points
  */
-export function convertToCoordinates<T extends { time: Time; [key: string]: any }>(
+export function convertToCoordinates<
+  T extends { time: Time; [key: string]: any },
+>(
   items: T[],
   chart: IChartApi,
   series: ISeriesApi<any>,
-  valueKeys: string[]
+  valueKeys: string[],
 ): MultiCoordinatePoint[] {
-  return items.map(item => {
+  return items.map((item) => {
     const x = timeToCoordinate(item.time, chart);
     const coord: MultiCoordinatePoint = { x };
 
     // Convert each value to Y coordinate
     for (const key of valueKeys) {
       const value = item[key];
-      coord[key] = typeof value === 'number' ? priceToCoordinate(value, series) : null;
+      coord[key] =
+        typeof value === "number" ? priceToCoordinate(value, series) : null;
     }
 
     return coord;
@@ -370,9 +383,9 @@ export function getBarSpacing(chart: IChartApi): number {
  */
 export function isWhitespaceDataMultiField<HorzScaleItem>(
   data: CustomData<HorzScaleItem> | CustomSeriesWhitespaceData<HorzScaleItem>,
-  fields: string[]
+  fields: string[],
 ): data is CustomSeriesWhitespaceData<HorzScaleItem> {
-  return fields.every(field => {
+  return fields.every((field) => {
     const value = (data as any)[field];
     return value === null || value === undefined;
   });

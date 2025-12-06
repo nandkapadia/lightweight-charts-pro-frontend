@@ -32,12 +32,15 @@ import {
   LineWidth,
   IChartApi,
   PriceToCoordinateConverter,
-} from 'lightweight-charts';
-import { BitmapCoordinatesRenderingScope, CanvasRenderingTarget2D } from 'fancy-canvas';
-import { isWhitespaceDataMultiField } from './base/commonRendering';
-import { LineStyle } from '../../utils/renderingUtils';
-import { drawFillArea, drawMultiLine } from './base/commonRendering';
-import { logger } from '../../utils/logger';
+} from "lightweight-charts";
+import {
+  BitmapCoordinatesRenderingScope,
+  CanvasRenderingTarget2D,
+} from "fancy-canvas";
+import { isWhitespaceDataMultiField } from "./base/commonRendering";
+import { LineStyle } from "../../utils/renderingUtils";
+import { drawFillArea, drawMultiLine } from "./base/commonRendering";
+import { logger } from "../../utils/logger";
 
 // ============================================================================
 // Data Interface
@@ -96,15 +99,15 @@ export interface RibbonSeriesOptions extends CustomSeriesOptions {
  */
 const defaultRibbonOptions: RibbonSeriesOptions = {
   ...customSeriesDefaultOptions,
-  upperLineColor: '#4CAF50',
+  upperLineColor: "#4CAF50",
   upperLineWidth: 2,
   upperLineStyle: LineStyle.Solid,
   upperLineVisible: true,
-  lowerLineColor: '#F44336',
+  lowerLineColor: "#F44336",
   lowerLineWidth: 2,
   lowerLineStyle: LineStyle.Solid,
   lowerLineVisible: true,
-  fillColor: 'rgba(76, 175, 80, 0.1)',
+  fillColor: "rgba(76, 175, 80, 0.1)",
   fillVisible: true,
 };
 
@@ -116,9 +119,9 @@ const defaultRibbonOptions: RibbonSeriesOptions = {
  * Ribbon Series - ICustomSeries implementation
  * Provides autoscaling and direct rendering
  */
-class RibbonSeries<TData extends RibbonData = RibbonData>
-  implements ICustomSeriesPaneView<Time, TData, RibbonSeriesOptions>
-{
+class RibbonSeries<
+  TData extends RibbonData = RibbonData,
+> implements ICustomSeriesPaneView<Time, TData, RibbonSeriesOptions> {
   private _renderer: RibbonSeriesRenderer<TData>;
 
   constructor() {
@@ -131,16 +134,19 @@ class RibbonSeries<TData extends RibbonData = RibbonData>
   }
 
   isWhitespace(
-    data: TData | CustomSeriesWhitespaceData<Time>
+    data: TData | CustomSeriesWhitespaceData<Time>,
   ): data is CustomSeriesWhitespaceData<Time> {
-    return isWhitespaceDataMultiField(data, ['upper', 'lower']);
+    return isWhitespaceDataMultiField(data, ["upper", "lower"]);
   }
 
   renderer(): ICustomSeriesPaneRenderer {
     return this._renderer;
   }
 
-  update(data: PaneRendererCustomData<Time, TData>, options: RibbonSeriesOptions): void {
+  update(
+    data: PaneRendererCustomData<Time, TData>,
+    options: RibbonSeriesOptions,
+  ): void {
     this._renderer.update(data, options);
   }
 
@@ -153,21 +159,29 @@ class RibbonSeries<TData extends RibbonData = RibbonData>
  * Ribbon Series Renderer - ICustomSeries
  * Only used when primitive is NOT attached
  */
-class RibbonSeriesRenderer<TData extends RibbonData = RibbonData>
-  implements ICustomSeriesPaneRenderer
-{
+class RibbonSeriesRenderer<
+  TData extends RibbonData = RibbonData,
+> implements ICustomSeriesPaneRenderer {
   private _data: PaneRendererCustomData<Time, TData> | null = null;
   private _options: RibbonSeriesOptions | null = null;
 
-  update(data: PaneRendererCustomData<Time, TData>, options: RibbonSeriesOptions): void {
+  update(
+    data: PaneRendererCustomData<Time, TData>,
+    options: RibbonSeriesOptions,
+  ): void {
     this._data = data;
     this._options = options;
   }
 
-  draw(target: CanvasRenderingTarget2D, priceConverter: PriceToCoordinateConverter): void {
-    target.useBitmapCoordinateSpace((scope: BitmapCoordinatesRenderingScope) => {
-      this._drawImpl(scope, priceConverter);
-    });
+  draw(
+    target: CanvasRenderingTarget2D,
+    priceConverter: PriceToCoordinateConverter,
+  ): void {
+    target.useBitmapCoordinateSpace(
+      (scope: BitmapCoordinatesRenderingScope) => {
+        this._drawImpl(scope, priceConverter);
+      },
+    );
   }
 
   /**
@@ -176,7 +190,7 @@ class RibbonSeriesRenderer<TData extends RibbonData = RibbonData>
    */
   private _drawImpl(
     renderingScope: BitmapCoordinatesRenderingScope,
-    priceToCoordinate: PriceToCoordinateConverter
+    priceToCoordinate: PriceToCoordinateConverter,
   ): void {
     // Early exit if no data to render
     if (
@@ -197,12 +211,14 @@ class RibbonSeriesRenderer<TData extends RibbonData = RibbonData>
     const visibleRange = this._data.visibleRange;
 
     // Transform all bars to bitmap coordinates once (performance optimization)
-    const bars = this._data.bars.map(bar => {
+    const bars = this._data.bars.map((bar) => {
       const { upper, lower } = bar.originalData;
       return {
         x: bar.x * renderingScope.horizontalPixelRatio,
-        upperY: (priceToCoordinate(upper) ?? 0) * renderingScope.verticalPixelRatio,
-        lowerY: (priceToCoordinate(lower) ?? 0) * renderingScope.verticalPixelRatio,
+        upperY:
+          (priceToCoordinate(upper) ?? 0) * renderingScope.verticalPixelRatio,
+        lowerY:
+          (priceToCoordinate(lower) ?? 0) * renderingScope.verticalPixelRatio,
       };
     });
 
@@ -215,11 +231,11 @@ class RibbonSeriesRenderer<TData extends RibbonData = RibbonData>
       drawFillArea(
         ctx,
         bars,
-        'upperY',
-        'lowerY',
+        "upperY",
+        "lowerY",
         options.fillColor,
         visibleRange.from,
-        visibleRange.to
+        visibleRange.to,
       );
     }
 
@@ -227,12 +243,12 @@ class RibbonSeriesRenderer<TData extends RibbonData = RibbonData>
       drawMultiLine(
         ctx,
         bars,
-        'upperY',
+        "upperY",
         options.upperLineColor,
         options.upperLineWidth * renderingScope.horizontalPixelRatio,
         options.upperLineStyle,
         visibleRange.from,
-        visibleRange.to
+        visibleRange.to,
       );
     }
 
@@ -240,12 +256,12 @@ class RibbonSeriesRenderer<TData extends RibbonData = RibbonData>
       drawMultiLine(
         ctx,
         bars,
-        'lowerY',
+        "lowerY",
         options.lowerLineColor,
         options.lowerLineWidth * renderingScope.horizontalPixelRatio,
         options.lowerLineStyle,
         visibleRange.from,
-        visibleRange.to
+        visibleRange.to,
       );
     }
 
@@ -332,31 +348,35 @@ export function createRibbonSeries(
 
     // Pane control
     paneId?: number;
-  } = {}
+  } = {},
 ): any {
   // Extract paneId (must be passed as third parameter to addCustomSeries)
   const paneId = options.paneId ?? 0;
 
   // Create ICustomSeries (always created for autoscaling)
-  const series = chart.addCustomSeries(new RibbonSeries(), {
-    _seriesType: 'Ribbon', // Internal property for series type identification
-    upperLineColor: options.upperLineColor ?? '#4CAF50',
-    upperLineWidth: options.upperLineWidth ?? 2,
-    upperLineStyle: options.upperLineStyle ?? LineStyle.Solid,
-    upperLineVisible: options.upperLineVisible !== false,
-    lowerLineColor: options.lowerLineColor ?? '#F44336',
-    lowerLineWidth: options.lowerLineWidth ?? 2,
-    lowerLineStyle: options.lowerLineStyle ?? LineStyle.Solid,
-    lowerLineVisible: options.lowerLineVisible !== false,
-    fillColor: options.fillColor ?? 'rgba(76, 175, 80, 0.1)',
-    fillVisible: options.fillVisible !== false,
-    priceScaleId: options.priceScaleId ?? 'right',
-    lastValueVisible: options.lastValueVisible ?? false,
-    priceLineVisible: options.priceLineVisible ?? false,
-    visible: options.visible ?? true,
-    title: options.title,
-    _usePrimitive: options.usePrimitive ?? false, // Internal flag to disable rendering
-  } as any, paneId);
+  const series = chart.addCustomSeries(
+    new RibbonSeries(),
+    {
+      _seriesType: "Ribbon", // Internal property for series type identification
+      upperLineColor: options.upperLineColor ?? "#4CAF50",
+      upperLineWidth: options.upperLineWidth ?? 2,
+      upperLineStyle: options.upperLineStyle ?? LineStyle.Solid,
+      upperLineVisible: options.upperLineVisible !== false,
+      lowerLineColor: options.lowerLineColor ?? "#F44336",
+      lowerLineWidth: options.lowerLineWidth ?? 2,
+      lowerLineStyle: options.lowerLineStyle ?? LineStyle.Solid,
+      lowerLineVisible: options.lowerLineVisible !== false,
+      fillColor: options.fillColor ?? "rgba(76, 175, 80, 0.1)",
+      fillVisible: options.fillVisible !== false,
+      priceScaleId: options.priceScaleId ?? "right",
+      lastValueVisible: options.lastValueVisible ?? false,
+      priceLineVisible: options.priceLineVisible ?? false,
+      visible: options.visible ?? true,
+      title: options.title,
+      _usePrimitive: options.usePrimitive ?? false, // Internal flag to disable rendering
+    } as any,
+    paneId,
+  );
 
   // Set data on series (for autoscaling)
   if (options.data && options.data.length > 0) {
@@ -366,28 +386,34 @@ export function createRibbonSeries(
   // Attach primitive if requested
   if (options.usePrimitive) {
     // Dynamic import to avoid circular dependencies
-    void import('../../primitives/RibbonPrimitive')
+    void import("../../primitives/RibbonPrimitive")
       .then(({ RibbonPrimitive }) => {
         const primitive = new RibbonPrimitive(chart, {
-          upperLineColor: options.upperLineColor ?? '#4CAF50',
+          upperLineColor: options.upperLineColor ?? "#4CAF50",
           upperLineWidth: options.upperLineWidth ?? 2,
-          upperLineStyle: Math.min(options.upperLineStyle ?? LineStyle.Solid, 2) as 0 | 1 | 2,
+          upperLineStyle: Math.min(
+            options.upperLineStyle ?? LineStyle.Solid,
+            2,
+          ) as 0 | 1 | 2,
           upperLineVisible: options.upperLineVisible !== false,
-          lowerLineColor: options.lowerLineColor ?? '#F44336',
+          lowerLineColor: options.lowerLineColor ?? "#F44336",
           lowerLineWidth: options.lowerLineWidth ?? 2,
-          lowerLineStyle: Math.min(options.lowerLineStyle ?? LineStyle.Solid, 2) as 0 | 1 | 2,
+          lowerLineStyle: Math.min(
+            options.lowerLineStyle ?? LineStyle.Solid,
+            2,
+          ) as 0 | 1 | 2,
           lowerLineVisible: options.lowerLineVisible !== false,
-          fillColor: options.fillColor ?? 'rgba(76, 175, 80, 0.1)',
+          fillColor: options.fillColor ?? "rgba(76, 175, 80, 0.1)",
           fillVisible: options.fillVisible !== false,
           visible: true,
-          priceScaleId: options.priceScaleId ?? 'right',
+          priceScaleId: options.priceScaleId ?? "right",
           zIndex: options.zIndex ?? 0,
         });
 
         series.attachPrimitive(primitive);
       })
       .catch((error: Error) => {
-        logger.error('Failed to load RibbonPrimitive', 'RibbonSeries', error);
+        logger.error("Failed to load RibbonPrimitive", "RibbonSeries", error);
       });
   }
 

@@ -6,10 +6,10 @@
  */
 
 // Custom series plugins
-export * from './series';
+export * from "./series";
 
 // Chart-level plugins (tooltip, etc.)
-export * from './chart';
+export * from "./chart";
 
 // Overlay plugins (rectangles, etc.)
-export * from './overlay';
+export * from "./overlay";

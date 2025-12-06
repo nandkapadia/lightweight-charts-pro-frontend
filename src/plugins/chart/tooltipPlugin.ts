@@ -31,11 +31,11 @@
  * ```
  */
 
-import { ChartCoordinateService } from '../../services/ChartCoordinateService';
-import { createSingleton } from '../../utils/SingletonBase';
-import { logger } from '../../utils/logger';
-import { sanitizeHtml } from '../../utils/sanitization';
-import { TooltipManager } from './TooltipManager';
+import { ChartCoordinateService } from "../../services/ChartCoordinateService";
+import { createSingleton } from "../../utils/SingletonBase";
+import { logger } from "../../utils/logger";
+import { sanitizeHtml } from "../../utils/sanitization";
+import { TooltipManager } from "./TooltipManager";
 
 /**
  * TooltipPlugin - Pure DOM rendering layer for tooltips
@@ -128,7 +128,7 @@ export class TooltipPlugin {
 
     // Validate service was created
     if (!this._coordinateService) {
-      throw new Error('Failed to initialize ChartCoordinateService');
+      throw new Error("Failed to initialize ChartCoordinateService");
     }
 
     return this._coordinateService;
@@ -146,7 +146,7 @@ export class TooltipPlugin {
     content: string,
     style: string | Partial<CSSStyleDeclaration>,
     position: { x: number; y: number },
-    cssClasses?: string[]
+    cssClasses?: string[],
   ): void {
     try {
       // Step 1: Ensure tooltip element exists (lazy creation)
@@ -156,7 +156,7 @@ export class TooltipPlugin {
 
       // Step 2: Validate element was created successfully
       if (!this.tooltipElement) {
-        logger.warn('Failed to create tooltip element', 'TooltipPlugin');
+        logger.warn("Failed to create tooltip element", "TooltipPlugin");
         return;
       }
 
@@ -168,14 +168,14 @@ export class TooltipPlugin {
 
       // Step 5: Apply optional CSS classes
       if (cssClasses && cssClasses.length > 0) {
-        this.tooltipElement.className = `lw-tooltip ${cssClasses.join(' ')}`;
+        this.tooltipElement.className = `lw-tooltip ${cssClasses.join(" ")}`;
       } else {
-        this.tooltipElement.className = 'lw-tooltip';
+        this.tooltipElement.className = "lw-tooltip";
       }
 
       // Step 6: Make visible (but transparent) to measure dimensions
-      this.tooltipElement.style.display = 'block';
-      this.tooltipElement.style.opacity = '0';
+      this.tooltipElement.style.display = "block";
+      this.tooltipElement.style.opacity = "0";
 
       // Step 7: Force browser layout to get accurate dimensions
       void this.tooltipElement.offsetHeight;
@@ -186,11 +186,11 @@ export class TooltipPlugin {
       // Step 9: Fade in with RAF for smooth transition
       requestAnimationFrame(() => {
         if (this.tooltipElement) {
-          this.tooltipElement.style.opacity = '1';
+          this.tooltipElement.style.opacity = "1";
         }
       });
     } catch (error) {
-      logger.error('Failed to show tooltip', 'TooltipPlugin', error);
+      logger.error("Failed to show tooltip", "TooltipPlugin", error);
     }
   }
 
@@ -214,12 +214,12 @@ export class TooltipPlugin {
       }
 
       // Start fade-out transition
-      this.tooltipElement.style.opacity = '0';
+      this.tooltipElement.style.opacity = "0";
 
       // Hide element after fade-out completes (track timeout for cleanup)
       this._hideTimeoutId = setTimeout(() => {
         if (this.tooltipElement) {
-          this.tooltipElement.style.display = 'none';
+          this.tooltipElement.style.display = "none";
         }
         this._hideTimeoutId = null;
       }, 150); // Match CSS transition duration
@@ -232,8 +232,8 @@ export class TooltipPlugin {
   private ensureTooltipElement(): void {
     if (this.tooltipElement) return;
 
-    this.tooltipElement = document.createElement('div');
-    this.tooltipElement.className = 'lw-tooltip';
+    this.tooltipElement = document.createElement("div");
+    this.tooltipElement.className = "lw-tooltip";
 
     // MINIMAL default styling - plugins override everything
     this.tooltipElement.style.cssText = `
@@ -252,12 +252,15 @@ export class TooltipPlugin {
   /**
    * Apply styles provided by plugin
    */
-  private applyStyle(element: HTMLElement, style: string | Partial<CSSStyleDeclaration>): void {
+  private applyStyle(
+    element: HTMLElement,
+    style: string | Partial<CSSStyleDeclaration>,
+  ): void {
     try {
-      if (typeof style === 'string') {
+      if (typeof style === "string") {
         // CSS string - append to existing (preserve position, z-index, etc.)
         const existingStyle = element.style.cssText;
-        element.style.cssText = existingStyle + ';' + style;
+        element.style.cssText = existingStyle + ";" + style;
       } else {
         // Style object - apply each property
         Object.entries(style).forEach(([key, value]) => {
@@ -267,7 +270,7 @@ export class TooltipPlugin {
         });
       }
     } catch (error) {
-      logger.error('Failed to apply tooltip style', 'TooltipPlugin', error);
+      logger.error("Failed to apply tooltip style", "TooltipPlugin", error);
     }
   }
 
@@ -298,7 +301,7 @@ export class TooltipPlugin {
           width: containerBounds.width,
           height: containerBounds.height,
         },
-        'top' // Preferred anchor
+        "top", // Preferred anchor
       );
 
       // Apply position using ChartCoordinateService
@@ -307,7 +310,7 @@ export class TooltipPlugin {
         left: position.x,
       });
     } catch (error) {
-      logger.error('Failed to position tooltip', 'TooltipPlugin', error);
+      logger.error("Failed to position tooltip", "TooltipPlugin", error);
     }
   }
 
@@ -315,7 +318,7 @@ export class TooltipPlugin {
    * Update tooltip position (for following cursor)
    */
   updatePosition(position: { x: number; y: number }): void {
-    if (this.tooltipElement && this.tooltipElement.style.display !== 'none') {
+    if (this.tooltipElement && this.tooltipElement.style.display !== "none") {
       this.position(position);
     }
   }
@@ -339,9 +342,9 @@ export class TooltipPlugin {
       // Unregister from manager
       TooltipManager.getInstance().unregisterRenderer();
 
-      logger.info('TooltipPlugin destroyed', 'TooltipPlugin');
+      logger.info("TooltipPlugin destroyed", "TooltipPlugin");
     } catch (error) {
-      logger.error('Failed to destroy TooltipPlugin', 'TooltipPlugin', error);
+      logger.error("Failed to destroy TooltipPlugin", "TooltipPlugin", error);
     }
   }
 

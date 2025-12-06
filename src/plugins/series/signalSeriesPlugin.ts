@@ -30,11 +30,14 @@ import {
   ICustomSeriesPaneRenderer,
   ICustomSeriesPaneView,
   IChartApi,
-} from 'lightweight-charts';
-import { BitmapCoordinatesRenderingScope, CanvasRenderingTarget2D } from 'fancy-canvas';
-import { isTransparent } from '../../utils/colorUtils';
-import { SignalColorCalculator } from '../../utils/signalColorUtils';
-import { logger } from '../../utils/logger';
+} from "lightweight-charts";
+import {
+  BitmapCoordinatesRenderingScope,
+  CanvasRenderingTarget2D,
+} from "fancy-canvas";
+import { isTransparent } from "../../utils/colorUtils";
+import { SignalColorCalculator } from "../../utils/signalColorUtils";
+import { logger } from "../../utils/logger";
 
 // ============================================================================
 // Data Interface
@@ -93,11 +96,11 @@ export interface SignalSeriesOptions extends CustomSeriesOptions {
  */
 const defaultSignalOptions: SignalSeriesOptions = {
   ...customSeriesDefaultOptions,
-  neutralColor: 'rgba(128, 128, 128, 0.1)',
-  signalColor: 'rgba(76, 175, 80, 0.2)',
+  neutralColor: "rgba(128, 128, 128, 0.1)",
+  signalColor: "rgba(76, 175, 80, 0.2)",
   alertColor: undefined,
   lastValueVisible: false,
-  title: 'Signal',
+  title: "Signal",
   visible: true,
   priceLineVisible: false,
 };
@@ -115,12 +118,17 @@ const defaultSignalOptions: SignalSeriesOptions = {
  * @template TData - The data type extending SignalData
  * @internal
  */
-class SignalSeriesRenderer<TData extends SignalData> implements ICustomSeriesPaneRenderer {
+class SignalSeriesRenderer<
+  TData extends SignalData,
+> implements ICustomSeriesPaneRenderer {
   private _data: PaneRendererCustomData<Time, TData> | null = null;
   private _options: SignalSeriesOptions | null = null;
   private _hasNonBooleanValues: boolean = false;
 
-  update(data: PaneRendererCustomData<Time, TData>, options: SignalSeriesOptions): void {
+  update(
+    data: PaneRendererCustomData<Time, TData>,
+    options: SignalSeriesOptions,
+  ): void {
     this._data = data;
     this._options = options;
     // Check if data contains non-boolean values (values other than 0 or 1)
@@ -132,17 +140,21 @@ class SignalSeriesRenderer<TData extends SignalData> implements ICustomSeriesPan
    * This determines whether alertColor should be used
    * Handles both boolean (true/false) and numeric (0/1) values
    */
-  private _checkForNonBooleanValues(data: PaneRendererCustomData<Time, TData>): boolean {
+  private _checkForNonBooleanValues(
+    data: PaneRendererCustomData<Time, TData>,
+  ): boolean {
     if (!data || !data.bars) return false;
 
-    const values = data.bars.map(bar => (bar.originalData as TData).value);
+    const values = data.bars.map((bar) => (bar.originalData as TData).value);
     return SignalColorCalculator.checkForNonBooleanValues(values);
   }
 
   draw(target: CanvasRenderingTarget2D): void {
-    target.useBitmapCoordinateSpace((scope: BitmapCoordinatesRenderingScope) => {
-      this._drawImpl(scope);
-    });
+    target.useBitmapCoordinateSpace(
+      (scope: BitmapCoordinatesRenderingScope) => {
+        this._drawImpl(scope);
+      },
+    );
   }
 
   private _drawImpl(renderingScope: BitmapCoordinatesRenderingScope): void {
@@ -173,7 +185,7 @@ class SignalSeriesRenderer<TData extends SignalData> implements ICustomSeriesPan
       // Convert boolean to number if needed (true -> 1, false -> 0)
       // This allows Python users to use bool values naturally
       let value = signalData.value;
-      if (typeof value === 'boolean') {
+      if (typeof value === "boolean") {
         value = value ? 1 : 0;
       }
 
@@ -191,8 +203,12 @@ class SignalSeriesRenderer<TData extends SignalData> implements ICustomSeriesPan
       // Calculate band boundaries in bitmap coordinates
       // Center on bar X coordinate and extend by half bar spacing on each side
       const x = bar.x * renderingScope.horizontalPixelRatio;
-      const startX = Math.floor(x - halfBarSpacing * renderingScope.horizontalPixelRatio);
-      const endX = Math.floor(x + halfBarSpacing * renderingScope.horizontalPixelRatio);
+      const startX = Math.floor(
+        x - halfBarSpacing * renderingScope.horizontalPixelRatio,
+      );
+      const endX = Math.floor(
+        x + halfBarSpacing * renderingScope.horizontalPixelRatio,
+      );
 
       // Draw vertical band spanning full chart height
       ctx.fillStyle = color;
@@ -202,8 +218,15 @@ class SignalSeriesRenderer<TData extends SignalData> implements ICustomSeriesPan
     ctx.restore();
   }
 
-  private getColorForValue(value: number, options: SignalSeriesOptions): string {
-    return SignalColorCalculator.getColorForValue(value, options, this._hasNonBooleanValues);
+  private getColorForValue(
+    value: number,
+    options: SignalSeriesOptions,
+  ): string {
+    return SignalColorCalculator.getColorForValue(
+      value,
+      options,
+      this._hasNonBooleanValues,
+    );
   }
 }
 
@@ -215,9 +238,9 @@ class SignalSeriesRenderer<TData extends SignalData> implements ICustomSeriesPan
  * Signal Series - ICustomSeries implementation
  * Renders vertical background bands based on signal values
  */
-export class SignalSeries<TData extends SignalData = SignalData>
-  implements ICustomSeriesPaneView<Time, TData, SignalSeriesOptions>
-{
+export class SignalSeries<
+  TData extends SignalData = SignalData,
+> implements ICustomSeriesPaneView<Time, TData, SignalSeriesOptions> {
   private _renderer: SignalSeriesRenderer<TData>;
 
   constructor() {
@@ -246,9 +269,11 @@ export class SignalSeries<TData extends SignalData = SignalData>
    * @returns True if value is null/undefined
    */
   isWhitespace(
-    data: TData | CustomSeriesWhitespaceData<Time>
+    data: TData | CustomSeriesWhitespaceData<Time>,
   ): data is CustomSeriesWhitespaceData<Time> {
-    return (data as TData).value === undefined || (data as TData).value === null;
+    return (
+      (data as TData).value === undefined || (data as TData).value === null
+    );
   }
 
   /**
@@ -257,7 +282,10 @@ export class SignalSeries<TData extends SignalData = SignalData>
    * @param data - Renderer data from chart
    * @param options - Series options
    */
-  update(data: PaneRendererCustomData<Time, TData>, options: SignalSeriesOptions): void {
+  update(
+    data: PaneRendererCustomData<Time, TData>,
+    options: SignalSeriesOptions,
+  ): void {
     this._renderer.update(data, options);
   }
 
@@ -289,7 +317,11 @@ export class SignalSeries<TData extends SignalData = SignalData>
  *
  * @returns Signal series instance
  */
-export function SignalSeriesPlugin(): ICustomSeriesPaneView<Time, SignalData, SignalSeriesOptions> {
+export function SignalSeriesPlugin(): ICustomSeriesPaneView<
+  Time,
+  SignalData,
+  SignalSeriesOptions
+> {
   return new SignalSeries();
 }
 
@@ -328,7 +360,7 @@ export function createSignalSeries(
 
     // Pane control
     paneId?: number;
-  } = {}
+  } = {},
 ): any {
   // Extract paneId (must be passed as third parameter to addCustomSeries)
   const paneId = options.paneId ?? 0;
@@ -336,18 +368,22 @@ export function createSignalSeries(
   const usePrimitive = options.usePrimitive ?? false;
 
   // Create ICustomSeries (always created for autoscaling)
-  const series = (chart as any).addCustomSeries(SignalSeriesPlugin(), {
-    _seriesType: 'Signal', // Internal property for series type identification
-    neutralColor: options.neutralColor ?? 'rgba(128, 128, 128, 0.1)',
-    signalColor: options.signalColor ?? 'rgba(76, 175, 80, 0.2)',
-    alertColor: options.alertColor, // No default - only use if explicitly provided
-    priceScaleId: options.priceScaleId ?? 'right',
-    lastValueVisible: options.lastValueVisible ?? false,
-    title: options.title ?? 'Signal',
-    visible: options.visible !== false,
-    priceLineVisible: options.priceLineVisible ?? false,
-    _usePrimitive: usePrimitive, // Internal flag to disable rendering
-  }, paneId);
+  const series = (chart as any).addCustomSeries(
+    SignalSeriesPlugin(),
+    {
+      _seriesType: "Signal", // Internal property for series type identification
+      neutralColor: options.neutralColor ?? "rgba(128, 128, 128, 0.1)",
+      signalColor: options.signalColor ?? "rgba(76, 175, 80, 0.2)",
+      alertColor: options.alertColor, // No default - only use if explicitly provided
+      priceScaleId: options.priceScaleId ?? "right",
+      lastValueVisible: options.lastValueVisible ?? false,
+      title: options.title ?? "Signal",
+      visible: options.visible !== false,
+      priceLineVisible: options.priceLineVisible ?? false,
+      _usePrimitive: usePrimitive, // Internal flag to disable rendering
+    },
+    paneId,
+  );
 
   // Set data on series
   if (options.data && options.data.length > 0) {
@@ -356,11 +392,11 @@ export function createSignalSeries(
 
   // Conditionally create primitive for background rendering
   if (usePrimitive) {
-    void import('../../primitives/SignalPrimitive')
+    void import("../../primitives/SignalPrimitive")
       .then(({ SignalPrimitive }) => {
         const primitive = new SignalPrimitive(chart, {
-          neutralColor: options.neutralColor ?? 'rgba(128, 128, 128, 0.1)',
-          signalColor: options.signalColor ?? 'rgba(76, 175, 80, 0.2)',
+          neutralColor: options.neutralColor ?? "rgba(128, 128, 128, 0.1)",
+          signalColor: options.signalColor ?? "rgba(76, 175, 80, 0.2)",
           alertColor: options.alertColor, // No default - only use if explicitly provided
           visible: options.visible !== false,
           zIndex: options.zIndex ?? -100,
@@ -368,7 +404,7 @@ export function createSignalSeries(
         series.attachPrimitive(primitive);
       })
       .catch((error: Error) => {
-        logger.error('Failed to load SignalPrimitive', 'SignalSeries', error);
+        logger.error("Failed to load SignalPrimitive", "SignalSeries", error);
       });
   }
 

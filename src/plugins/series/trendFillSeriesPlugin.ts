@@ -36,11 +36,14 @@ import {
   LineWidth,
   ICustomSeriesPaneRenderer,
   ICustomSeriesPaneView,
-} from 'lightweight-charts';
-import { BitmapCoordinatesRenderingScope, CanvasRenderingTarget2D } from 'fancy-canvas';
-import { isWhitespaceDataMultiField } from './base/commonRendering';
-import { LineStyle } from '../../utils/renderingUtils';
-import { TrendFillPrimitive } from '../../primitives/TrendFillPrimitive';
+} from "lightweight-charts";
+import {
+  BitmapCoordinatesRenderingScope,
+  CanvasRenderingTarget2D,
+} from "fancy-canvas";
+import { isWhitespaceDataMultiField } from "./base/commonRendering";
+import { LineStyle } from "../../utils/renderingUtils";
+import { TrendFillPrimitive } from "../../primitives/TrendFillPrimitive";
 
 // ============================================================================
 // Data Interface
@@ -151,17 +154,25 @@ interface TrendFillBarItem {
  * @template TData - The data type extending TrendFillData
  * @internal
  */
-class TrendFillSeriesRenderer<TData extends TrendFillData> implements ICustomSeriesPaneRenderer {
+class TrendFillSeriesRenderer<
+  TData extends TrendFillData,
+> implements ICustomSeriesPaneRenderer {
   _data: PaneRendererCustomData<Time, TData> | null = null;
   _options: TrendFillSeriesOptions | null = null;
 
-  draw(target: CanvasRenderingTarget2D, priceConverter: PriceToCoordinateConverter): void {
+  draw(
+    target: CanvasRenderingTarget2D,
+    priceConverter: PriceToCoordinateConverter,
+  ): void {
     target.useBitmapCoordinateSpace((scope: BitmapCoordinatesRenderingScope) =>
-      this._drawImpl(scope, priceConverter)
+      this._drawImpl(scope, priceConverter),
     );
   }
 
-  update(data: PaneRendererCustomData<Time, TData>, options: TrendFillSeriesOptions): void {
+  update(
+    data: PaneRendererCustomData<Time, TData>,
+    options: TrendFillSeriesOptions,
+  ): void {
     this._data = data;
     this._options = options;
   }
@@ -177,7 +188,7 @@ class TrendFillSeriesRenderer<TData extends TrendFillData> implements ICustomSer
    */
   _drawImpl(
     renderingScope: BitmapCoordinatesRenderingScope,
-    priceToCoordinate: PriceToCoordinateConverter
+    priceToCoordinate: PriceToCoordinateConverter,
   ): void {
     // Early exit if no data to render
     if (
@@ -198,19 +209,31 @@ class TrendFillSeriesRenderer<TData extends TrendFillData> implements ICustomSer
     const visibleRange = this._data.visibleRange;
 
     // Transform all bars to bitmap coordinates once (performance optimization)
-    const bars: TrendFillBarItem[] = this._data.bars.map(bar => {
+    const bars: TrendFillBarItem[] = this._data.bars.map((bar) => {
       const { baseLine, trendLine, trendDirection } = bar.originalData;
       const isUptrend = trendDirection > 0;
 
       return {
         x: bar.x * renderingScope.horizontalPixelRatio,
-        baseLineY: (priceToCoordinate(baseLine) ?? 0) * renderingScope.verticalPixelRatio,
-        trendLineY: (priceToCoordinate(trendLine) ?? 0) * renderingScope.verticalPixelRatio,
+        baseLineY:
+          (priceToCoordinate(baseLine) ?? 0) *
+          renderingScope.verticalPixelRatio,
+        trendLineY:
+          (priceToCoordinate(trendLine) ?? 0) *
+          renderingScope.verticalPixelRatio,
         trendDirection,
-        fillColor: isUptrend ? options.uptrendFillColor : options.downtrendFillColor,
-        lineColor: isUptrend ? options.uptrendLineColor : options.downtrendLineColor,
-        lineWidth: isUptrend ? options.uptrendLineWidth : options.downtrendLineWidth,
-        lineStyle: isUptrend ? options.uptrendLineStyle : options.downtrendLineStyle,
+        fillColor: isUptrend
+          ? options.uptrendFillColor
+          : options.downtrendFillColor,
+        lineColor: isUptrend
+          ? options.uptrendLineColor
+          : options.downtrendLineColor,
+        lineWidth: isUptrend
+          ? options.uptrendLineWidth
+          : options.downtrendLineWidth,
+        lineStyle: isUptrend
+          ? options.uptrendLineStyle
+          : options.downtrendLineStyle,
       };
     });
 
@@ -236,7 +259,7 @@ class TrendFillSeriesRenderer<TData extends TrendFillData> implements ICustomSer
   private _drawFills(
     ctx: CanvasRenderingContext2D,
     bars: TrendFillBarItem[],
-    visibleRange: { from: number; to: number }
+    visibleRange: { from: number; to: number },
   ): void {
     // Group consecutive bars with same trend direction
     let currentGroup: TrendFillBarItem[] = [];
@@ -281,7 +304,10 @@ class TrendFillSeriesRenderer<TData extends TrendFillData> implements ICustomSer
       }
 
       // Start new group if color or direction changes
-      if (bar.fillColor !== currentColor || bar.trendDirection !== currentDirection) {
+      if (
+        bar.fillColor !== currentColor ||
+        bar.trendDirection !== currentDirection
+      ) {
         flushGroup();
         currentGroup = [bar];
         currentColor = bar.fillColor;
@@ -300,12 +326,12 @@ class TrendFillSeriesRenderer<TData extends TrendFillData> implements ICustomSer
   private _drawTrendLine(
     ctx: CanvasRenderingContext2D,
     bars: TrendFillBarItem[],
-    visibleRange: { from: number; to: number }
+    visibleRange: { from: number; to: number },
   ): void {
     if (!this._options) return;
 
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
 
     // Group by color, width, and style
     let currentColor: string | null = null;
@@ -324,7 +350,12 @@ class TrendFillSeriesRenderer<TData extends TrendFillData> implements ICustomSer
         bar.lineWidth !== currentWidth ||
         bar.lineStyle !== currentStyle
       ) {
-        if (currentPath && currentColor && currentWidth && currentStyle !== null) {
+        if (
+          currentPath &&
+          currentColor &&
+          currentWidth &&
+          currentStyle !== null
+        ) {
           ctx.strokeStyle = currentColor;
           ctx.lineWidth = currentWidth;
           this._applyLineStyle(ctx, currentStyle);
@@ -355,7 +386,7 @@ class TrendFillSeriesRenderer<TData extends TrendFillData> implements ICustomSer
   private _drawBaseLine(
     ctx: CanvasRenderingContext2D,
     bars: TrendFillBarItem[],
-    visibleRange: { from: number; to: number }
+    visibleRange: { from: number; to: number },
   ): void {
     if (!this._options) return;
 
@@ -367,7 +398,7 @@ class TrendFillSeriesRenderer<TData extends TrendFillData> implements ICustomSer
       baseLine.lineTo(bars[i].x, bars[i].baseLineY);
     }
 
-    ctx.lineJoin = 'round';
+    ctx.lineJoin = "round";
     ctx.strokeStyle = this._options.baseLineColor;
     ctx.lineWidth = this._options.baseLineWidth;
     this._applyLineStyle(ctx, this._options.baseLineStyle);
@@ -377,7 +408,10 @@ class TrendFillSeriesRenderer<TData extends TrendFillData> implements ICustomSer
   /**
    * Apply line dash pattern based on LineStyle
    */
-  private _applyLineStyle(ctx: CanvasRenderingContext2D, style: LineStyle): void {
+  private _applyLineStyle(
+    ctx: CanvasRenderingContext2D,
+    style: LineStyle,
+  ): void {
     switch (style) {
       case LineStyle.Solid:
         ctx.setLineDash([]);
@@ -413,9 +447,9 @@ class TrendFillSeriesRenderer<TData extends TrendFillData> implements ICustomSer
  * @template TData - Data type extending TrendFillData
  * @internal
  */
-class TrendFillSeries<TData extends TrendFillData>
-  implements ICustomSeriesPaneView<Time, TData, TrendFillSeriesOptions>
-{
+class TrendFillSeries<
+  TData extends TrendFillData,
+> implements ICustomSeriesPaneView<Time, TData, TrendFillSeriesOptions> {
   _renderer: TrendFillSeriesRenderer<TData>;
 
   constructor() {
@@ -449,16 +483,19 @@ class TrendFillSeries<TData extends TrendFillData>
    * @returns True if whitespace
    */
   isWhitespace(
-    data: TData | CustomSeriesWhitespaceData<Time>
+    data: TData | CustomSeriesWhitespaceData<Time>,
   ): data is CustomSeriesWhitespaceData<Time> {
-    return isWhitespaceDataMultiField(data, ['baseLine', 'trendLine']);
+    return isWhitespaceDataMultiField(data, ["baseLine", "trendLine"]);
   }
 
   renderer(): TrendFillSeriesRenderer<TData> {
     return this._renderer;
   }
 
-  update(data: PaneRendererCustomData<Time, TData>, options: TrendFillSeriesOptions): void {
+  update(
+    data: PaneRendererCustomData<Time, TData>,
+    options: TrendFillSeriesOptions,
+  ): void {
     this._renderer.update(data, options);
   }
 
@@ -470,21 +507,21 @@ class TrendFillSeries<TData extends TrendFillData>
   defaultOptions(): TrendFillSeriesOptions {
     return {
       ...customSeriesDefaultOptions,
-      uptrendFillColor: 'rgba(76, 175, 80, 0.3)',
-      downtrendFillColor: 'rgba(244, 67, 54, 0.3)',
+      uptrendFillColor: "rgba(76, 175, 80, 0.3)",
+      downtrendFillColor: "rgba(244, 67, 54, 0.3)",
       fillVisible: true,
 
-      uptrendLineColor: '#4CAF50', // Green for uptrend
+      uptrendLineColor: "#4CAF50", // Green for uptrend
       uptrendLineWidth: 2,
       uptrendLineStyle: LineStyle.Solid,
       uptrendLineVisible: true,
 
-      downtrendLineColor: '#F44336', // Red for downtrend
+      downtrendLineColor: "#F44336", // Red for downtrend
       downtrendLineWidth: 2,
       downtrendLineStyle: LineStyle.Solid,
       downtrendLineVisible: true,
 
-      baseLineColor: '#666666',
+      baseLineColor: "#666666",
       baseLineWidth: 1,
       baseLineStyle: LineStyle.Dotted,
       baseLineVisible: false, // Hide base line by default
@@ -603,27 +640,27 @@ export function createTrendFillSeries(
     zIndex?: number;
     useHalfBarWidth?: boolean;
     data?: any[];
-  } = {}
+  } = {},
 ): any {
   // Create the ICustomSeries
   const series = chart.addCustomSeries(new TrendFillSeries(), {
-    _seriesType: 'TrendFill', // Internal property for series type identification
-    uptrendFillColor: options.uptrendFillColor ?? 'rgba(76, 175, 80, 0.3)',
-    downtrendFillColor: options.downtrendFillColor ?? 'rgba(244, 67, 54, 0.3)',
+    _seriesType: "TrendFill", // Internal property for series type identification
+    uptrendFillColor: options.uptrendFillColor ?? "rgba(76, 175, 80, 0.3)",
+    downtrendFillColor: options.downtrendFillColor ?? "rgba(244, 67, 54, 0.3)",
     fillVisible: options.fillVisible !== false,
-    uptrendLineColor: options.uptrendLineColor ?? '#4CAF50',
+    uptrendLineColor: options.uptrendLineColor ?? "#4CAF50",
     uptrendLineWidth: options.uptrendLineWidth ?? 2,
     uptrendLineStyle: options.uptrendLineStyle ?? LineStyle.Solid,
     uptrendLineVisible: options.uptrendLineVisible !== false,
-    downtrendLineColor: options.downtrendLineColor ?? '#F44336',
+    downtrendLineColor: options.downtrendLineColor ?? "#F44336",
     downtrendLineWidth: options.downtrendLineWidth ?? 2,
     downtrendLineStyle: options.downtrendLineStyle ?? LineStyle.Solid,
     downtrendLineVisible: options.downtrendLineVisible !== false,
-    baseLineColor: options.baseLineColor ?? '#666666',
+    baseLineColor: options.baseLineColor ?? "#666666",
     baseLineWidth: options.baseLineWidth ?? 1,
     baseLineStyle: options.baseLineStyle ?? LineStyle.Dotted,
     baseLineVisible: options.baseLineVisible === true,
-    priceScaleId: options.priceScaleId ?? 'right',
+    priceScaleId: options.priceScaleId ?? "right",
     lastValueVisible: options.lastValueVisible ?? false,
     priceLineVisible: options.priceLineVisible ?? false,
     visible: options.visible ?? true,
@@ -640,30 +677,40 @@ export function createTrendFillSeries(
   if (options.usePrimitive) {
     const primitiveOptions = {
       // Fill options
-      uptrendFillColor: options.uptrendFillColor ?? 'rgba(76, 175, 80, 0.3)',
-      downtrendFillColor: options.downtrendFillColor ?? 'rgba(244, 67, 54, 0.3)',
+      uptrendFillColor: options.uptrendFillColor ?? "rgba(76, 175, 80, 0.3)",
+      downtrendFillColor:
+        options.downtrendFillColor ?? "rgba(244, 67, 54, 0.3)",
       fillVisible: options.fillVisible ?? true,
 
       // Uptrend line options (flat)
-      uptrendLineColor: options.uptrendLineColor ?? '#4CAF50',
+      uptrendLineColor: options.uptrendLineColor ?? "#4CAF50",
       uptrendLineWidth: options.uptrendLineWidth ?? 2,
-      uptrendLineStyle: Math.min(options.uptrendLineStyle ?? LineStyle.Solid, 2) as 0 | 1 | 2,
+      uptrendLineStyle: Math.min(
+        options.uptrendLineStyle ?? LineStyle.Solid,
+        2,
+      ) as 0 | 1 | 2,
       uptrendLineVisible: options.uptrendLineVisible !== false,
 
       // Downtrend line options (flat)
-      downtrendLineColor: options.downtrendLineColor ?? '#F44336',
+      downtrendLineColor: options.downtrendLineColor ?? "#F44336",
       downtrendLineWidth: options.downtrendLineWidth ?? 2,
-      downtrendLineStyle: Math.min(options.downtrendLineStyle ?? LineStyle.Solid, 2) as 0 | 1 | 2,
+      downtrendLineStyle: Math.min(
+        options.downtrendLineStyle ?? LineStyle.Solid,
+        2,
+      ) as 0 | 1 | 2,
       downtrendLineVisible: options.downtrendLineVisible !== false,
 
       // Base line options (flat)
-      baseLineColor: options.baseLineColor ?? '#666666',
+      baseLineColor: options.baseLineColor ?? "#666666",
       baseLineWidth: options.baseLineWidth ?? 1,
-      baseLineStyle: Math.min(options.baseLineStyle ?? LineStyle.Dotted, 2) as 0 | 1 | 2,
+      baseLineStyle: Math.min(options.baseLineStyle ?? LineStyle.Dotted, 2) as
+        | 0
+        | 1
+        | 2,
       baseLineVisible: options.baseLineVisible === true,
 
       visible: true,
-      priceScaleId: options.priceScaleId ?? 'right',
+      priceScaleId: options.priceScaleId ?? "right",
       useHalfBarWidth: options.useHalfBarWidth !== false,
       zIndex: options.zIndex ?? 0,
     };

@@ -36,9 +36,9 @@
  * ```
  */
 
-import { EventEmitter } from '../../utils/EventEmitter';
-import { logger } from '../../utils/logger';
-import { TooltipPlugin } from './tooltipPlugin';
+import { EventEmitter } from "../../utils/EventEmitter";
+import { logger } from "../../utils/logger";
+import { TooltipPlugin } from "./tooltipPlugin";
 
 /**
  * Tooltip request event data
@@ -200,7 +200,7 @@ export class TooltipManager {
    */
   registerRenderer(renderer: TooltipPlugin): void {
     this.renderer = renderer;
-    logger.info('TooltipRenderer registered', 'TooltipManager');
+    logger.info("TooltipRenderer registered", "TooltipManager");
   }
 
   /**
@@ -216,7 +216,7 @@ export class TooltipManager {
    */
   unregisterRenderer(): void {
     if (this.renderer) {
-      logger.info('TooltipRenderer unregistered', 'TooltipManager');
+      logger.info("TooltipRenderer unregistered", "TooltipManager");
       this.renderer = null;
     }
   }
@@ -239,7 +239,10 @@ export class TooltipManager {
     // Step 1: Validate required fields
     // Ensures request has minimum data needed for display
     if (!request.source || !request.content) {
-      logger.warn('Invalid tooltip request: missing source or content', 'TooltipManager');
+      logger.warn(
+        "Invalid tooltip request: missing source or content",
+        "TooltipManager",
+      );
       return;
     }
 
@@ -290,7 +293,11 @@ export class TooltipManager {
       });
     }
     // Case B: All requests cleared and no RAF pending
-    else if (wasActive && this.activeRequests.size === 0 && this.rafId === null) {
+    else if (
+      wasActive &&
+      this.activeRequests.size === 0 &&
+      this.rafId === null
+    ) {
       // Schedule RAF to hide tooltip immediately
       this.rafId = requestAnimationFrame(() => {
         this.processRequests();
@@ -347,7 +354,10 @@ export class TooltipManager {
 
     // Step 4: Update display if highest priority differs from current
     // Prevents unnecessary DOM updates
-    if (highestPriority && highestPriority.source !== this.currentTooltip?.source) {
+    if (
+      highestPriority &&
+      highestPriority.source !== this.currentTooltip?.source
+    ) {
       this.showTooltip(highestPriority);
     }
   }
@@ -369,7 +379,7 @@ export class TooltipManager {
   private showTooltip(request: TooltipRequestEvent): void {
     // Validate renderer is registered
     if (!this.renderer) {
-      logger.warn('No tooltip renderer registered', 'TooltipManager');
+      logger.warn("No tooltip renderer registered", "TooltipManager");
       return;
     }
 
@@ -379,16 +389,21 @@ export class TooltipManager {
     try {
       // Delegate rendering to TooltipPlugin
       // Plugin receives pre-rendered content and styling
-      this.renderer.show(request.content, request.style, request.position, request.cssClasses);
+      this.renderer.show(
+        request.content,
+        request.style,
+        request.position,
+        request.cssClasses,
+      );
 
       // Emit lifecycle event for external monitoring
-      this.eventEmitter.emit('tooltip:shown', {
+      this.eventEmitter.emit("tooltip:shown", {
         source: request.source,
         timestamp: Date.now(),
       } as TooltipShownEvent);
     } catch (error) {
       // Log but don't throw - prevents tooltip errors from breaking chart
-      logger.error('Failed to show tooltip', 'TooltipManager', error);
+      logger.error("Failed to show tooltip", "TooltipManager", error);
     }
   }
 
@@ -413,13 +428,13 @@ export class TooltipManager {
         this.renderer.hide();
       } catch (error) {
         // Log but don't throw
-        logger.error('Failed to hide tooltip', 'TooltipManager', error);
+        logger.error("Failed to hide tooltip", "TooltipManager", error);
       }
     }
 
     // Emit lifecycle event if a tooltip was displayed
     if (this.currentTooltip) {
-      this.eventEmitter.emit('tooltip:hidden', {
+      this.eventEmitter.emit("tooltip:hidden", {
         source: this.currentTooltip.source,
         timestamp: Date.now(),
       } as TooltipHiddenEvent);
@@ -435,7 +450,10 @@ export class TooltipManager {
    * @param event - Event name ('tooltip:shown' | 'tooltip:hidden')
    * @param callback - Callback function
    */
-  on(event: 'tooltip:shown' | 'tooltip:hidden', callback: (data: any) => void): void {
+  on(
+    event: "tooltip:shown" | "tooltip:hidden",
+    callback: (data: any) => void,
+  ): void {
     this.eventEmitter.on(event, callback);
   }
 
@@ -445,7 +463,10 @@ export class TooltipManager {
    * @param event - Event name
    * @param callback - Callback function to remove
    */
-  off(event: 'tooltip:shown' | 'tooltip:hidden', callback: (data: any) => void): void {
+  off(
+    event: "tooltip:shown" | "tooltip:hidden",
+    callback: (data: any) => void,
+  ): void {
     this.eventEmitter.off(event, callback);
   }
 
