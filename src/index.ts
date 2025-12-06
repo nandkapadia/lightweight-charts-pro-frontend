@@ -22,7 +22,7 @@ export {
   createSignalSeriesPlugin,
   defaultSignalOptions,
   createTrendFillSeries,
-} from './plugins/series';
+} from "./plugins/series";
 export type {
   BandData,
   BandSeriesOptions,
@@ -34,13 +34,13 @@ export type {
   SignalSeriesOptions,
   TrendFillData,
   TrendFillSeriesOptions,
-} from './plugins/series';
+} from "./plugins/series";
 
 // Chart plugins
-export { TooltipManager, TooltipPlugin } from './plugins/chart';
+export { TooltipManager, TooltipPlugin } from "./plugins/chart";
 
 // Overlay plugins
-export { RectangleOverlayPlugin } from './plugins/overlay';
+export { RectangleOverlayPlugin } from "./plugins/overlay";
 
 // =============================================================================
 // PRIMITIVES - UI primitive components
@@ -68,8 +68,8 @@ export {
   ButtonColors,
   ButtonEffects,
   PrimitivePriority,
-} from './primitives';
-export type { BasePrimitiveConfig, RangeConfig } from './primitives';
+} from "./primitives";
+export type { BasePrimitiveConfig, RangeConfig } from "./primitives";
 
 // =============================================================================
 // SERIES - Unified series factory and descriptors
@@ -91,8 +91,8 @@ export {
   updateSeriesMarkers,
   updateSeriesOptions,
   PropertyMapper,
-} from './series';
-export type { ExtendedSeriesConfig, ExtendedSeriesApi } from './series';
+} from "./series";
+export type { ExtendedSeriesConfig, ExtendedSeriesApi } from "./series";
 
 // =============================================================================
 // SERVICES - Chart management services
@@ -107,20 +107,20 @@ export {
   TradeTemplateProcessor,
   createAnnotationVisualElements,
   createTradeVisualElements,
-} from './services';
+} from "./services";
 
 // =============================================================================
 // TYPES - Shared type definitions
 // =============================================================================
 
 // Export from types index which handles duplicate resolution
-export * from './types';
+export * from "./types";
 
 // =============================================================================
 // CONFIG - Configuration utilities
 // =============================================================================
 
-export * from './config';
+export * from "./config";
 
 // =============================================================================
 // UTILS - Utility functions (selective to avoid duplicates)
@@ -138,12 +138,12 @@ export {
   primitiveLog,
   perfLog,
   ResizeObserverManager,
-} from './utils';
+} from "./utils";
 
 // Export utility functions
-export * from './utils/lightweightChartsUtils';
-export * from './utils/colorUtils';
-export * from './utils/signalColorUtils';
+export * from "./utils/lightweightChartsUtils";
+export * from "./utils/colorUtils";
+export * from "./utils/signalColorUtils";
 export {
   validateChartCoordinates,
   validateScaleDimensions,
@@ -154,7 +154,7 @@ export {
   areCoordinatesStale,
   logValidationResult,
   getCoordinateDebugInfo,
-} from './utils/coordinateValidation';
+} from "./utils/coordinateValidation";
 // dataValidation - exclude ValidationResult (already in types/coordinates)
 export {
   validateData,
@@ -162,10 +162,10 @@ export {
   filterValidData,
   ValidationConfigs,
   QuickValidators,
-} from './utils/dataValidation';
-export type { ValidationConfig } from './utils/dataValidation';
-export * from './utils/lineStyle';
-export * from './utils/errorHandler';
+} from "./utils/dataValidation";
+export type { ValidationConfig } from "./utils/dataValidation";
+export * from "./utils/lineStyle";
+export * from "./utils/errorHandler";
 
 // Performance utilities - exclude debounce (already in colorUtils)
 export {
@@ -177,4 +177,4 @@ export {
   batchDOMUpdates,
   getCachedDimensions,
   createOptimizedStylesAdvanced,
-} from './utils/performance';
+} from "./utils/performance";
