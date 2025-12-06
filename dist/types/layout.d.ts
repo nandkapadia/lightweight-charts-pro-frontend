@@ -28,7 +28,7 @@
  * };
  * ```
  */
-export type Corner = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+export type Corner = "top-left" | "top-right" | "bottom-left" | "bottom-right";
 export interface Dimensions {
     width: number;
     height: number;

@@ -108,7 +108,7 @@ export interface TradeData {
     entryPrice: number;
     exitPrice: number;
     quantity?: number;
-    side: 'long' | 'short';
+    side: "long" | "short";
     pnl?: number;
     pnlPercentage?: number;
     series_id?: string;
@@ -135,7 +135,7 @@ export interface RectangleConfig {
  * Shape data for series
  */
 export interface ShapeData {
-    type: 'rectangle' | 'line' | 'arrow' | 'circle';
+    type: "rectangle" | "line" | "arrow" | "circle";
     points: Array<{
         time: Time;
         price: number;
@@ -198,7 +198,7 @@ export interface TemplateContext {
  */
 export interface LegendData {
     visible?: boolean;
-    position?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+    position?: "top-left" | "top-right" | "bottom-left" | "bottom-right";
     text?: string;
     symbolName?: string;
     textColor?: string;
@@ -220,7 +220,7 @@ export interface LegendData {
 /**
  * Corner position type
  */
-export type CornerPosition = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+export type CornerPosition = "top-left" | "top-right" | "bottom-left" | "bottom-right";
 /**
  * Button configuration
  */
@@ -301,15 +301,15 @@ export interface Annotation {
     backgroundColor?: string;
     borderColor?: string;
     textColor?: string;
-    shape?: 'circle' | 'square' | 'diamond' | 'arrow_up' | 'arrow_down' | 'flag';
+    shape?: "circle" | "square" | "diamond" | "arrow_up" | "arrow_down" | "flag";
     /** Position relative to bar. 'above'/'below' are converted to 'aboveBar'/'belowBar' */
-    position?: 'aboveBar' | 'belowBar' | 'inBar' | 'above' | 'below';
+    position?: "aboveBar" | "belowBar" | "inBar" | "above" | "below";
     size?: number;
     layer?: number;
     visible?: boolean;
     customData?: Record<string, unknown>;
     /** Type of annotation for visual rendering */
-    type?: 'arrow' | 'shape' | 'circle' | 'rectangle' | 'line' | 'text';
+    type?: "arrow" | "shape" | "circle" | "rectangle" | "line" | "text";
     /** Font size for text annotations */
     fontSize?: number;
     /** Border width for shape annotations */
@@ -347,7 +347,7 @@ export interface AnnotationText {
     backgroundColor?: string;
     fontSize?: number;
     fontFamily?: string;
-    position?: 'aboveBar' | 'belowBar' | 'inBar';
+    position?: "aboveBar" | "belowBar" | "inBar";
     padding?: number;
 }
 /**
@@ -355,9 +355,9 @@ export interface AnnotationText {
  */
 export interface MarkerData {
     time: Time;
-    position: 'aboveBar' | 'belowBar' | 'inBar';
+    position: "aboveBar" | "belowBar" | "inBar";
     color?: string;
-    shape?: 'circle' | 'square' | 'arrowUp' | 'arrowDown';
+    shape?: "circle" | "square" | "arrowUp" | "arrowDown";
     text?: string;
     size?: number;
     id?: string;
@@ -444,7 +444,7 @@ export interface SeriesConfigChangeEvent {
 export interface PaneCollapseEvent {
     paneId: number;
     isCollapsed: boolean;
-    trigger: 'user' | 'api';
+    trigger: "user" | "api";
 }
 /**
  * Series options configuration
@@ -454,7 +454,7 @@ export interface SeriesOptionsConfig {
     visible?: boolean;
     lastValueVisible?: boolean;
     priceLineVisible?: boolean;
-    priceLineSource?: 'lastBar' | 'lastVisible';
+    priceLineSource?: "lastBar" | "lastVisible";
     priceLineWidth?: number;
     priceLineColor?: string;
     priceLineStyle?: number;
@@ -510,7 +510,7 @@ export interface ChartLayoutConfig {
  * Price scale configuration
  */
 export interface PriceScaleConfig {
-    position?: 'left' | 'right' | 'none';
+    position?: "left" | "right" | "none";
     mode?: number;
     autoScale?: boolean;
     invertScale?: boolean;
@@ -580,7 +580,7 @@ export interface TradeConfig {
     pnl?: number;
     pnlPercentage?: number;
     /** Type of trade (long/short) */
-    tradeType?: 'long' | 'short';
+    tradeType?: "long" | "short";
     /** Trade quantity */
     quantity?: number;
     [key: string]: unknown;
@@ -589,7 +589,7 @@ export interface TradeConfig {
  * Trade visualization options
  */
 export interface TradeVisualizationOptions {
-    style: 'markers' | 'rectangles' | 'both' | 'lines' | 'arrows' | 'zones';
+    style: "markers" | "rectangles" | "both" | "lines" | "arrows" | "zones";
     entryMarkerColorLong?: string;
     entryMarkerColorShort?: string;
     exitMarkerColorProfit?: string;
@@ -598,10 +598,10 @@ export interface TradeVisualizationOptions {
     showPnlInMarkers?: boolean;
     entryMarkerTemplate?: string;
     exitMarkerTemplate?: string;
-    entryMarkerShape?: 'arrowUp' | 'arrowDown' | 'circle' | 'square';
-    exitMarkerShape?: 'arrowUp' | 'arrowDown' | 'circle' | 'square';
-    entryMarkerPosition?: 'belowBar' | 'aboveBar';
-    exitMarkerPosition?: 'belowBar' | 'aboveBar';
+    entryMarkerShape?: "arrowUp" | "arrowDown" | "circle" | "square";
+    exitMarkerShape?: "arrowUp" | "arrowDown" | "circle" | "square";
+    entryMarkerPosition?: "belowBar" | "aboveBar";
+    exitMarkerPosition?: "belowBar" | "aboveBar";
     showMarkerText?: boolean;
     rectangleFillOpacity?: number;
     rectangleBorderWidth?: number;

@@ -1,14 +1,14 @@
-import { C as CornerLayoutManager, P as PrimitiveEventManager } from "../PrimitiveEventManager-DrK6RuJi.js";
-import { c as createSingleton, C as ChartCoordinateService, x as LegendDimensions, y as LegendColors, z as FormatDefaults, A as ContainerDefaults, E as CommonValues, G as TimeRangeSeconds, B as ButtonDimensions, H as ButtonSpacing, n as ButtonEffects, m as ButtonColors, I as DefaultRangeSwitcherConfig, l as logger } from "../SingletonBase-vKYdZ5tk.js";
-import { J, K, O, N, w, R, U } from "../SingletonBase-vKYdZ5tk.js";
-import { T as TemplateEngine, a as TradeTemplateProcessor } from "../TradeTemplateProcessor-DwcE0VRc.js";
-import { B, T } from "../TrendFillPrimitive-DHivyY9P.js";
-import { s as sanitizeHtml } from "../sanitization-HfsXpoG7.js";
-import { T as TooltipManager } from "../TooltipManager-tt1WqIi2.js";
-import { BandPrimitive } from "../BandPrimitive-BJsNeyNJ.js";
-import { RibbonPrimitive } from "../RibbonPrimitive-hcLJbxIK.js";
-import { GradientRibbonPrimitive } from "../GradientRibbonPrimitive-95ttgdAP.js";
-import { SignalPrimitive } from "../SignalPrimitive-D3Alyq5j.js";
+import { C as CornerLayoutManager, P as PrimitiveEventManager } from "../PrimitiveEventManager-DHN3p0kt.js";
+import { c as createSingleton, C as ChartCoordinateService, x as LegendDimensions, y as LegendColors, z as FormatDefaults, A as ContainerDefaults, E as CommonValues, G as TimeRangeSeconds, B as ButtonDimensions, H as ButtonSpacing, n as ButtonEffects, m as ButtonColors, I as DefaultRangeSwitcherConfig, l as logger } from "../SingletonBase-U-nNeQaU.js";
+import { J, K, O, N, w, R, U } from "../SingletonBase-U-nNeQaU.js";
+import { T as TemplateEngine, a as TradeTemplateProcessor } from "../TradeTemplateProcessor-8_VDoPqm.js";
+import { B, T } from "../TrendFillPrimitive-CYhR28d5.js";
+import { s as sanitizeHtml } from "../sanitization-C4wUVTJC.js";
+import { T as TooltipManager } from "../TooltipManager-BHAViL7r.js";
+import { BandPrimitive } from "../BandPrimitive-qwRQsolj.js";
+import { RibbonPrimitive } from "../RibbonPrimitive-CUS8OIAM.js";
+import { GradientRibbonPrimitive } from "../GradientRibbonPrimitive-D9eS6vkT.js";
+import { SignalPrimitive } from "../SignalPrimitive-BlYMaNR8.js";
 class PrimitiveStylingUtils {
   /**
    * Apply base styles to an element with fallback handling
@@ -198,7 +198,8 @@ class PrimitiveStylingUtils {
     if (position.right !== void 0) style.right = `${position.right}px`;
     if (position.bottom !== void 0) style.bottom = `${position.bottom}px`;
     if (position.left !== void 0) style.left = `${position.left}px`;
-    if (position.zIndex !== void 0) style.zIndex = position.zIndex.toString();
+    if (position.zIndex !== void 0)
+      style.zIndex = position.zIndex.toString();
   }
   /**
    * Reset position styles on an element.
@@ -340,7 +341,10 @@ class BasePanePrimitive {
           draw: () => {
             if (!this.chart || !this.mounted) return;
             const paneId = this.getPaneId();
-            const newCoords = this.coordinateService.getPaneCoordinates(this.chart, paneId);
+            const newCoords = this.coordinateService.getPaneCoordinates(
+              this.chart,
+              paneId
+            );
             if (!newCoords) return;
             if (this.hasCoordinatesChanged(newCoords)) {
               this.lastPaneCoords = {
@@ -430,7 +434,10 @@ class BasePanePrimitive {
     const chartId = this.getChartId();
     this.layoutManager = CornerLayoutManager.getInstance(chartId, paneId);
     this.layoutManager.setChartApi(this.chart);
-    this.coordinateService.setupLayoutManagerIntegration(this.chart, this.layoutManager);
+    this.coordinateService.setupLayoutManagerIntegration(
+      this.chart,
+      this.layoutManager
+    );
   }
   /**
    * Get the pane ID for this primitive
@@ -498,7 +505,8 @@ class BasePanePrimitive {
       if (configStyle.fontFamily) style.fontFamily = configStyle.fontFamily;
       if (configStyle.borderRadius && !isLegend)
         style.borderRadius = `${configStyle.borderRadius}px`;
-      if (configStyle.padding && !isLegend) style.padding = `${configStyle.padding}px`;
+      if (configStyle.padding && !isLegend)
+        style.padding = `${configStyle.padding}px`;
       if (isLegend) {
         style.margin = "0";
       } else if (configStyle.margin) {
@@ -550,7 +558,10 @@ class BasePanePrimitive {
       ...this.templateContext,
       customData: this.templateData
     };
-    this.lastTemplateResult = this.templateEngine.processTemplate(template, context);
+    this.lastTemplateResult = this.templateEngine.processTemplate(
+      template,
+      context
+    );
     if (this.lastTemplateResult.hasErrors) ;
   }
   /**
@@ -580,9 +591,12 @@ class BasePanePrimitive {
    */
   setupDefaultEventSubscriptions() {
     if (!this.eventManager) return;
-    const crosshairSub = this.eventManager.subscribe("crosshairMove", (event) => {
-      this.handleCrosshairMove(event);
-    });
+    const crosshairSub = this.eventManager.subscribe(
+      "crosshairMove",
+      (event) => {
+        this.handleCrosshairMove(event);
+      }
+    );
     this.eventSubscriptions.push(crosshairSub);
     this.setupCustomEventSubscriptions();
   }
@@ -799,7 +813,9 @@ class LegendPrimitive extends BasePanePrimitive {
   renderContent() {
     if (!this.containerElement) return;
     const content = this.getProcessedContent();
-    let legendElement = this.containerElement.querySelector(".legend-content");
+    let legendElement = this.containerElement.querySelector(
+      ".legend-content"
+    );
     if (!legendElement) {
       legendElement = document.createElement("div");
       legendElement.className = "legend-content";
@@ -849,7 +865,11 @@ class LegendPrimitive extends BasePanePrimitive {
       PrimitiveStylingUtils.applyBorder(element, borderStyles);
       PrimitiveStylingUtils.applyBaseStyles(element, baseStyles);
       if (baseStyles.backgroundColor) {
-        element.style.setProperty("background-color", baseStyles.backgroundColor, "important");
+        element.style.setProperty(
+          "background-color",
+          baseStyles.backgroundColor,
+          "important"
+        );
       }
       if (baseStyles.color) {
         element.style.setProperty("color", baseStyles.color, "important");
@@ -912,9 +932,12 @@ class LegendPrimitive extends BasePanePrimitive {
    */
   setupCustomEventSubscriptions() {
     if (!this.eventManager) return;
-    const crosshairSub = this.eventManager.subscribe("crosshairMove", (event) => {
-      this.updateLegendFromCrosshair(event);
-    });
+    const crosshairSub = this.eventManager.subscribe(
+      "crosshairMove",
+      (event) => {
+        this.updateLegendFromCrosshair(event);
+      }
+    );
     this.eventSubscriptions.push(crosshairSub);
   }
   /**
@@ -1250,10 +1273,13 @@ class RangeSwitcherPrimitive extends BasePanePrimitive {
     const containerConfig = this.config.style?.container;
     if (containerConfig) {
       if (containerConfig.display) style.display = containerConfig.display;
-      if (containerConfig.flexDirection) style.flexDirection = containerConfig.flexDirection;
+      if (containerConfig.flexDirection)
+        style.flexDirection = containerConfig.flexDirection;
       if (containerConfig.gap) style.gap = `${containerConfig.gap}px`;
-      if (containerConfig.alignItems) style.alignItems = containerConfig.alignItems;
-      if (containerConfig.justifyContent) style.justifyContent = containerConfig.justifyContent;
+      if (containerConfig.alignItems)
+        style.alignItems = containerConfig.alignItems;
+      if (containerConfig.justifyContent)
+        style.justifyContent = containerConfig.justifyContent;
     }
     style.pointerEvents = "auto";
   }
@@ -1287,7 +1313,12 @@ class RangeSwitcherPrimitive extends BasePanePrimitive {
         stateStyles.transform = "translateY(-1px)";
       }
       const state = isHover ? "hover" : "default";
-      PrimitiveStylingUtils.applyInteractionState(button, baseStyles, stateStyles, state);
+      PrimitiveStylingUtils.applyInteractionState(
+        button,
+        baseStyles,
+        stateStyles,
+        state
+      );
       if (buttonConfig.minWidth) {
         button.style.minWidth = `${buttonConfig.minWidth}px`;
       }
@@ -2144,7 +2175,11 @@ class TradeRectanglePrimitive {
         TooltipManager.getInstance().hideTooltip(this._primitiveId);
       }
     } catch (error) {
-      logger.warn("Hit test error in crosshair handler", "TradeRectanglePrimitive", error);
+      logger.warn(
+        "Hit test error in crosshair handler",
+        "TradeRectanglePrimitive",
+        error
+      );
       TooltipManager.getInstance().hideTooltip(this._primitiveId);
     }
   }
@@ -2196,7 +2231,11 @@ class TradeRectanglePrimitive {
       chart.timeScale().subscribeVisibleTimeRangeChange(this._timeScaleCallback);
       chart.subscribeCrosshairMove(this._crosshairCallback);
     } catch (error) {
-      logger.error("Failed to attach trade rectangle primitive", "TradeRectanglePrimitive", error);
+      logger.error(
+        "Failed to attach trade rectangle primitive",
+        "TradeRectanglePrimitive",
+        error
+      );
     }
     this._requestUpdate();
   }

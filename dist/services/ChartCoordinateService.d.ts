@@ -28,7 +28,7 @@ export interface PositioningConfig {
         height?: number;
     };
     zIndex?: number;
-    alignment?: 'start' | 'center' | 'end';
+    alignment?: "start" | "center" | "end";
     offset?: {
         x?: number;
         y?: number;
@@ -40,7 +40,7 @@ export interface PositioningConfig {
 export interface TooltipPosition {
     x: number;
     y: number;
-    anchor: 'top' | 'bottom' | 'left' | 'right';
+    anchor: "top" | "bottom" | "left" | "right";
     offset: {
         x: number;
         y: number;
@@ -384,7 +384,7 @@ export declare class ChartCoordinateService {
     /**
      * Calculate tooltip position relative to cursor
      */
-    calculateTooltipPosition(cursorX: number, cursorY: number, tooltipWidth: number, tooltipHeight: number, containerBounds: BoundingBox, preferredAnchor?: 'top' | 'bottom' | 'left' | 'right'): TooltipPosition;
+    calculateTooltipPosition(cursorX: number, cursorY: number, tooltipWidth: number, tooltipHeight: number, containerBounds: BoundingBox, preferredAnchor?: "top" | "bottom" | "left" | "right"): TooltipPosition;
     /**
      * Calculate overlay position (for rectangles, annotations, etc.)
      * Note: This requires a series to convert prices to coordinates
@@ -393,7 +393,7 @@ export declare class ChartCoordinateService {
     /**
      * Calculate multi-pane layout positions
      */
-    calculateMultiPaneLayout(totalHeight: number, paneHeights: number[] | 'equal' | {
+    calculateMultiPaneLayout(totalHeight: number, paneHeights: number[] | "equal" | {
         [key: number]: number;
     }): {
         [paneId: number]: BoundingBox;
@@ -401,7 +401,7 @@ export declare class ChartCoordinateService {
     /**
      * Calculate crosshair label position
      */
-    calculateCrosshairLabelPosition(crosshairX: number, crosshairY: number, labelWidth: number, labelHeight: number, containerBounds: BoundingBox, axis: 'x' | 'y'): {
+    calculateCrosshairLabelPosition(crosshairX: number, crosshairY: number, labelWidth: number, labelHeight: number, containerBounds: BoundingBox, axis: "x" | "y"): {
         x: number;
         y: number;
     };

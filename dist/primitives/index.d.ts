@@ -7,7 +7,7 @@
 export { BasePanePrimitive, PrimitivePriority } from './BasePanePrimitive';
 export type { BasePrimitiveConfig } from './BasePanePrimitive';
 export { BaseSeriesPrimitive } from './BaseSeriesPrimitive';
-export { LegendPrimitive, createLegendPrimitive, DefaultLegendConfigs } from './LegendPrimitive';
+export { LegendPrimitive, createLegendPrimitive, DefaultLegendConfigs, } from './LegendPrimitive';
 export { RangeSwitcherPrimitive, createRangeSwitcherPrimitive, DefaultRangeConfigs, TimeRange, } from './RangeSwitcherPrimitive';
 export type { RangeConfig } from './RangeSwitcherPrimitive';
 export { TradeRectanglePrimitive } from './TradeRectanglePrimitive';
@@ -17,6 +17,6 @@ export { GradientRibbonPrimitive } from './GradientRibbonPrimitive';
 export { SignalPrimitive } from './SignalPrimitive';
 export { TrendFillPrimitive } from './TrendFillPrimitive';
 export { PrimitiveStylingUtils } from './PrimitiveStylingUtils';
-export type { BaseStyleConfig, TypographyConfig, BorderConfig } from './PrimitiveStylingUtils';
+export type { BaseStyleConfig, TypographyConfig, BorderConfig, } from './PrimitiveStylingUtils';
 export * from './PrimitiveDefaults';
 //# sourceMappingURL=index.d.ts.map

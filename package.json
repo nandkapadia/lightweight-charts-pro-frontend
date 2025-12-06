@@ -1,6 +1,6 @@
 {
   "name": "@lightweight-charts-pro/core",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "description": "Framework-agnostic core library for TradingView Lightweight Charts Pro",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -8,34 +8,34 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
-      "require": "./dist/index.cjs",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/index.cjs"
     },
     "./plugins": {
+      "types": "./dist/plugins/index.d.ts",
       "import": "./dist/plugins/index.js",
-      "require": "./dist/plugins/index.cjs",
-      "types": "./dist/plugins/index.d.ts"
+      "require": "./dist/plugins/index.cjs"
     },
     "./primitives": {
+      "types": "./dist/primitives/index.d.ts",
       "import": "./dist/primitives/index.js",
-      "require": "./dist/primitives/index.cjs",
-      "types": "./dist/primitives/index.d.ts"
+      "require": "./dist/primitives/index.cjs"
     },
     "./series": {
+      "types": "./dist/series/index.d.ts",
       "import": "./dist/series/index.js",
-      "require": "./dist/series/index.cjs",
-      "types": "./dist/series/index.d.ts"
+      "require": "./dist/series/index.cjs"
     },
     "./services": {
+      "types": "./dist/services/index.d.ts",
       "import": "./dist/services/index.js",
-      "require": "./dist/services/index.cjs",
-      "types": "./dist/services/index.d.ts"
+      "require": "./dist/services/index.cjs"
     },
     "./utils": {
+      "types": "./dist/utils/index.d.ts",
       "import": "./dist/utils/index.js",
-      "require": "./dist/utils/index.cjs",
-      "types": "./dist/utils/index.d.ts"
+      "require": "./dist/utils/index.cjs"
     }
   },
   "files": [

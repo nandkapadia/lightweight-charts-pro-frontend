@@ -113,7 +113,7 @@ export interface ChartStyleOptions {
 /** Optimized styles result */
 export interface OptimizedStyles {
     container: {
-        position: 'relative';
+        position: "relative";
         border: string;
         borderRadius: string;
         padding: string;
@@ -127,7 +127,7 @@ export interface OptimizedStyles {
     chartContainer: {
         width: string;
         height: string;
-        position: 'relative';
+        position: "relative";
     };
 }
 export declare const createOptimizedStylesAdvanced: (width: number | null, height: number | null, shouldAutoSize: boolean, chartOptions?: ChartStyleOptions) => OptimizedStyles;

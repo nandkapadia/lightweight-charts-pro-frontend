@@ -1,10 +1,10 @@
-import { D as DIMENSIONS, l as logger } from "../SingletonBase-vKYdZ5tk.js";
-import { C } from "../SingletonBase-vKYdZ5tk.js";
-import { C as C2, P } from "../PrimitiveEventManager-DrK6RuJi.js";
-import { K as KeyedSingletonManager, c as cleanupInstance } from "../Disposable-BRvCF1V2.js";
-import { h as handleError, E as ErrorSeverity } from "../errorHandler-BuTzh9tq.js";
-import { T, a } from "../TradeTemplateProcessor-DwcE0VRc.js";
-import { a as a2, b, c } from "../tradeVisualization-DYwm4RS6.js";
+import { D as DIMENSIONS, l as logger } from "../SingletonBase-U-nNeQaU.js";
+import { C } from "../SingletonBase-U-nNeQaU.js";
+import { C as C2, P } from "../PrimitiveEventManager-DHN3p0kt.js";
+import { K as KeyedSingletonManager, c as cleanupInstance } from "../Disposable-s5YYE-pO.js";
+import { h as handleError, E as ErrorSeverity } from "../errorHandler-DjpPYQWq.js";
+import { T, a } from "../TradeTemplateProcessor-8_VDoPqm.js";
+import { a as a2, b, c } from "../tradeVisualization-krm94H-H.js";
 class PaneCollapseManager extends KeyedSingletonManager {
   constructor(chartApi, config = {}) {
     super();
@@ -70,7 +70,9 @@ class PaneCollapseManager extends KeyedSingletonManager {
   toggle(paneId) {
     const state = this.states.get(paneId);
     if (!state) {
-      logger.error("Pane state not initialized", "PaneCollapseManager", { paneId });
+      logger.error("Pane state not initialized", "PaneCollapseManager", {
+        paneId
+      });
       return;
     }
     try {
@@ -101,7 +103,9 @@ class PaneCollapseManager extends KeyedSingletonManager {
     try {
       const panes = this.chartApi.panes();
       if (!panes || !panes[paneId]) {
-        logger.error("Pane not found in chart.panes()", "PaneCollapseManager", { paneId });
+        logger.error("Pane not found in chart.panes()", "PaneCollapseManager", {
+          paneId
+        });
         return;
       }
       const currentSizes = /* @__PURE__ */ new Map();
@@ -172,7 +176,9 @@ class PaneCollapseManager extends KeyedSingletonManager {
     try {
       const panes = this.chartApi.panes();
       if (!panes || !panes[paneId]) {
-        logger.error("Pane not found in chart.panes()", "PaneCollapseManager", { paneId });
+        logger.error("Pane not found in chart.panes()", "PaneCollapseManager", {
+          paneId
+        });
         return;
       }
       const currentSizes = /* @__PURE__ */ new Map();
@@ -281,7 +287,12 @@ const createAnnotationVisualElements = (annotations) => {
           if (annotation.type === "rectangle" || annotation.type === "line") {
             const shape = {
               type: annotation.type,
-              points: [{ time: parseTime(annotation.time), price: annotation.price ?? 0 }],
+              points: [
+                {
+                  time: parseTime(annotation.time),
+                  price: annotation.price ?? 0
+                }
+              ],
               color: annotation.color || "#2196F3",
               fillColor: annotation.backgroundColor || "#2196F3",
               borderWidth: annotation.borderWidth || 1,
@@ -303,14 +314,26 @@ const createAnnotationVisualElements = (annotations) => {
             texts.push(text);
           }
         } catch (error) {
-          logger.error("Annotation text extraction failed", "AnnotationSystem", error);
+          logger.error(
+            "Annotation text extraction failed",
+            "AnnotationSystem",
+            error
+          );
         }
       });
     } catch (forEachError) {
-      logger.error("Annotation forEach operation failed", "AnnotationSystem", forEachError);
+      logger.error(
+        "Annotation forEach operation failed",
+        "AnnotationSystem",
+        forEachError
+      );
     }
   } catch (outerError) {
-    logger.error("Annotation system outer operation failed", "AnnotationSystem", outerError);
+    logger.error(
+      "Annotation system outer operation failed",
+      "AnnotationSystem",
+      outerError
+    );
   }
   return { markers, shapes, texts };
 };

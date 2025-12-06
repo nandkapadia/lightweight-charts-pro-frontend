@@ -22,15 +22,15 @@ export interface LegendPrimitiveConfig extends BasePrimitiveConfig {
     /**
      * Legend styling
      */
-    style?: BasePrimitiveConfig['style'] & {
+    style?: BasePrimitiveConfig["style"] & {
         /**
          * Text alignment
          */
-        textAlign?: 'left' | 'center' | 'right';
+        textAlign?: "left" | "center" | "right";
         /**
          * Font weight
          */
-        fontWeight?: 'normal' | 'bold' | 'lighter' | number;
+        fontWeight?: "normal" | "bold" | "lighter" | number;
         /**
          * Text shadow
          */
@@ -45,7 +45,7 @@ export interface LegendPrimitiveConfig extends BasePrimitiveConfig {
         border?: {
             width?: number;
             color?: string;
-            style?: 'solid' | 'dashed' | 'dotted';
+            style?: "solid" | "dashed" | "dotted";
         };
     };
 }

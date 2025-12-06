@@ -1,11 +1,11 @@
 "use strict";
 Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
-const SingletonBase = require("../SingletonBase-BygEKI3I.cjs");
-const PrimitiveEventManager = require("../PrimitiveEventManager-CwtmooxI.cjs");
-const Disposable = require("../Disposable-2YszKtdL.cjs");
-const errorHandler = require("../errorHandler-Qr51wwfv.cjs");
-const TradeTemplateProcessor = require("../TradeTemplateProcessor-Dadi3Bon.cjs");
-const tradeVisualization = require("../tradeVisualization-CeKL58vO.cjs");
+const SingletonBase = require("../SingletonBase-gDO3BjT2.cjs");
+const PrimitiveEventManager = require("../PrimitiveEventManager-CiTRMx-T.cjs");
+const Disposable = require("../Disposable-CKqiosew.cjs");
+const errorHandler = require("../errorHandler-DNFrCBFd.cjs");
+const TradeTemplateProcessor = require("../TradeTemplateProcessor-hYBbKXpD.cjs");
+const tradeVisualization = require("../tradeVisualization-D9aVQTro.cjs");
 class PaneCollapseManager extends Disposable.KeyedSingletonManager {
   constructor(chartApi, config = {}) {
     super();
@@ -71,7 +71,9 @@ class PaneCollapseManager extends Disposable.KeyedSingletonManager {
   toggle(paneId) {
     const state = this.states.get(paneId);
     if (!state) {
-      SingletonBase.logger.error("Pane state not initialized", "PaneCollapseManager", { paneId });
+      SingletonBase.logger.error("Pane state not initialized", "PaneCollapseManager", {
+        paneId
+      });
       return;
     }
     try {
@@ -102,7 +104,9 @@ class PaneCollapseManager extends Disposable.KeyedSingletonManager {
     try {
       const panes = this.chartApi.panes();
       if (!panes || !panes[paneId]) {
-        SingletonBase.logger.error("Pane not found in chart.panes()", "PaneCollapseManager", { paneId });
+        SingletonBase.logger.error("Pane not found in chart.panes()", "PaneCollapseManager", {
+          paneId
+        });
         return;
       }
       const currentSizes = /* @__PURE__ */ new Map();
@@ -173,7 +177,9 @@ class PaneCollapseManager extends Disposable.KeyedSingletonManager {
     try {
       const panes = this.chartApi.panes();
       if (!panes || !panes[paneId]) {
-        SingletonBase.logger.error("Pane not found in chart.panes()", "PaneCollapseManager", { paneId });
+        SingletonBase.logger.error("Pane not found in chart.panes()", "PaneCollapseManager", {
+          paneId
+        });
         return;
       }
       const currentSizes = /* @__PURE__ */ new Map();
@@ -282,7 +288,12 @@ const createAnnotationVisualElements = (annotations) => {
           if (annotation.type === "rectangle" || annotation.type === "line") {
             const shape = {
               type: annotation.type,
-              points: [{ time: parseTime(annotation.time), price: annotation.price ?? 0 }],
+              points: [
+                {
+                  time: parseTime(annotation.time),
+                  price: annotation.price ?? 0
+                }
+              ],
               color: annotation.color || "#2196F3",
               fillColor: annotation.backgroundColor || "#2196F3",
               borderWidth: annotation.borderWidth || 1,
@@ -304,14 +315,26 @@ const createAnnotationVisualElements = (annotations) => {
             texts.push(text);
           }
         } catch (error) {
-          SingletonBase.logger.error("Annotation text extraction failed", "AnnotationSystem", error);
+          SingletonBase.logger.error(
+            "Annotation text extraction failed",
+            "AnnotationSystem",
+            error
+          );
         }
       });
     } catch (forEachError) {
-      SingletonBase.logger.error("Annotation forEach operation failed", "AnnotationSystem", forEachError);
+      SingletonBase.logger.error(
+        "Annotation forEach operation failed",
+        "AnnotationSystem",
+        forEachError
+      );
     }
   } catch (outerError) {
-    SingletonBase.logger.error("Annotation system outer operation failed", "AnnotationSystem", outerError);
+    SingletonBase.logger.error(
+      "Annotation system outer operation failed",
+      "AnnotationSystem",
+      outerError
+    );
   }
   return { markers, shapes, texts };
 };

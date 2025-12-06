@@ -69,7 +69,7 @@ export interface TypographyConfig {
     fontSize?: number;
     fontFamily?: string;
     fontWeight?: string | number;
-    textAlign?: 'left' | 'center' | 'right';
+    textAlign?: "left" | "center" | "right";
     lineHeight?: number | string;
     letterSpacing?: number | string;
 }
@@ -96,7 +96,7 @@ export interface BorderConfig {
     borderRadius?: number;
     borderWidth?: number;
     borderColor?: string;
-    borderStyle?: 'solid' | 'dashed' | 'dotted' | 'none';
+    borderStyle?: "solid" | "dashed" | "dotted" | "none";
 }
 /**
  * Shadow configuration
@@ -132,7 +132,7 @@ export declare class PrimitiveStylingUtils {
     /**
      * Apply interaction states (hover, active, disabled) consistently
      */
-    static applyInteractionState(element: HTMLElement, baseStyles: BaseStyleConfig, stateStyles: BaseStyleConfig, state?: 'default' | 'hover' | 'active' | 'disabled'): void;
+    static applyInteractionState(element: HTMLElement, baseStyles: BaseStyleConfig, stateStyles: BaseStyleConfig, state?: "default" | "hover" | "active" | "disabled"): void;
     /**
      * Validate and normalize color values
      */
@@ -144,7 +144,7 @@ export declare class PrimitiveStylingUtils {
     /**
      * Create a standardized flex container
      */
-    static createFlexContainer(element: HTMLElement, direction?: 'row' | 'column', align?: string, justify?: string, gap?: number): void;
+    static createFlexContainer(element: HTMLElement, direction?: "row" | "column", align?: string, justify?: string, gap?: number): void;
     /**
      * Apply consistent transition effects
      */

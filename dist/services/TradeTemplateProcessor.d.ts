@@ -1,6 +1,6 @@
 import { TemplateOptions, TemplateResult } from './TemplateEngine';
 export interface TradeTemplateData {
-    tradeType: 'long' | 'short';
+    tradeType: "long" | "short";
     entryPrice: number;
     exitPrice: number;
     pnl: number;

@@ -102,7 +102,7 @@ export interface ExtendedSeriesConfig {
     /** Show price line */
     priceLineVisible?: boolean;
     /** Price line source (0 = lastBar, 1 = lastVisible, or string 'lastBar'/'lastVisible') */
-    priceLineSource?: number | 'lastBar' | 'lastVisible';
+    priceLineSource?: number | "lastBar" | "lastVisible";
     /** Price line width */
     priceLineWidth?: number;
     /** Price line color */

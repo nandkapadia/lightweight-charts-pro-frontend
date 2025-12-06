@@ -203,6 +203,6 @@ export declare class TemplateEngine {
     /**
      * Create template context from series data
      */
-    createContextFromSeriesData(seriesData: SeriesDataValue, customData?: Record<string, unknown>, formatting?: TemplateContext['formatting']): TemplateContext;
+    createContextFromSeriesData(seriesData: SeriesDataValue, customData?: Record<string, unknown>, formatting?: TemplateContext["formatting"]): TemplateContext;
 }
 //# sourceMappingURL=TemplateEngine.d.ts.map

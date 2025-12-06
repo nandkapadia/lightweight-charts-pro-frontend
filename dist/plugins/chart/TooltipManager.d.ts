@@ -230,14 +230,14 @@ export declare class TooltipManager {
      * @param event - Event name ('tooltip:shown' | 'tooltip:hidden')
      * @param callback - Callback function
      */
-    on(event: 'tooltip:shown' | 'tooltip:hidden', callback: (data: any) => void): void;
+    on(event: "tooltip:shown" | "tooltip:hidden", callback: (data: any) => void): void;
     /**
      * Unsubscribe from events
      *
      * @param event - Event name
      * @param callback - Callback function to remove
      */
-    off(event: 'tooltip:shown' | 'tooltip:hidden', callback: (data: any) => void): void;
+    off(event: "tooltip:shown" | "tooltip:hidden", callback: (data: any) => void): void;
     /**
      * Clear all active requests (e.g., on chart reset)
      */

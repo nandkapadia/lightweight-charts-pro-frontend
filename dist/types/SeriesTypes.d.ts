@@ -11,7 +11,7 @@
  * Includes both standard lightweight-charts series and custom extensions
  * for advanced financial and technical analysis indicators.
  */
-export type SeriesType = 'line' | 'area' | 'candlestick' | 'bar' | 'histogram' | 'baseline' | 'supertrend' | 'bollinger_bands' | 'sma' | 'ema' | 'ribbon' | 'gradient_ribbon' | 'band' | 'signal' | 'trend_fill';
+export type SeriesType = "line" | "area" | "candlestick" | "bar" | "histogram" | "baseline" | "supertrend" | "bollinger_bands" | "sma" | "ema" | "ribbon" | "gradient_ribbon" | "band" | "signal" | "trend_fill";
 /**
  * Base styling configuration for series appearance.
  *
@@ -52,7 +52,7 @@ export interface SeriesConfiguration {
     lowerLine?: SeriesStyleConfig;
     fill?: SeriesStyleConfig;
     fillVisible?: boolean;
-    source?: 'close' | 'open' | 'high' | 'low' | 'hl2' | 'hlc3' | 'ohlc4';
+    source?: "close" | "open" | "high" | "low" | "hl2" | "hlc3" | "ohlc4";
     offset?: number;
 }
 //# sourceMappingURL=SeriesTypes.d.ts.map

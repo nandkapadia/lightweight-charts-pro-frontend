@@ -8,7 +8,7 @@ export interface TradeRectangleData {
     fillColor: string;
     borderColor: string;
     borderWidth: number;
-    borderStyle: 'solid' | 'dashed' | 'dotted';
+    borderStyle: "solid" | "dashed" | "dotted";
     opacity: number;
     priceScaleId?: string;
     quantity?: number;

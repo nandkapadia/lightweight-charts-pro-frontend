@@ -2,7 +2,7 @@ import { ISeriesApi, LineStyle, LineWidth, SeriesOptionsMap } from 'lightweight-
 /**
  * Property types for dialog rendering
  */
-export type PropertyType = 'boolean' | 'number' | 'color' | 'line' | 'lineStyle' | 'lineWidth';
+export type PropertyType = "boolean" | "number" | "color" | "line" | "lineStyle" | "lineWidth";
 /**
  * Line configuration for nested line editor
  */

@@ -5,7 +5,7 @@
  * and custom series types with consistent configuration.
  */
 export { SeriesFactory, SeriesCreationError, getSeriesDescriptor, getAvailableSeriesTypes, isCustomSeries, createSeries, getDefaultOptions, registerSeriesDescriptor, unregisterSeriesDescriptor, getSeriesDescriptorsByCategory, createSeriesWithConfig, updateSeriesData, updateSeriesMarkers, updateSeriesOptions, } from './UnifiedSeriesFactory';
-export type { ExtendedSeriesConfig, ExtendedSeriesApi } from './UnifiedSeriesFactory';
+export type { ExtendedSeriesConfig, ExtendedSeriesApi, } from './UnifiedSeriesFactory';
 export { PropertyMapper } from './UnifiedPropertyMapper';
 export * from './core';
 export * from './descriptors';

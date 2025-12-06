@@ -1,15 +1,15 @@
 "use strict";
 Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
-const PrimitiveEventManager = require("../PrimitiveEventManager-CwtmooxI.cjs");
-const SingletonBase = require("../SingletonBase-BygEKI3I.cjs");
-const TradeTemplateProcessor = require("../TradeTemplateProcessor-Dadi3Bon.cjs");
-const TrendFillPrimitive = require("../TrendFillPrimitive-CtORNuw-.cjs");
-const sanitization = require("../sanitization-oV4kM94W.cjs");
-const TooltipManager = require("../TooltipManager-BQr3hh4S.cjs");
-const BandPrimitive = require("../BandPrimitive-B-FZ-yCS.cjs");
-const RibbonPrimitive = require("../RibbonPrimitive-CTwl-n6e.cjs");
-const GradientRibbonPrimitive = require("../GradientRibbonPrimitive-CS1Z2c97.cjs");
-const SignalPrimitive = require("../SignalPrimitive-DKmHoKb-.cjs");
+const PrimitiveEventManager = require("../PrimitiveEventManager-CiTRMx-T.cjs");
+const SingletonBase = require("../SingletonBase-gDO3BjT2.cjs");
+const TradeTemplateProcessor = require("../TradeTemplateProcessor-hYBbKXpD.cjs");
+const TrendFillPrimitive = require("../TrendFillPrimitive-KhsF2haK.cjs");
+const sanitization = require("../sanitization-DC4_oy5v.cjs");
+const TooltipManager = require("../TooltipManager-Da0NSX91.cjs");
+const BandPrimitive = require("../BandPrimitive-DbtRVbsg.cjs");
+const RibbonPrimitive = require("../RibbonPrimitive-ABhh7Uya.cjs");
+const GradientRibbonPrimitive = require("../GradientRibbonPrimitive-D3WbcxmW.cjs");
+const SignalPrimitive = require("../SignalPrimitive-iiJ-TEp1.cjs");
 class PrimitiveStylingUtils {
   /**
    * Apply base styles to an element with fallback handling
@@ -199,7 +199,8 @@ class PrimitiveStylingUtils {
     if (position.right !== void 0) style.right = `${position.right}px`;
     if (position.bottom !== void 0) style.bottom = `${position.bottom}px`;
     if (position.left !== void 0) style.left = `${position.left}px`;
-    if (position.zIndex !== void 0) style.zIndex = position.zIndex.toString();
+    if (position.zIndex !== void 0)
+      style.zIndex = position.zIndex.toString();
   }
   /**
    * Reset position styles on an element.
@@ -341,7 +342,10 @@ class BasePanePrimitive {
           draw: () => {
             if (!this.chart || !this.mounted) return;
             const paneId = this.getPaneId();
-            const newCoords = this.coordinateService.getPaneCoordinates(this.chart, paneId);
+            const newCoords = this.coordinateService.getPaneCoordinates(
+              this.chart,
+              paneId
+            );
             if (!newCoords) return;
             if (this.hasCoordinatesChanged(newCoords)) {
               this.lastPaneCoords = {
@@ -431,7 +435,10 @@ class BasePanePrimitive {
     const chartId = this.getChartId();
     this.layoutManager = PrimitiveEventManager.CornerLayoutManager.getInstance(chartId, paneId);
     this.layoutManager.setChartApi(this.chart);
-    this.coordinateService.setupLayoutManagerIntegration(this.chart, this.layoutManager);
+    this.coordinateService.setupLayoutManagerIntegration(
+      this.chart,
+      this.layoutManager
+    );
   }
   /**
    * Get the pane ID for this primitive
@@ -499,7 +506,8 @@ class BasePanePrimitive {
       if (configStyle.fontFamily) style.fontFamily = configStyle.fontFamily;
       if (configStyle.borderRadius && !isLegend)
         style.borderRadius = `${configStyle.borderRadius}px`;
-      if (configStyle.padding && !isLegend) style.padding = `${configStyle.padding}px`;
+      if (configStyle.padding && !isLegend)
+        style.padding = `${configStyle.padding}px`;
       if (isLegend) {
         style.margin = "0";
       } else if (configStyle.margin) {
@@ -551,7 +559,10 @@ class BasePanePrimitive {
       ...this.templateContext,
       customData: this.templateData
     };
-    this.lastTemplateResult = this.templateEngine.processTemplate(template, context);
+    this.lastTemplateResult = this.templateEngine.processTemplate(
+      template,
+      context
+    );
     if (this.lastTemplateResult.hasErrors) ;
   }
   /**
@@ -581,9 +592,12 @@ class BasePanePrimitive {
    */
   setupDefaultEventSubscriptions() {
     if (!this.eventManager) return;
-    const crosshairSub = this.eventManager.subscribe("crosshairMove", (event) => {
-      this.handleCrosshairMove(event);
-    });
+    const crosshairSub = this.eventManager.subscribe(
+      "crosshairMove",
+      (event) => {
+        this.handleCrosshairMove(event);
+      }
+    );
     this.eventSubscriptions.push(crosshairSub);
     this.setupCustomEventSubscriptions();
   }
@@ -800,7 +814,9 @@ class LegendPrimitive extends BasePanePrimitive {
   renderContent() {
     if (!this.containerElement) return;
     const content = this.getProcessedContent();
-    let legendElement = this.containerElement.querySelector(".legend-content");
+    let legendElement = this.containerElement.querySelector(
+      ".legend-content"
+    );
     if (!legendElement) {
       legendElement = document.createElement("div");
       legendElement.className = "legend-content";
@@ -850,7 +866,11 @@ class LegendPrimitive extends BasePanePrimitive {
       PrimitiveStylingUtils.applyBorder(element, borderStyles);
       PrimitiveStylingUtils.applyBaseStyles(element, baseStyles);
       if (baseStyles.backgroundColor) {
-        element.style.setProperty("background-color", baseStyles.backgroundColor, "important");
+        element.style.setProperty(
+          "background-color",
+          baseStyles.backgroundColor,
+          "important"
+        );
       }
       if (baseStyles.color) {
         element.style.setProperty("color", baseStyles.color, "important");
@@ -913,9 +933,12 @@ class LegendPrimitive extends BasePanePrimitive {
    */
   setupCustomEventSubscriptions() {
     if (!this.eventManager) return;
-    const crosshairSub = this.eventManager.subscribe("crosshairMove", (event) => {
-      this.updateLegendFromCrosshair(event);
-    });
+    const crosshairSub = this.eventManager.subscribe(
+      "crosshairMove",
+      (event) => {
+        this.updateLegendFromCrosshair(event);
+      }
+    );
     this.eventSubscriptions.push(crosshairSub);
   }
   /**
@@ -1251,10 +1274,13 @@ class RangeSwitcherPrimitive extends BasePanePrimitive {
     const containerConfig = this.config.style?.container;
     if (containerConfig) {
       if (containerConfig.display) style.display = containerConfig.display;
-      if (containerConfig.flexDirection) style.flexDirection = containerConfig.flexDirection;
+      if (containerConfig.flexDirection)
+        style.flexDirection = containerConfig.flexDirection;
       if (containerConfig.gap) style.gap = `${containerConfig.gap}px`;
-      if (containerConfig.alignItems) style.alignItems = containerConfig.alignItems;
-      if (containerConfig.justifyContent) style.justifyContent = containerConfig.justifyContent;
+      if (containerConfig.alignItems)
+        style.alignItems = containerConfig.alignItems;
+      if (containerConfig.justifyContent)
+        style.justifyContent = containerConfig.justifyContent;
     }
     style.pointerEvents = "auto";
   }
@@ -1288,7 +1314,12 @@ class RangeSwitcherPrimitive extends BasePanePrimitive {
         stateStyles.transform = "translateY(-1px)";
       }
       const state = isHover ? "hover" : "default";
-      PrimitiveStylingUtils.applyInteractionState(button, baseStyles, stateStyles, state);
+      PrimitiveStylingUtils.applyInteractionState(
+        button,
+        baseStyles,
+        stateStyles,
+        state
+      );
       if (buttonConfig.minWidth) {
         button.style.minWidth = `${buttonConfig.minWidth}px`;
       }
@@ -2145,7 +2176,11 @@ class TradeRectanglePrimitive {
         TooltipManager.TooltipManager.getInstance().hideTooltip(this._primitiveId);
       }
     } catch (error) {
-      SingletonBase.logger.warn("Hit test error in crosshair handler", "TradeRectanglePrimitive", error);
+      SingletonBase.logger.warn(
+        "Hit test error in crosshair handler",
+        "TradeRectanglePrimitive",
+        error
+      );
       TooltipManager.TooltipManager.getInstance().hideTooltip(this._primitiveId);
     }
   }
@@ -2197,7 +2232,11 @@ class TradeRectanglePrimitive {
       chart.timeScale().subscribeVisibleTimeRangeChange(this._timeScaleCallback);
       chart.subscribeCrosshairMove(this._crosshairCallback);
     } catch (error) {
-      SingletonBase.logger.error("Failed to attach trade rectangle primitive", "TradeRectanglePrimitive", error);
+      SingletonBase.logger.error(
+        "Failed to attach trade rectangle primitive",
+        "TradeRectanglePrimitive",
+        error
+      );
     }
     this._requestUpdate();
   }

@@ -66,7 +66,7 @@ export interface RangeSwitcherPrimitiveConfig extends BasePrimitiveConfig {
     /**
      * Range switcher styling
      */
-    style?: BasePrimitiveConfig['style'] & {
+    style?: BasePrimitiveConfig["style"] & {
         /**
          * Button styling
          */
@@ -87,8 +87,8 @@ export interface RangeSwitcherPrimitiveConfig extends BasePrimitiveConfig {
          * Container styling
          */
         container?: {
-            display?: 'flex' | 'block';
-            flexDirection?: 'row' | 'column';
+            display?: "flex" | "block";
+            flexDirection?: "row" | "column";
             gap?: number;
             alignItems?: string;
             justifyContent?: string;
