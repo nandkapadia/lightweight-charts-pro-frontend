@@ -7,11 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.0.0] - 2024-12-06
+## [0.1.0] - 2024-12-06
 
-### 🎉 Major Release - Production Ready
+### 🎉 Initial Release - Production Ready
 
-This is the first production-ready release of @lightweight-charts-pro/core with comprehensive documentation and stability improvements.
+This is the initial production-ready release of @lightweight-charts-pro/core with comprehensive documentation and stability improvements.
 
 ### Added
 
@@ -166,6 +166,6 @@ If upgrading from 0.2.x:
 
 ## Version Links
 
-[unreleased]: https://github.com/nandkapadia/lightweight-charts-pro-frontend/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/nandkapadia/lightweight-charts-pro-frontend/releases/tag/v1.0.0
+[unreleased]: https://github.com/nandkapadia/lightweight-charts-pro-frontend/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/nandkapadia/lightweight-charts-pro-frontend/releases/tag/v0.1.0
 [0.2.0]: https://github.com/nandkapadia/lightweight-charts-pro-frontend/releases/tag/v0.2.0

@@ -1,6 +1,6 @@
 {
   "name": "@lightweight-charts-pro/core",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Framework-agnostic core library for TradingView Lightweight Charts Pro",
   "type": "module",
   "main": "./dist/index.cjs",
