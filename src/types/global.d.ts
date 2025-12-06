@@ -5,7 +5,7 @@
  * Fixes type safety issues by properly typing window extensions used throughout the app.
  */
 
-import { ISeriesApi, IChartApi } from 'lightweight-charts';
+import { ISeriesApi, IChartApi } from "lightweight-charts";
 
 /**
  * Chart series reference map structure

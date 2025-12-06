@@ -29,7 +29,7 @@
  * ```
  */
 
-export type Corner = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
+export type Corner = "top-left" | "top-right" | "bottom-left" | "bottom-right";
 
 export interface Dimensions {
   width: number;
@@ -94,7 +94,10 @@ export interface CornerLayoutState {
 
 export interface LayoutManagerEvents {
   onLayoutChanged: (_corner: Corner, _widgets: IPositionableWidget[]) => void;
-  onOverflow: (_corner: Corner, _overflowingWidgets: IPositionableWidget[]) => void;
+  onOverflow: (
+    _corner: Corner,
+    _overflowingWidgets: IPositionableWidget[],
+  ) => void;
 }
 
 // Pane types

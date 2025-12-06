@@ -4,8 +4,8 @@
  * Provides type-safe alternatives to `any` types in UnifiedSeriesFactory
  */
 
-import { ISeriesApi, SeriesMarker, Time } from 'lightweight-charts';
-import { TradeConfig, TradeVisualizationOptions } from './index';
+import { ISeriesApi, SeriesMarker, Time } from "lightweight-charts";
+import { TradeConfig, TradeVisualizationOptions } from "./index";
 
 /**
  * Generic series data point

@@ -6,13 +6,13 @@
  */
 
 // Coordinates - canonical source for coordinate types
-export * from './coordinates';
+export * from "./coordinates";
 
 // Layout types
-export * from './layout';
+export * from "./layout";
 
 // Series types
-export * from './SeriesTypes';
+export * from "./SeriesTypes";
 
 // Chart interfaces - selective export to avoid duplicates
 // The duplicated types (BoundingBox, ElementPosition, PaneCoordinates) are
@@ -72,4 +72,4 @@ export type {
   // Trade types
   TradeConfig,
   TradeVisualizationOptions,
-} from './ChartInterfaces';
+} from "./ChartInterfaces";
