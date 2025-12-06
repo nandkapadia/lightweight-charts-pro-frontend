@@ -16,7 +16,7 @@ export default defineConfig({
       include: ["src/**/*.ts"],
       exclude: ["src/**/*.d.ts", "src/**/index.ts", "src/__tests__/**"],
     },
-    setupFiles: [], // No setup files for now
+    setupFiles: ['./vitest.setup.ts'],
     // Use threads for better memory management and parallel execution
     pool: "threads",
     poolOptions: {
