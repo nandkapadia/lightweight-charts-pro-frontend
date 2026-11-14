@@ -1,4 +1,5 @@
 import { IPrimitivePaneRenderer, IPrimitivePaneView, ISeriesPrimitive, IChartApi, ISeriesApi, Coordinate, UTCTimestamp, PrimitiveHoveredItem } from 'lightweight-charts';
+import { TradeRectangleHoverTarget } from './tradeRectangleHover';
 /**
  * Trade rectangle data structure
  *
@@ -275,7 +276,7 @@ declare class TradeRectangleView implements IPrimitivePaneView {
  * series.attachPrimitive(primitive);
  * ```
  */
-export declare class TradeRectanglePrimitive implements ISeriesPrimitive {
+export declare class TradeRectanglePrimitive implements ISeriesPrimitive, TradeRectangleHoverTarget {
     /** Trade rectangle data (entry/exit time/price, colors, etc.) */
     private _data;
     /** Reference to chart API (set when primitive is attached) */
@@ -288,10 +289,6 @@ export declare class TradeRectanglePrimitive implements ISeriesPrimitive {
     private _requestUpdate?;
     /** Time scale change event callback (stored for cleanup) */
     private _timeScaleCallback?;
-    /** Crosshair move event callback (stored for cleanup) */
-    private _crosshairCallback?;
-    /** Throttle flag to prevent excessive updates */
-    private _updateThrottled;
     /** Unique identifier for this primitive instance */
     private _primitiveId;
     /** Tooltip configuration options */
@@ -361,50 +358,58 @@ export declare class TradeRectanglePrimitive implements ISeriesPrimitive {
     /**
      * Hit test to check if mouse coordinates are inside the trade rectangle
      *
-     * Performs precise hit testing by converting trade data coordinates to
-     * screen coordinates and checking if the mouse position falls within
-     * the rectangle bounds (with tolerance buffer).
+     * Called by Lightweight Charts to resolve what is under the cursor. A hit is
+     * reported with the trade id (or this primitive's id when the trade has
+     * none) as `externalId`, which surfaces as `hoveredInfo.objectId`.
      *
-     * Process:
-     * 1. Convert trade times/prices to screen coordinates
-     * 2. Calculate rectangle bounds (left, right, top, bottom)
-     * 3. Add 2px tolerance buffer for easier interaction
-     * 4. Check if mouse (x, y) is within expanded bounds
-     *
-     * @param {number} x - Mouse X coordinate (screen pixels)
-     * @param {number} y - Mouse Y coordinate (screen pixels)
+     * @param {number} x - Mouse X coordinate (pane pixels)
+     * @param {number} y - Mouse Y coordinate (pane pixels)
      * @returns {PrimitiveHoveredItem | null} Hit result or null if not hit
-     *
-     * @remarks
-     * - Returns null if chart/series not available
-     * - Returns null if coordinate conversion fails
-     * - Uses 2px tolerance buffer for better UX
-     * - Silently catches and handles any conversion errors
      */
     hitTest(x: number, y: number): PrimitiveHoveredItem | null;
     /**
-     * Handle crosshair move events for tooltip display
+     * Id reported as `externalId` from {@link hitTest}
      *
-     * Called whenever the crosshair moves on the chart. Performs hit testing
-     * to determine if the crosshair is over this trade rectangle and requests/hides
-     * the tooltip accordingly via the TooltipManager.
+     * @returns {string} The trade id, or this primitive's id when the trade has none
+     */
+    getHoverId(): string;
+    /**
+     * Check whether a pane-relative point is inside the trade rectangle
      *
      * Process:
-     * 1. Validate tooltip is enabled and crosshair point is valid
-     * 2. Perform hit test with current crosshair position
-     * 3. If hit, request tooltip with content/style
-     * 4. If not hit, hide tooltip
+     * 1. Validate chart/series and skip points in another pane
+     * 2. Convert trade times/prices to screen coordinates
+     * 3. Validate the coordinate conversion succeeded
+     * 4. Calculate rectangle bounds (left, right, top, bottom)
+     * 5. Add 2px tolerance buffer for easier interaction
+     * 6. Check if (x, y) is within the expanded bounds
      *
-     * @private
-     * @param {any} param - Crosshair move event parameter with point property
+     * @param {number} x - X coordinate (pane pixels)
+     * @param {number} y - Y coordinate (pane pixels)
+     * @param {number} [paneIndex] - Pane the point is in; skipped when undefined
+     * @returns {boolean} True when the point is inside the rectangle
      *
      * @remarks
-     * - Returns early if tooltips are disabled
-     * - Validates point coordinates are numbers before hit testing
-     * - Uses TooltipManager for decoupled tooltip display
-     * - Catches and logs hit test errors to prevent tooltip flickering
+     * - Returns false if chart/series not available or coordinate conversion fails
+     * - Silently catches and handles any conversion errors
      */
-    private handleCrosshairMove;
+    containsPoint(x: number, y: number, paneIndex?: number): boolean;
+    /**
+     * Show this trade's tooltip at the cursor position
+     *
+     * Called by the shared trade rectangle hover handler when the cursor is over
+     * this rectangle.
+     *
+     * @param {{ x: number; y: number }} position - Cursor position in pane pixels
+     */
+    showTooltip(position: {
+        x: number;
+        y: number;
+    }): void;
+    /**
+     * Hide this trade's tooltip
+     */
+    hideTooltip(): void;
     /**
      * Lifecycle: Primitive attached to series
      *
@@ -414,7 +419,7 @@ export declare class TradeRectanglePrimitive implements ISeriesPrimitive {
      *
      * Event subscriptions:
      * - Time scale changes (for coordinate re-calculation on pan/zoom)
-     * - Crosshair moves (for tooltip display on hover)
+     * - Shared per-chart hover handler (for tooltip display on hover)
      *
      * @param {{ chart: IChartApi; series: ISeriesApi<any>; requestUpdate: () => void }} params
      *   - chart: Chart API reference

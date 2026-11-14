@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
-const UnifiedPropertyMapper = require("../UnifiedPropertyMapper-CB5XI8dJ.cjs");
+const UnifiedPropertyMapper = require("../UnifiedPropertyMapper-CfQAZ5Rz.cjs");
 exports.AREA_SERIES_DESCRIPTOR = UnifiedPropertyMapper.AREA_SERIES_DESCRIPTOR;
 exports.BAND_SERIES_DESCRIPTOR = UnifiedPropertyMapper.BAND_SERIES_DESCRIPTOR;
 exports.BAR_SERIES_DESCRIPTOR = UnifiedPropertyMapper.BAR_SERIES_DESCRIPTOR;

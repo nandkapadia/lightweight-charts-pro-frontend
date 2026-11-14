@@ -569,19 +569,35 @@ export type DeepPartial<T> = {
 };
 /**
  * Trade configuration for visualization
+ *
+ * Runtime Behavior:
+ * - exitTime is optional (for open trades without exit)
+ * - exitPrice is optional (for open trades without exit)
+ * - isProfitable is optional (backend may omit, defaults to false)
+ * - Accepts both trade_type (snake_case) and tradeType (camelCase)
  */
 export interface TradeConfig {
+    /** Trade entry timestamp (Unix seconds, milliseconds, or ISO 8601 string) */
     entryTime: string | number;
+    /** Trade entry price (must be positive) */
     entryPrice: number;
-    exitTime: string | number;
-    exitPrice: number;
-    isProfitable: boolean;
+    /** Unique trade identifier */
     id: string;
+    /** Trade exit timestamp (undefined/null for open trades) */
+    exitTime?: string | number | null;
+    /** Trade exit price (undefined/null for open trades) */
+    exitPrice?: number | null;
+    /** Whether the trade was profitable (defaults to false if omitted) */
+    isProfitable?: boolean;
+    /** Profit/loss amount */
     pnl?: number;
+    /** Profit/loss percentage */
     pnlPercentage?: number;
-    /** Type of trade (long/short) */
+    /** Type of trade (long/short) - camelCase variant */
     tradeType?: "long" | "short";
-    /** Trade quantity */
+    /** Type of trade (long/short) - snake_case variant (from backend) */
+    trade_type?: "long" | "short";
+    /** Trade quantity/size */
     quantity?: number;
     [key: string]: unknown;
 }
