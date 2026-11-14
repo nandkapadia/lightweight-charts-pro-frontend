@@ -40,6 +40,7 @@ import {
   TradeRectanglePrimitive,
   createTradeRectanglePrimitives,
 } from "../../primitives/TradeRectanglePrimitive";
+import { TooltipManager } from "../../plugins/chart/TooltipManager";
 
 describe("TradeRectanglePrimitive - Construction", () => {
   it("should create primitive with required data", () => {
@@ -305,7 +306,7 @@ describe("TradeRectanglePrimitive - Event Handling", () => {
     expect(requestUpdateSpy).toHaveBeenCalled();
   });
 
-  it("should throttle crosshair updates", () => {
+  it("should not request redraws on crosshair moves", () => {
     vi.useFakeTimers();
 
     primitive.attached({
@@ -313,31 +314,194 @@ describe("TradeRectanglePrimitive - Event Handling", () => {
       series: mockSeries,
       requestUpdate: requestUpdateSpy,
     });
-
     requestUpdateSpy.mockClear();
 
-    // Create mock crosshair parameter with point data
-    const mockCrosshairParam = {
-      point: { x: 100, y: 200 },
-      time: 1000 as any,
-      seriesData: new Map(),
-    };
+    crosshairCallback({ point: { x: 100, y: 200 }, seriesData: new Map() });
+    vi.advanceTimersByTime(1000);
 
-    // Trigger multiple crosshair events rapidly
-    crosshairCallback(mockCrosshairParam);
-    crosshairCallback(mockCrosshairParam);
-    crosshairCallback(mockCrosshairParam);
-
-    // Should only be called once immediately
-    expect(requestUpdateSpy).toHaveBeenCalledTimes(0);
-
-    // Advance timers
-    vi.advanceTimersByTime(100);
-
-    // Should be called after throttle period
-    expect(requestUpdateSpy).toHaveBeenCalledTimes(1);
+    expect(requestUpdateSpy).not.toHaveBeenCalled();
 
     vi.useRealTimers();
+  });
+
+  it("should report the trade id from hitTest", () => {
+    const withTradeId = new TradeRectanglePrimitive({
+      ...primitive.data(),
+      tradeId: "trade-42",
+    });
+    withTradeId.attached({
+      chart: mockChart,
+      series: mockSeries,
+      requestUpdate: requestUpdateSpy,
+    });
+
+    expect(withTradeId.hitTest(50, 75)).toMatchObject({
+      externalId: "trade-42",
+      zOrder: "normal",
+    });
+    expect(withTradeId.hitTest(500, 500)).toBeNull();
+  });
+
+  it("should fall back to its own id from hitTest without a trade id", () => {
+    primitive.attached({
+      chart: mockChart,
+      series: mockSeries,
+      requestUpdate: requestUpdateSpy,
+    });
+
+    expect(primitive.hitTest(50, 75)?.externalId).toBe(primitive.getId());
+  });
+
+  it("should show and hide its tooltip based on hoveredInfo", () => {
+    const manager = TooltipManager.getInstance();
+    const requestSpy = vi
+      .spyOn(manager, "requestTooltip")
+      .mockImplementation(() => {});
+    const hideSpy = vi
+      .spyOn(manager, "hideTooltip")
+      .mockImplementation(() => {});
+
+    primitive.attached({
+      chart: mockChart,
+      series: mockSeries,
+      requestUpdate: requestUpdateSpy,
+    });
+
+    crosshairCallback({
+      point: { x: 50, y: 75 },
+      seriesData: new Map(),
+      hoveredInfo: {
+        type: "primitive",
+        sourceKind: "series-primitive",
+        objectKind: "primitive",
+        objectId: primitive.getId(),
+      },
+    });
+
+    expect(requestSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        source: primitive.getId(),
+        position: { x: 50, y: 75 },
+      }),
+    );
+    expect(hideSpy).not.toHaveBeenCalled();
+
+    crosshairCallback({ point: { x: 300, y: 300 }, seriesData: new Map() });
+
+    expect(hideSpy).toHaveBeenCalledWith(primitive.getId());
+
+    requestSpy.mockRestore();
+    hideSpy.mockRestore();
+  });
+
+  describe("when another series wins the hover", () => {
+    const seriesHover = {
+      type: "series-range",
+      sourceKind: "series",
+      objectKind: "series",
+    };
+    let requestSpy: any;
+
+    beforeEach(() => {
+      requestSpy = vi
+        .spyOn(TooltipManager.getInstance(), "requestTooltip")
+        .mockImplementation(() => {});
+      mockSeries.getPane = vi.fn(() => ({ paneIndex: () => 0 }));
+      primitive.attached({
+        chart: mockChart,
+        series: mockSeries,
+        requestUpdate: requestUpdateSpy,
+      });
+    });
+
+    afterEach(() => {
+      requestSpy.mockRestore();
+    });
+
+    it("should still show the tooltip inside the rectangle", () => {
+      crosshairCallback({
+        point: { x: 50, y: 75 },
+        paneIndex: 0,
+        seriesData: new Map(),
+        hoveredInfo: seriesHover,
+      });
+
+      expect(requestSpy).toHaveBeenCalledWith(
+        expect.objectContaining({ source: primitive.getId() }),
+      );
+    });
+
+    it("should not show the tooltip outside the rectangle", () => {
+      crosshairCallback({
+        point: { x: 300, y: 300 },
+        paneIndex: 0,
+        seriesData: new Map(),
+        hoveredInfo: seriesHover,
+      });
+
+      expect(requestSpy).not.toHaveBeenCalled();
+    });
+
+    it("should not show the tooltip for a point in another pane", () => {
+      crosshairCallback({
+        point: { x: 50, y: 75 },
+        paneIndex: 1,
+        seriesData: new Map(),
+        hoveredInfo: seriesHover,
+      });
+
+      expect(requestSpy).not.toHaveBeenCalled();
+    });
+  });
+
+  it("should not show a tooltip when tooltips are disabled", () => {
+    const requestSpy = vi
+      .spyOn(TooltipManager.getInstance(), "requestTooltip")
+      .mockImplementation(() => {});
+    const disabled = new TradeRectanglePrimitive(primitive.data(), {
+      enabled: false,
+    });
+
+    disabled.attached({
+      chart: mockChart,
+      series: mockSeries,
+      requestUpdate: requestUpdateSpy,
+    });
+
+    crosshairCallback({
+      point: { x: 50, y: 75 },
+      seriesData: new Map(),
+      hoveredInfo: {
+        type: "primitive",
+        sourceKind: "series-primitive",
+        objectKind: "primitive",
+        objectId: disabled.getId(),
+      },
+    });
+
+    expect(requestSpy).not.toHaveBeenCalled();
+
+    requestSpy.mockRestore();
+  });
+
+  it("should share one crosshair subscription per chart", () => {
+    const other = new TradeRectanglePrimitive(primitive.data());
+    const params = {
+      chart: mockChart,
+      series: mockSeries,
+      requestUpdate: requestUpdateSpy,
+    };
+
+    primitive.attached(params);
+    other.attached(params);
+
+    expect(mockChart.subscribeCrosshairMove).toHaveBeenCalledTimes(1);
+
+    primitive.detached();
+    expect(mockChart.unsubscribeCrosshairMove).not.toHaveBeenCalled();
+
+    other.detached();
+    expect(mockChart.unsubscribeCrosshairMove).toHaveBeenCalledTimes(1);
   });
 
   it("should handle attach errors gracefully", () => {

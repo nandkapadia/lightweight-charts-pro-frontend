@@ -44,6 +44,11 @@ import {
   TradeTemplateProcessor,
   TradeTemplateData,
 } from "../services/TradeTemplateProcessor";
+import {
+  TradeRectangleHoverTarget,
+  registerTradeRectangleHover,
+  unregisterTradeRectangleHover,
+} from "./tradeRectangleHover";
 
 /**
  * Trade rectangle data structure
@@ -482,7 +487,9 @@ class TradeRectangleView implements IPrimitivePaneView {
  * series.attachPrimitive(primitive);
  * ```
  */
-export class TradeRectanglePrimitive implements ISeriesPrimitive {
+export class TradeRectanglePrimitive
+  implements ISeriesPrimitive, TradeRectangleHoverTarget
+{
   /** Trade rectangle data (entry/exit time/price, colors, etc.) */
   private _data: TradeRectangleData;
   /** Reference to chart API (set when primitive is attached) */
@@ -495,10 +502,6 @@ export class TradeRectanglePrimitive implements ISeriesPrimitive {
   private _requestUpdate?: () => void;
   /** Time scale change event callback (stored for cleanup) */
   private _timeScaleCallback?: (() => void) | null;
-  /** Crosshair move event callback (stored for cleanup) */
-  private _crosshairCallback?: ((param: any) => void) | null;
-  /** Throttle flag to prevent excessive updates */
-  private _updateThrottled: boolean = false;
 
   /** Unique identifier for this primitive instance */
   private _primitiveId: string;
@@ -687,33 +690,72 @@ export class TradeRectanglePrimitive implements ISeriesPrimitive {
   /**
    * Hit test to check if mouse coordinates are inside the trade rectangle
    *
-   * Performs precise hit testing by converting trade data coordinates to
-   * screen coordinates and checking if the mouse position falls within
-   * the rectangle bounds (with tolerance buffer).
+   * Called by Lightweight Charts to resolve what is under the cursor. A hit is
+   * reported with the trade id (or this primitive's id when the trade has
+   * none) as `externalId`, which surfaces as `hoveredInfo.objectId`.
    *
-   * Process:
-   * 1. Convert trade times/prices to screen coordinates
-   * 2. Calculate rectangle bounds (left, right, top, bottom)
-   * 3. Add 2px tolerance buffer for easier interaction
-   * 4. Check if mouse (x, y) is within expanded bounds
-   *
-   * @param {number} x - Mouse X coordinate (screen pixels)
-   * @param {number} y - Mouse Y coordinate (screen pixels)
+   * @param {number} x - Mouse X coordinate (pane pixels)
+   * @param {number} y - Mouse Y coordinate (pane pixels)
    * @returns {PrimitiveHoveredItem | null} Hit result or null if not hit
-   *
-   * @remarks
-   * - Returns null if chart/series not available
-   * - Returns null if coordinate conversion fails
-   * - Uses 2px tolerance buffer for better UX
-   * - Silently catches and handles any conversion errors
    */
   hitTest(x: number, y: number): PrimitiveHoveredItem | null {
-    // Step 1: Validate chart and series are available
-    if (!this._chart || !this._series) {
+    if (!this.containsPoint(x, y)) {
       return null;
     }
 
+    return {
+      externalId: this.getHoverId(),
+      zOrder: "normal",
+      distance: 0,
+      hitTestPriority: 0,
+      itemType: "primitive",
+    };
+  }
+
+  /**
+   * Id reported as `externalId` from {@link hitTest}
+   *
+   * @returns {string} The trade id, or this primitive's id when the trade has none
+   */
+  getHoverId(): string {
+    return this._data.tradeId || this._primitiveId;
+  }
+
+  /**
+   * Check whether a pane-relative point is inside the trade rectangle
+   *
+   * Process:
+   * 1. Validate chart/series and skip points in another pane
+   * 2. Convert trade times/prices to screen coordinates
+   * 3. Validate the coordinate conversion succeeded
+   * 4. Calculate rectangle bounds (left, right, top, bottom)
+   * 5. Add 2px tolerance buffer for easier interaction
+   * 6. Check if (x, y) is within the expanded bounds
+   *
+   * @param {number} x - X coordinate (pane pixels)
+   * @param {number} y - Y coordinate (pane pixels)
+   * @param {number} [paneIndex] - Pane the point is in; skipped when undefined
+   * @returns {boolean} True when the point is inside the rectangle
+   *
+   * @remarks
+   * - Returns false if chart/series not available or coordinate conversion fails
+   * - Silently catches and handles any conversion errors
+   */
+  containsPoint(x: number, y: number, paneIndex?: number): boolean {
+    // Step 1: Validate chart and series are available, and the pane matches
+    if (!this._chart || !this._series) {
+      return false;
+    }
+
     try {
+      if (
+        paneIndex !== undefined &&
+        typeof this._series.getPane === "function" &&
+        this._series.getPane().paneIndex() !== paneIndex
+      ) {
+        return false;
+      }
+
       // Step 2: Convert trade data coordinates to screen coordinates
       const timeScale = this._chart.timeScale();
       const x1 = timeScale.timeToCoordinate(this._data.time1);
@@ -723,7 +765,7 @@ export class TradeRectanglePrimitive implements ISeriesPrimitive {
 
       // Step 3: Validate coordinate conversion succeeded
       if (x1 === null || x2 === null || y1 === null || y2 === null) {
-        return null;
+        return false;
       }
 
       // Step 4: Calculate rectangle bounds using min/max
@@ -741,96 +783,56 @@ export class TradeRectanglePrimitive implements ISeriesPrimitive {
       const expandedTop = rectTop - tolerance;
       const expandedBottom = rectBottom + tolerance;
 
-      // Step 6: Check if mouse coordinates fall within expanded bounds
-      if (
+      // Step 6: Check if coordinates fall within expanded bounds
+      return (
         x >= expandedLeft &&
         x <= expandedRight &&
         y >= expandedTop &&
         y <= expandedBottom
-      ) {
-        // Hit detected - return hover item
-        return {
-          externalId: this._data.tradeId || "trade-rectangle",
-          zOrder: "normal",
-        };
-      }
-
-      // Step 7: No hit detected
-      return null;
+      );
     } catch {
       // Silently handle any errors during hit testing
-      return null;
+      return false;
     }
   }
 
   /**
-   * Handle crosshair move events for tooltip display
+   * Show this trade's tooltip at the cursor position
    *
-   * Called whenever the crosshair moves on the chart. Performs hit testing
-   * to determine if the crosshair is over this trade rectangle and requests/hides
-   * the tooltip accordingly via the TooltipManager.
+   * Called by the shared trade rectangle hover handler when the cursor is over
+   * this rectangle.
    *
-   * Process:
-   * 1. Validate tooltip is enabled and crosshair point is valid
-   * 2. Perform hit test with current crosshair position
-   * 3. If hit, request tooltip with content/style
-   * 4. If not hit, hide tooltip
-   *
-   * @private
-   * @param {any} param - Crosshair move event parameter with point property
-   *
-   * @remarks
-   * - Returns early if tooltips are disabled
-   * - Validates point coordinates are numbers before hit testing
-   * - Uses TooltipManager for decoupled tooltip display
-   * - Catches and logs hit test errors to prevent tooltip flickering
+   * @param {{ x: number; y: number }} position - Cursor position in pane pixels
    */
-  private handleCrosshairMove(param: any): void {
-    // Step 1: Check if tooltips are enabled
+  showTooltip(position: { x: number; y: number }): void {
     if (!this._tooltipOptions.enabled) {
       return;
     }
 
-    // Step 2: Validate crosshair point exists and has valid numeric coordinates
-    // param.point may be undefined if crosshair is off the chart
-    if (
-      !param.point ||
-      typeof param.point.x !== "number" ||
-      typeof param.point.y !== "number"
-    ) {
-      TooltipManager.getInstance().hideTooltip(this._primitiveId);
-      return;
-    }
-
     try {
-      // Step 3: Perform hit test with crosshair coordinates
-      const isHit = this.hitTest(param.point.x, param.point.y);
-
-      if (isHit) {
-        // Step 4a: Hit detected - request tooltip display
-        // Generate content and style, then send to TooltipManager
-        TooltipManager.getInstance().requestTooltip({
-          source: this._primitiveId,
-          priority: this._tooltipOptions.priority || 10,
-          content: this.createTooltipContent(),
-          style: this.createTooltipStyle(),
-          position: param.point,
-          cssClasses: ["trade-tooltip"],
-        });
-      } else {
-        // Step 4b: No hit - hide tooltip
-        TooltipManager.getInstance().hideTooltip(this._primitiveId);
-      }
+      TooltipManager.getInstance().requestTooltip({
+        source: this._primitiveId,
+        priority: this._tooltipOptions.priority || 10,
+        content: this.createTooltipContent(),
+        style: this.createTooltipStyle(),
+        position,
+        cssClasses: ["trade-tooltip"],
+      });
     } catch (error) {
-      // Step 5: Handle any errors during hit testing
-      // Log for debugging but don't show errors to prevent flickering
       logger.warn(
-        "Hit test error in crosshair handler",
+        "Failed to show trade rectangle tooltip",
         "TradeRectanglePrimitive",
         error,
       );
-      TooltipManager.getInstance().hideTooltip(this._primitiveId);
+      this.hideTooltip();
     }
+  }
+
+  /**
+   * Hide this trade's tooltip
+   */
+  hideTooltip(): void {
+    TooltipManager.getInstance().hideTooltip(this._primitiveId);
   }
 
   /**
@@ -842,7 +844,7 @@ export class TradeRectanglePrimitive implements ISeriesPrimitive {
    *
    * Event subscriptions:
    * - Time scale changes (for coordinate re-calculation on pan/zoom)
-   * - Crosshair moves (for tooltip display on hover)
+   * - Shared per-chart hover handler (for tooltip display on hover)
    *
    * @param {{ chart: IChartApi; series: ISeriesApi<any>; requestUpdate: () => void }} params
    *   - chart: Chart API reference
@@ -881,29 +883,12 @@ export class TradeRectanglePrimitive implements ISeriesPrimitive {
         this._requestUpdate?.();
       };
 
-      // Step 3b: Create crosshair move callback
-      // This handles both tooltip display and coordinate updates
-      this._crosshairCallback = (param: any) => {
-        // Handle tooltip display on hover
-        this.handleCrosshairMove(param);
-
-        // Throttle coordinate updates to prevent performance issues
-        // Crosshair moves frequently, so we limit updates to 10fps
-        if (!this._updateThrottled) {
-          this._updateThrottled = true;
-          setTimeout(() => {
-            this._updateThrottled = false;
-            this._requestUpdate?.();
-          }, 100); // 100ms = 10fps throttle
-        }
-      };
-
-      // Step 3c: Subscribe to chart events
+      // Step 3b: Subscribe to chart events
       // Store callbacks for cleanup in detached()
       chart
         .timeScale()
         .subscribeVisibleTimeRangeChange(this._timeScaleCallback);
-      chart.subscribeCrosshairMove(this._crosshairCallback);
+      registerTradeRectangleHover(chart, this);
     } catch (error) {
       logger.error(
         "Failed to attach trade rectangle primitive",
@@ -952,11 +937,10 @@ export class TradeRectanglePrimitive implements ISeriesPrimitive {
       }
     }
 
-    // Step 3: Unsubscribe from crosshair events (hover)
-    if (this._chart && this._crosshairCallback) {
+    // Step 3: Leave the shared hover handler (hover tooltips)
+    if (this._chart) {
       try {
-        this._chart.unsubscribeCrosshairMove(this._crosshairCallback);
-        this._crosshairCallback = null;
+        unregisterTradeRectangleHover(this._chart, this);
       } catch (error) {
         // Log error but continue cleanup
         logger.error(
@@ -972,7 +956,6 @@ export class TradeRectanglePrimitive implements ISeriesPrimitive {
     this._chart = null;
     this._series = null;
     this._requestUpdate = undefined;
-    this._updateThrottled = false;
   }
 
   /**

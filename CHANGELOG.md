@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+Targets 0.2.0 (minor bump: the lightweight-charts peer dependency now requires 5.3).
+
+### Changed
+- **BREAKING: `lightweight-charts` peer dependency is now `^5.3.0`** (was `^5.0.0`).
+  The trade rectangle hover handling reads `MouseEventParams.hoveredInfo`, added in 5.3.
+- **Trade rectangle tooltips share one crosshair subscription per chart** instead of one
+  per rectangle. The rectangle reported in `hoveredInfo` is used when present; otherwise
+  the rectangles' own bounds are checked, so tooltips still appear when another series
+  drawn above the trade's series is under the cursor. Bounds checks are limited to the
+  hovered pane.
+- **Trade rectangles no longer request a redraw on every crosshair move** (the 100 ms
+  throttled `requestUpdate`); the chart already redraws primitives when needed.
+- `TradeRectanglePrimitive.hitTest` reports `externalId` as the trade id as before, but
+  falls back to the primitive's unique id instead of the shared `"trade-rectangle"`.
+
 ## [0.1.0] - 2025-12-06
 
 ### 🎉 Initial Release - Production Ready
