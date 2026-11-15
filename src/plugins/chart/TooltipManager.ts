@@ -353,10 +353,18 @@ export class TooltipManager {
     }
 
     // Step 4: Show or refresh the highest-priority tooltip.
-    // Same-source updates must still run so position/content track the cursor
-    // while hovering inside one trade rectangle.
+    // Same source + same content: only move the existing tooltip (avoids opacity flicker).
+    // Content or source change: full show().
     if (highestPriority) {
-      this.showTooltip(highestPriority);
+      const sameSource = highestPriority.source === this.currentTooltip?.source;
+      const sameContent =
+        sameSource && highestPriority.content === this.currentTooltip?.content;
+      if (sameContent && this.renderer) {
+        this.currentTooltip = highestPriority;
+        this.renderer.updatePosition(highestPriority.position);
+      } else {
+        this.showTooltip(highestPriority);
+      }
     }
   }
 

@@ -179,9 +179,14 @@ export class TooltipPlugin {
         this.tooltipElement.className = "lw-tooltip";
       }
 
-      // Step 6: Make visible (but transparent) to measure dimensions
+      // Step 6: Make visible. Skip opacity flicker when already shown (e.g. content refresh).
+      const alreadyVisible =
+        this.tooltipElement.style.display === "block" &&
+        this.tooltipElement.style.opacity === "1";
       this.tooltipElement.style.display = "block";
-      this.tooltipElement.style.opacity = "0";
+      if (!alreadyVisible) {
+        this.tooltipElement.style.opacity = "0";
+      }
 
       // Step 7: Force browser layout to get accurate dimensions
       void this.tooltipElement.offsetHeight;
@@ -189,7 +194,10 @@ export class TooltipPlugin {
       // Step 8: Calculate and apply optimal position
       this.position(position);
 
-      // Step 9: Fade in with RAF for smooth transition
+      // Step 9: Fade in with RAF for smooth transition (only when newly shown)
+      if (alreadyVisible) {
+        return;
+      }
       requestAnimationFrame(() => {
         if (this.tooltipElement) {
           this.tooltipElement.style.opacity = "1";
