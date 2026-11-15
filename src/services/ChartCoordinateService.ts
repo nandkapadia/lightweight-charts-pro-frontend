@@ -359,7 +359,8 @@ export class ChartCoordinateService {
       if (
         !paneSize ||
         typeof paneSize.height !== "number" ||
-        typeof paneSize.width !== "number"
+        typeof paneSize.width !== "number" ||
+        (paneSize.height <= 0 && paneSize.width <= 0)
       ) {
         return null;
       }
@@ -369,7 +370,15 @@ export class ChartCoordinateService {
       for (let i = 0; i < paneId; i++) {
         try {
           const size = chart.paneSize(i);
-          if (size && typeof size.height === "number") {
+          if (
+            size &&
+            typeof size.height === "number" &&
+            !(
+              size.height <= 0 &&
+              typeof size.width === "number" &&
+              size.width <= 0
+            )
+          ) {
             offsetY += size.height;
           }
         } catch {
@@ -411,7 +420,8 @@ export class ChartCoordinateService {
       if (
         !paneSize ||
         typeof paneSize.height !== "number" ||
-        typeof paneSize.width !== "number"
+        typeof paneSize.width !== "number" ||
+        (paneSize.height <= 0 && paneSize.width <= 0)
       ) {
         return null;
       }
@@ -421,7 +431,15 @@ export class ChartCoordinateService {
       for (let i = 0; i < paneId; i++) {
         try {
           const size = chart.paneSize(i);
-          if (size && typeof size.height === "number") {
+          if (
+            size &&
+            typeof size.height === "number" &&
+            !(
+              size.height <= 0 &&
+              typeof size.width === "number" &&
+              size.width <= 0
+            )
+          ) {
             offsetY += size.height;
           }
         } catch {
@@ -1003,12 +1021,19 @@ export class ChartCoordinateService {
 
       // Helper function to count total number of panes
       const getTotalPaneCount = (): number => {
+        const maxPanes = 10;
         let paneCount = 0;
         try {
-          // Keep trying to get pane sizes until we find a non-existent pane
-          while (true) {
+          // Bound the loop: mocks may return {width:0,height:0} forever, and
+          // real LWC throws once the pane index is out of range.
+          while (paneCount < maxPanes) {
             const paneSize = chart.paneSize(paneCount);
-            if (!paneSize || typeof paneSize.height !== "number") {
+            if (
+              !paneSize ||
+              typeof paneSize.height !== "number" ||
+              typeof paneSize.width !== "number" ||
+              (paneSize.height <= 0 && paneSize.width <= 0)
+            ) {
               break;
             }
             paneCount++;

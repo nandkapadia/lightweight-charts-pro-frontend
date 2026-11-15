@@ -149,6 +149,12 @@ export class TooltipPlugin {
     cssClasses?: string[],
   ): void {
     try {
+      // Cancel any pending hide so re-entry within the hide delay stays visible
+      if (this._hideTimeoutId !== null) {
+        clearTimeout(this._hideTimeoutId);
+        this._hideTimeoutId = null;
+      }
+
       // Step 1: Ensure tooltip element exists (lazy creation)
       if (!this.tooltipElement) {
         this.ensureTooltipElement();

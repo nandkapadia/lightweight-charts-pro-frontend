@@ -352,12 +352,10 @@ export class TooltipManager {
       }
     }
 
-    // Step 4: Update display if highest priority differs from current
-    // Prevents unnecessary DOM updates
-    if (
-      highestPriority &&
-      highestPriority.source !== this.currentTooltip?.source
-    ) {
+    // Step 4: Show or refresh the highest-priority tooltip.
+    // Same-source updates must still run so position/content track the cursor
+    // while hovering inside one trade rectangle.
+    if (highestPriority) {
       this.showTooltip(highestPriority);
     }
   }

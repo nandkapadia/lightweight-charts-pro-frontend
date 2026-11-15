@@ -92,9 +92,11 @@ class TradeRectangleHoverController {
     const info = param.hoveredInfo;
     if (info?.objectKind === "primitive" && info.objectId !== undefined) {
       const matches = targets.filter((t) => t.getHoverId() === info.objectId);
-      const match = matches.length === 1 ? matches[0] : matches.find(contains);
-      if (match) {
-        return match;
+      // Always require contains() (bounds + pane). Prefer top-most (reverse).
+      for (let i = matches.length - 1; i >= 0; i--) {
+        if (contains(matches[i])) {
+          return matches[i];
+        }
       }
     }
 
