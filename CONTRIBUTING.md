@@ -257,7 +257,7 @@ Use one of the following scopes:
 1. **Update from upstream**
    ```bash
    git fetch upstream
-   git rebase upstream/master
+   git rebase upstream/main
    ```
 
 2. **Run all checks**
@@ -370,7 +370,7 @@ npm run docs:serve  # Serves docs at http://localhost:8080
 ```
 
 **CI/CD Documentation:**
-- Documentation is automatically generated and deployed to GitHub Pages on every push to `master`
+- Documentation is automatically generated and deployed to GitHub Pages on every push to `main`
 - View live docs at: https://nandkapadia.github.io/lightweight-charts-pro-frontend/
 
 ### JSDoc Requirements

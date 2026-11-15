@@ -6,7 +6,7 @@ This directory contains GitHub Actions workflows for automated testing, document
 
 ### CI/CD (`ci.yml`)
 
-This workflow runs on every push and pull request to `master` and `dev` branches.
+This workflow runs on every push and pull request to `main` and `dev` branches.
 
 **Jobs:**
 
@@ -16,7 +16,7 @@ This workflow runs on every push and pull request to `master` and `dev` branches
    - Unit tests
    - Package build verification
 
-2. **Generate & Deploy Documentation** (runs only on `master` branch)
+2. **Generate & Deploy Documentation** (runs only on `main` branch)
    - Generates TypeDoc documentation
    - Uploads documentation as artifact (90-day retention)
    - Deploys to GitHub Pages at `https://[username].github.io/[repo]/`
@@ -53,7 +53,7 @@ This workflow runs on every push and pull request to `master` and `dev` branches
 
 ## Documentation
 
-Documentation is automatically generated and deployed when pushing to `master` branch.
+Documentation is automatically generated and deployed when pushing to `main` branch.
 
 **Manual generation:**
 ```bash
